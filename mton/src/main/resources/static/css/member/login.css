@@ -1,0 +1,159 @@
+:root {
+    --bg-light: #F1EFEC;
+    --bg-mid: #D4C9BE;
+    --main-dark: #123458;
+    --black: #030303;
+}
+
+@font-face {
+    font-family: 'S-CoreDream-3Light';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body,
+html {
+    font-family: 'S-CoreDream-3Light';
+    height: 100%;
+    background: url('/img/login_bg.jpg') no-repeat center center/cover;
+    /* font-family: 'Pretendard', sans-serif; */
+    position: relative;
+}
+
+.overlay {
+    background: rgba(15, 18, 26, 0.6);
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    top: 0;
+    left: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-direction: column;
+}
+
+.logo-text {
+    margin-bottom: 10px;
+}
+
+.login-box {
+    background-color: rgba(33, 42, 62, 0.75);
+    border: 1px solid #D4C9BE;
+    padding: 40px 40px 50px 40px;
+    border-radius: 12px;
+    width: 400px;
+    text-align: center;
+    color: var(--bg-light);
+}
+
+.login-box h2 {
+    font-size: 1.5rem;
+    margin-bottom: 25px;
+    color: var(--bg-light);
+}
+
+.login-box input[type="text"],
+.login-box input[type="password"] {
+    width: 100%;
+    /* padding: 12px 8px; */
+    margin: 10px 0;
+    border: none;
+    border-radius: 5px;
+    background-color: rgba(255, 255, 255, 0.9);
+    color: var(--black);
+    font-size: 1rem;
+}
+
+.login-options {
+    display: flex;
+    justify-content: space-between;
+    font-size: 0.9rem;
+    margin: 10px 0 20px;
+}
+
+.login-options label {
+    color: var(--bg-light);
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.login-box button {
+    /* width: 100%; */
+    padding: 10px;
+    background-color: #D4C9BE;
+    color: #123458;
+    font-weight: bold;
+    border: none;
+    border-radius: 5px;
+    font-size: 1.1rem;
+    cursor: pointer;
+    margin-top: 10px;
+    transition: background 0.3s;
+}
+
+.login-box button:hover {
+    background-color: #F1EFEC;
+    color: #123458;
+}
+
+.sub-links {
+    align-items: center;
+    margin-top: 15px;
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    font-size: 0.85rem;
+}
+
+.sub-links a {
+    color: var(--bg-light);
+    text-decoration: none;
+    margin: 4px 0;
+}
+
+/* 로고 css start */
+@font-face {
+    font-family: 'establishRetrosansOTF';
+    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2112@1.0/establishRetrosansOTF.woff') format('woff');
+    font-weight: normal;
+    font-style: normal;
+}
+
+
+.bi-box {
+    background-color: #d4c9be;
+    color: #F1F6F9;
+}
+
+.logo {
+    color: #F1F6F9;
+    font-family: 'establishRetrosansOTF';
+    letter-spacing: 1.3px;
+}
+
+.logo-on {
+    color: #d4c9be;
+}
+
+.large-logo {
+    font-size: 4rem;
+}
+/* 로고 css end */
+
+#loginForm {
+    width: 90%;
+}
+
+.dot-mark {
+    text-emphasis: filled;
+    /* position: relative; */
+}
