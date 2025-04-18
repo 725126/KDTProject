@@ -1,10 +1,3 @@
-:root {
-    --bg-light: #F1EFEC;
-    --bg-mid: #D4C9BE;
-    --main-dark: #123458;
-    --black: #030303;
-}
-
 @font-face {
     font-family: 'S-CoreDream-3Light';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
@@ -12,115 +5,6 @@
     font-style: normal;
 }
 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
-
-body,
-html {
-    font-family: 'S-CoreDream-3Light';
-    height: 100%;
-    background: url('/img/login_bg.jpg') no-repeat center center/cover;
-    /* font-family: 'Pretendard', sans-serif; */
-    position: relative;
-}
-
-.overlay {
-    background: rgba(15, 18, 26, 0.6);
-    position: absolute;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    flex-direction: column;
-}
-
-.logo-text {
-    margin-bottom: 10px;
-}
-
-.login-box {
-    background-color: rgba(33, 42, 62, 0.75);
-    border: 1px solid #D4C9BE;
-    padding: 40px 40px 50px 40px;
-    border-radius: 12px;
-    width: 400px;
-    text-align: center;
-    color: var(--bg-light);
-}
-
-.login-box h2 {
-    font-size: 1.5rem;
-    margin-bottom: 25px;
-    color: var(--bg-light);
-}
-
-.login-box input[type="text"],
-.login-box input[type="password"] {
-    width: 100%;
-    /* padding: 12px 8px; */
-    margin: 10px 0;
-    border: none;
-    border-radius: 5px;
-    background-color: rgba(255, 255, 255, 0.9);
-    color: var(--black);
-    font-size: 1rem;
-}
-
-.login-options {
-    display: flex;
-    justify-content: space-between;
-    font-size: 0.9rem;
-    margin: 10px 0 20px;
-}
-
-.login-options label {
-    color: var(--bg-light);
-    display: flex;
-    align-items: center;
-    gap: 5px;
-}
-
-.login-box button {
-    /* width: 100%; */
-    padding: 10px;
-    background-color: #D4C9BE;
-    color: #123458;
-    font-weight: bold;
-    border: none;
-    border-radius: 5px;
-    font-size: 1.1rem;
-    cursor: pointer;
-    margin-top: 10px;
-    transition: background 0.3s;
-}
-
-.login-box button:hover {
-    background-color: #F1EFEC;
-    color: #123458;
-}
-
-.sub-links {
-    align-items: center;
-    margin-top: 15px;
-    display: flex;
-    justify-content: space-between;
-    flex-wrap: wrap;
-    font-size: 0.85rem;
-}
-
-.sub-links a {
-    color: var(--bg-light);
-    text-decoration: none;
-    margin: 4px 0;
-}
-
-/* 로고 css start */
 @font-face {
     font-family: 'establishRetrosansOTF';
     src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2112@1.0/establishRetrosansOTF.woff') format('woff');
@@ -128,32 +12,195 @@ html {
     font-style: normal;
 }
 
+body {
+     /*background-color: #FBFBFB;*/
+    padding-top: 72px;
+    font-family: 'S-CoreDream-3Light';
+}
+
+/* 헤더 스타일 */
+.navbar {
+    height: 64px;
+    background-color: #ffffff;
+    /* border-bottom: 1px solid #eaedf4; */
+}
+
+.navbar-brand {
+    color: #1A73E8 !important;
+    font-size: 1.8rem;
+    letter-spacing: 4px;
+    padding-bottom: 0px !important;
+}
+
 
 .bi-box {
     background-color: #d4c9be;
-    color: #F1F6F9;
+    color: #123458;
 }
 
 .logo {
-    color: #F1F6F9;
+    color: #123458;
     font-family: 'establishRetrosansOTF';
-    letter-spacing: 1.3px;
+    letter-spacing: 1.2px;
 }
 
 .logo-on {
     color: #d4c9be;
 }
 
-.large-logo {
-    font-size: 4rem;
+.nav-link {
+    color: #555 !important;
+    font-size: 0.95rem;
+    margin-left: 1rem;
 }
-/* 로고 css end */
+
+.nav-link:hover {
+    color: #1A73E8 !important;
+}
+
+.login-wrapper {
+    min-height: calc(100vh - 72px);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 2rem;
+}
+
+.login-card {
+    display: flex;
+    width: 100%;
+    max-width: 900px;
+    background: white;
+    border-radius: 1rem;
+    border: 1px solid #BCCCDC;
+    overflow: hidden;
+}
+
+.login-card .form-control {
+    border-color: #dadada;
+}
+
+.login-left {
+    background-color: #F1F6F9;
+    flex: 1;
+    padding: 3rem;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+.login-left h2 {
+    color: #1A73E8;
+    margin-bottom: 1rem;
+    font-weight: bold;
+}
+
+.login-left p {
+    font-size: 1.1rem;
+    color: #333;
+    text-align: center;
+}
+
+.login-left .illustration {
+    /* margin-top: 2rem; */
+    width: 200px;
+}
+
+.login-right {
+    flex: 1;
+    padding: 3rem;
+}
+
+.btn-primary {
+    background-color: #1A73E8;
+    border-color: #1A73E8;
+}
+
+.btn-primary:hover {
+    background-color: #0f5ec6;
+    border-color: #0f5ec6;
+}
+
+.link-plain {
+    color: #212529;
+    text-decoration: none;
+    margin: 0 5px;
+    font-size: 0.9rem;
+}
+
+.link-plain:hover {
+    color: #212529;
+    text-decoration: underline;
+}
+
+.vertical-bar {
+    color: #b4c0d3;
+}
+
+.toast-msg {
+    margin-top: 100px;
+}
+
+.logo-img {
+    width: 170px;
+    height: auto;
+    /* object-fit: contain; */
+}
+
+.logo-middle {
+    width: 250px;
+}
+
+.join-btn {
+    /* background-color: transparent;
+    border: 1px solid #213555;
+    color: #213555; */
+    padding: 10px 15px 12px;
+    width: 100%;
+    font-size: 1.1rem;
+}
+
+.btn-outline-primary {
+    --bs-btn-color: #213555;
+    --bs-btn-border-color: #213555;
+    --bs-btn-hover-color: #fff;
+    --bs-btn-hover-bg: #213555;
+    --bs-btn-hover-border-color: #213555;
+    --bs-btn-focus-shadow-rgb: 13, 110, 253;
+    --bs-btn-active-color: #fff;
+    --bs-btn-active-bg: #213555;
+    --bs-btn-active-border-color: #213555;
+    --bs-btn-active-shadow: inset 0 3px 5px rgba(0, 0, 0, 0.125);
+    --bs-btn-disabled-color: #213555;
+    --bs-btn-disabled-bg: transparent;
+    --bs-btn-disabled-border-color: #213555;
+    --bs-gradient: none;
+}
+
+/* .join-btn:hover {
+    border: 1px solid #948979;
+    color: #948979;
+} */
+
+.text-main-color {
+    color: #213555;
+}
+
+.login-btn {
+    background-color: #213555;
+    color: #fff;
+}
+
+.login-btn:hover {
+    background-color: #9BA4B5;
+    color: #fff;
+}
 
 #loginForm {
     width: 90%;
 }
 
-.dot-mark {
-    text-emphasis: filled;
-    /* position: relative; */
+.large-logo {
+    font-size: 3rem;
 }
