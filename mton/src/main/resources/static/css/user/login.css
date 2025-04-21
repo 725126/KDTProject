@@ -1,61 +1,6 @@
-@font-face {
-    font-family: 'S-CoreDream-3Light';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_six@1.2/S-CoreDream-3Light.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
-@font-face {
-    font-family: 'establishRetrosansOTF';
-    src: url('https://fastly.jsdelivr.net/gh/projectnoonnu/noonfonts_2112@1.0/establishRetrosansOTF.woff') format('woff');
-    font-weight: normal;
-    font-style: normal;
-}
-
 body {
      /*background-color: #FBFBFB;*/
     padding-top: 72px;
-    font-family: 'S-CoreDream-3Light';
-}
-
-/* 헤더 스타일 */
-.navbar {
-    height: 64px;
-    background-color: #ffffff;
-    /* border-bottom: 1px solid #eaedf4; */
-}
-
-.navbar-brand {
-    color: #1A73E8 !important;
-    font-size: 1.8rem;
-    letter-spacing: 4px;
-    padding-bottom: 0px !important;
-}
-
-
-.bi-box {
-    background-color: #d4c9be;
-    color: #123458;
-}
-
-.logo {
-    color: #123458;
-    font-family: 'establishRetrosansOTF';
-    letter-spacing: 1.2px;
-}
-
-.logo-on {
-    color: #d4c9be;
-}
-
-.nav-link {
-    color: #555 !important;
-    font-size: 0.95rem;
-    margin-left: 1rem;
-}
-
-.nav-link:hover {
-    color: #1A73E8 !important;
 }
 
 .login-wrapper {

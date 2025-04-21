@@ -1,14 +1,14 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
-      layout:decorate="~{layout/basic.html}">
+      layout:decorate="~{layout/home-basic.html}">
 <head>
     <meta charset="UTF-8">
-    <title>자재ON - 메인(내부)</title>
-    <link rel="stylesheet" th:href="@{/css/member/main.css}">
+    <title>자재ON - 홈(내부)</title>
+    <link rel="stylesheet" th:href="@{/css/user/home.css}">
 </head>
 <body>
-<th:block layout:fragment="main">
+<th:block layout:fragment="internal-home">
     <div class="alert-box bg-white danger-notice p-3 mb-4 rounded-3 d-flex align-items-center">
         <i class="bi bi-exclamation-triangle-fill me-3 text-warning fs-4"></i>
         <div class="flex-grow-1">
@@ -21,7 +21,6 @@
     </div>
 
     <!-- 모달창 -->
-    <!-- 모달 -->
     <div class="modal fade" id="alertDetailModal" tabindex="-1" aria-labelledby="alertDetailModalLabel"
          aria-hidden="true">
         <div class="modal-dialog modal-dialog-centered modal-lg">
@@ -276,7 +275,7 @@
             </div>
         </div>
     </div>
-    <script th:src="@{/js/member/main.js}"></script>
+    <script th:src="@{/js/member/internal-home.js}"></script>
 </th:block>
 </body>
 </html>
