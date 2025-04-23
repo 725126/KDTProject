@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
-      layout:decorate="~{layout/home-basic.html}">
+      layout:decorate="~{layout/basic/home.html}">
 <head>
     <meta charset="UTF-8">
     <title>자재ON - 홈(내부)</title>
-    <link rel="stylesheet" th:href="@{/css/user/home.css}">
+    <link rel="stylesheet" th:href="@{/css/page/user/home.css}">
 </head>
 <body>
 <th:block layout:fragment="internal-home">
@@ -275,7 +275,7 @@
             </div>
         </div>
     </div>
-    <script th:src="@{/js/member/internal-home.js}"></script>
+    <script th:src="@{/js/page/user/internal-home.js}"></script>
 </th:block>
 </body>
 </html>

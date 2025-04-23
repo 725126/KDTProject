@@ -1,0 +1,89 @@
+body {
+    background-color: #FBFBFB;
+}
+
+.sidebar {
+    min-height: 100vh;
+}
+
+.sidebar .nav-link.active {
+    background-color: rgb(243 244 246 / var(--tw-bg-opacity, 1));
+}
+
+.profile-img {
+    width: 60px;
+    height: 60px;
+    background-color: #adb5bd;
+}
+
+
+/* 프로필 이미지 css start */
+.profile-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* margin-left: 35px; */
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    /* border: 2px solid #ccd0d6 !important; */
+    /* 동그랗게 */
+    font-size: 1.8rem;
+    /* 아이콘 크기 */
+    background-color: #EFB036 !important;
+    /* 배경색 (light) */
+    color: #fff !important;
+    /* 텍스트/아이콘 색상 */
+
+}
+/* 구매 EFB036 생산 3B6790 협력업체 4C7B8B */
+
+.department-name {
+    color: #747264;
+    font-weight: bold;
+}
+
+
+.my-tog {
+    color: #ccd0d6;
+    font-size: 0.7rem;
+}
+
+.no-bootstrap-style {
+    padding: 5px !important;
+    margin-left: 30px !important;
+    all: unset;
+}
+
+.no-bootstrap-style:hover {
+    border-radius: 20px !important;
+    background: #f4f6fa !important;
+}
+
+.container {
+    padding-top: 4rem;
+}
+
+/* 프로필 css start */
+.edit-profile-icon {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    /* margin-left: 35px; */
+    width: 64px;
+    height: 64px;
+    border-radius: 50%;
+    /* 동그랗게 */
+    font-size: 25px;
+    /* 아이콘 크기 */
+    background-color: #3B6790 !important;
+    /* 배경색 (light) */
+    color: #fff !important;
+    /* 텍스트/아이콘 색상 */
+}
+
+.my-nav-link {
+    margin-left: 0 !important;
+    font-size: 1.1rem !important;
+}
+

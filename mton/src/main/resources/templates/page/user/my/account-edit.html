@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/my-default.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 마이페이지 > 회원 정보 수정</title>
+    <link rel="stylesheet" th:href="@{/css/page/user/account-edit.css}">
+</head>
+<body>
+
+<th:block layout:fragment="account-edit">
+    <div class="scale-wrapper min-h-screen scale-100 w-100">
+        <div class="tab-container rounded border">
+            <!-- Bootstrap 탭 버튼 -->
+            <ul class="nav nav-pills nav-fill border-bottom pt-3" id="myTab" role="tablist">
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link tab-nav-link active pb-3 fs-5" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1"
+                            type="button" role="tab" aria-controls="tab1" aria-selected="true">회원 정보</button>
+                </li>
+                <li class="nav-item" role="presentation">
+                    <button class="nav-link tab-nav-link pb-3 fs-5" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button"
+                            role="tab" aria-controls="tab2" aria-selected="false">보안 설정</button>
+                </li>
+            </ul>
+
+            <!-- 탭 콘텐츠 -->
+            <div class="tab-content">
+                <div class="tab-pane fade show active mx-auto" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+
+
+                    <div class="mb-3">
+                        <label for="name" class="form-label">이름</label>
+                        <input type="text" class="form-control" id="name" value="홍길동" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="email" class="form-label">이메일(아이디)</label>
+                        <div class="input-group">
+                            <input type="email" class="form-control" id="email" value="gil@example.com"
+                                   placeholder="example@email.com" />
+                            <button class="btn btn-outline-primary" type="button" id="checkDuplicateBtn">중복확인</button>
+                        </div>
+                    </div>
+                    <div class="mb-3">
+                        <label for="phone" class="form-label">연락처</label>
+                        <input type="tel" class="form-control" id="phone" placeholder="010-1234-5678" />
+                    </div>
+                    <button class="btn edit-btn w-100 mt-3 py-3 px-5 fs-5">정보 수정</button>
+                </div>
+
+                <div class="tab-pane fade mx-auto" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
+                    <div class="mb-3">
+                        <label for="currentPassword" class="form-label">현재 비밀번호</label>
+                        <input type="password" class="form-control" id="currentPassword" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="newPassword" class="form-label">새 비밀번호</label>
+                        <input type="password" class="form-control" id="newPassword" />
+                    </div>
+                    <div class="mb-3">
+                        <label for="confirmPassword" class="form-label">비밀번호 확인</label>
+                        <input type="password" class="form-control" id="confirmPassword" />
+                    </div>
+                    <button class="btn edit-btn w-100 mt-3 py-3 px-5 fs-5">비밀번호 변경</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

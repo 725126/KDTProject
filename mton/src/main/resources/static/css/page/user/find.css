@@ -12,7 +12,7 @@ body {
     border-radius: 2rem;
     /* box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1); */
     padding: 2rem;
-    max-width: 400px;
+    max-width: 500px;
     width: 100%;
 }
 
@@ -32,8 +32,8 @@ body {
 }
 
 .icon-circle {
-    width: 60px;
-    height: 60px;
+    width: 100px;
+    height: 100px;
     background-color: #DDE6ED;
     /* background-color: #F1F6F9; */
     color: #394867;
@@ -49,4 +49,24 @@ body {
 .form-text {
     font-size: 0.9rem;
     color: #6c757d;
+}
+
+form {
+    margin: 0 auto;
+    width: 80%;
+}
+
+/*.verify-btn {*/
+/*    background-color: #526D82;*/
+/*}*/
+
+/*.verify-btn:hover {*/
+/*    background-color: #27374D;*/
+/*}*/
+
+.resend-link {
+    font-size: 0.875rem;
+    margin-top: 1rem;
+    color: #6c757d;
+    text-align: right;
 }

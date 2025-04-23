@@ -1,0 +1,23 @@
+<th:block th:fragment="paginationFragment">
+    <!-- 페이지네이션 CSS -->
+    <link rel="stylesheet" th:href="@{/css/fragment/pagination.css}">
+
+    <!-- 페이지네이션 start -->
+    <div class="pagination-box">
+        <div class="pagination-container">
+            <button class="nav-btn" id="prevBtn"><i class="bi bi-chevron-left"></i></button>
+            <div class="pagination" id="pagination"></div>
+            <button class="nav-btn" id="nextBtn"><i class="bi bi-chevron-right"></i></button>
+
+            <div class="goto-page">
+                페이지 이동:
+                <select id="gotoSelect"></select>
+                <button id="goBtn">GO</button>
+            </div>
+        </div>
+    </div>
+    <!-- 페이지네이션 end -->
+
+    <!-- 페이지네이션 JS -->
+    <script th:src="@{/js/fragment/pagination.js}"></script>
+</th:block>

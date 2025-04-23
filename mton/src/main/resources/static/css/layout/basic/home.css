@@ -293,7 +293,49 @@ body {
     font-weight: normal;
     font-style: normal;
 }
-
 .manu-span {
     font-family: 'GongGothicMedium';
 }
+
+/* 툴팁 css start */
+.tooltip-wrapper {
+    position: relative;
+    display: inline-block;
+    cursor: pointer;
+}
+
+.tooltip-wrapper .tooltip-bubble {
+    position: absolute;
+    top: 50%;
+    left: 100%;
+    transform: translateY(-50%) translateX(16px);
+    background-color: #333;
+    color: #fff;
+    padding: 10px 14px;
+    border-radius: 8px;
+    white-space: nowrap;
+    font-size: 14px;
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s;
+    z-index: 9999;
+}
+
+.tooltip-wrapper .tooltip-bubble::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    right: 100%;
+    transform: translateY(-50%);
+    width: 0;
+    height: 0;
+    border-top: 8px solid transparent;
+    border-bottom: 8px solid transparent;
+    border-right: 8px solid #333;
+}
+
+.tooltip-wrapper:hover .tooltip-bubble {
+    opacity: 1;
+    pointer-events: auto;
+}
+/* 툴팁 css end */

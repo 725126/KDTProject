@@ -8,3 +8,4 @@ toggler.addEventListener('click', () => {
     toggleIcon.classList.toggle('bi-chevron-left');
     toggleIcon.classList.toggle('bi-chevron-right');
 });
+

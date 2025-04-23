@@ -1,16 +1,15 @@
 <!DOCTYPE html>
 <html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
       xmlns:th="http://www.thymeleaf.org"
-      layout:decorate="~{layout/my-basic.html}">
+      layout:decorate="~{layout/basic/my-admin.html}">
 <head>
     <meta charset="UTF-8">
-    <title>자재ON - 마이페이지(관리자)</title>
-    <link rel="stylesheet" th:href="@{/css/user/join-list.css}">
-    <link rel="stylesheet" th:href="@{/css/layout/pagination.css}">
+    <title>자재ON - 마이페이지(관리자) > 가입 요청</title>
+    <link rel="stylesheet" th:href="@{/css/page/user/join-list.css}">
 </head>
 <body>
 
-<th:block layout:fragment="my-admin">
+<th:block layout:fragment="join-list">
 
     <!-- 필터 start -->
     <div class="filter-bar d-flex flex-wrap gap-3 align-items-center p-3 mb-4">
@@ -428,23 +427,8 @@
 
     </div>
 
-    <!-- 페이지네이션 start -->
-    <div class="pagination-box">
-        <div class="pagination-container">
-            <button class="nav-btn" id="prevBtn"><i class="bi bi-chevron-left"></i></button>
-            <div class="pagination" id="pagination"></div>
-            <button class="nav-btn" id="nextBtn"><i class="bi bi-chevron-right"></i></button>
-
-            <div class="goto-page">
-                페이지 이동:
-                <select id="gotoSelect"></select>
-                <button id="goBtn">GO</button>
-            </div>
-        </div>
-    </div>
-    <!-- 페이지네이션 end -->
-
-    <script th:src="@{/js/pagination.js}"></script>
+    <!-- 페이지네이션 -->
+    <th:block th:replace="fragment/pagination :: paginationFragment"></th:block>
 </th:block>
 
 </body>

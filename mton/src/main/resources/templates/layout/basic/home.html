@@ -9,7 +9,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <title>자재 관리의 시작, 자재ON</title>
-    <link rel="stylesheet" th:href="@{/css/layout/home-basic.css}">
+    <link rel="stylesheet" th:href="@{/css/layout/basic/home.css}">
 </head>
 <body>
 
@@ -128,6 +128,7 @@
                 </div>
                 <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
+
             <div class="collapse" id="planSubmenu">
                 <ul class="nav flex-column ms-4">
                     <li><a class="nav-link" href="#">월간 계획</a></li>
@@ -201,7 +202,7 @@
 </div>
 <!-- 메인 end -->
 
-<script th:src="@{/js/home-basic.js}"></script>
+<script th:src="@{/js/layout/basic/home.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.9/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.9/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

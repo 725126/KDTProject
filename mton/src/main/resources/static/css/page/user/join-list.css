@@ -1,6 +1,10 @@
 /* 회원가입 승인 요청 카드 css start */
 /* 구매 EFB036 생산 3B6790 협력업체 4C7B8B */
 
+.main-content {
+    padding: 2rem;
+}
+
 .card {
     border-radius: 1rem;
     transition: transform 0.2s ease;

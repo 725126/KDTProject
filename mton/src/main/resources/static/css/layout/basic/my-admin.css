@@ -1,5 +1,5 @@
 body {
-    background-color: #f8f9fa;
+    background-color: #FBFBFB;
     font-family: 'S-CoreDream-3Light';
 }
 
@@ -23,7 +23,7 @@ body {
 }
 
 .main-content {
-    padding: 2rem;
+    /*padding: 2rem;*/
 }
 
 .card {
@@ -290,10 +290,10 @@ body {
     background-color: #f1f3f5;
 }
 
-.btn-outline-primary {
-    border-color: #3182f6;
-    color: #3182f6;
-}
+/*.btn-outline-primary {*/
+/*    border-color: #3182f6;*/
+/*    color: #3182f6;*/
+/*}*/
 
 .btn-outline-primary:hover {
     background-color: #3182f6;

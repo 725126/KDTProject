@@ -1,7 +1,8 @@
 <th:block th:fragment="headerFragment">
-    <link rel="stylesheet" th:href="@{/css/layout/header.css}">
+    <!-- 헤더 CSS -->
+    <link rel="stylesheet" th:href="@{/css/fragment/header.css}">
 
-    <!-- 헤더 -->
+    <!-- 헤더 start -->
     <nav class="navbar fixed-top navbar-expand-lg border-bottom">
         <div class="container-fluid px-5">
             <a class="navbar-brand d-flex align-items-center" href="/intro">
@@ -16,4 +17,5 @@
             </div>
         </div>
     </nav>
+    <!-- 헤더 end -->
 </th:block>
