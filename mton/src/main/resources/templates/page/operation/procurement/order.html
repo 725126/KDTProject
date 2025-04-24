@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 구매 및 발주 > 자재 발주</title>
+</head>
+<body>
+
+<th:block layout:fragment="procurement-order">
+    <div class="container py-5">
+        <h2 class="mb-4">자재 발주</h2>
+        <div class="card p-4 mb-5">
+            <form id="order-input" class="row g-3">
+                <div class="col-md-3">
+                    <label for="ord-plan" class="form-label">조달계획</label>
+                    <input type="text" class="form-control" id="ord-plan">
+                </div>
+                <div class="col-md-3">
+                    <label for="ord-mat" class="form-label">자재</label>
+                    <input type="text" class="form-control" id="ord-mat">
+                </div>
+                <div class="col-md-3">
+                    <label for="ord-qty" class="form-label">발주 수</label>
+                    <input type="number" class="form-control" id="ord-qty">
+                </div>
+                <div class="col-md-3">
+                    <label for="ord-date" class="form-label">납기일</label>
+                    <input type="date" class="form-control" id="ord-date">
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">발주 등록</button>
+                </div>
+            </form>
+        </div>
+
+        <h2 class="mb-4">등록된 계약정보</h2>
+        <div class="card p-4">
+            <table class="table table-bordered table-hover data-table">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">조달코드</th>
+                    <th scope="col">자재명</th>
+                    <th scope="col">소요량</th>
+                    <th scope="col">계획일자</th>
+                    <th scope="col">납기일</th>
+                    <th scope="col">상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>OR001A01</td>
+                    <td>가이던스 FV 그립 핸들</td>
+                    <td>200</td>
+                    <td>2025-04-20</td>
+                    <td>2025-05-20</td>
+                    <td><span class="badge bg-info text-dark">진행중</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

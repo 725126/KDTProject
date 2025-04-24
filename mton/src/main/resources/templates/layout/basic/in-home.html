@@ -13,6 +13,8 @@
 </head>
 <body>
 
+<!-- *** 내부 회원용 home *** -->
+
 <!-- 헤더 -->
 <nav class="navbar fixed-top navbar-expand-lg border-bottom">
     <div class="container-fluid px-5">
@@ -31,11 +33,11 @@
         <li><i class="bi bi-tools me-2"></i>생산 부서</li>
         <li><i class="bi bi-building"></i>협력 업체</li> -->
 
-<!--        알림 없앤다면 me-2 지우기 -->
+        <!-- 알림 없앤다면 me-2 지우기 -->
         <div class="dropdown me-2">
             <button class="btn no-bootstrap-style d-flex align-items-center" type="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
-          <span class="profile-icon bg-light text-dark rounded-circle p-2">
+          <span class="profile-icon bg-light text-dark rounded-circle buyer-profile p-2">
             <i class="bi bi-cart-check"></i>
           </span>
                 <span class="ms-2">홍길동 님</span>
@@ -98,8 +100,6 @@
         </div>
 
 
-
-
     </div>
 </nav>
 
@@ -117,53 +117,59 @@
     </div>
 
 
-
     <ul class="nav flex-column main-menu">
 
         <li>
-            <a class="nav-link" data-bs-toggle="collapse" href="#planSubmenu" role="button" aria-expanded="false">
+            <a class="nav-link" data-bs-toggle="collapse" href="#productionSubmenu" role="button" aria-expanded="false">
                 <div class="icon-text">
-                    <i class="bi bi-calendar-check"></i>
-                    <span class="menu-text ms-2">발주계획</span>
+                    <i class="bi bi-gear-fill"></i>
+                    <span class="menu-text ms-2">생산</span>
                 </div>
                 <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
 
-            <div class="collapse" id="planSubmenu">
+            <div class="collapse" id="productionSubmenu">
                 <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="#">월간 계획</a></li>
-                    <li><a class="nav-link" href="#">일별 계획</a></li>
+                    <li><a class="nav-link" href="/internal/product/pbom">품목등록</a></li>
+                    <li><a class="nav-link" href="/internal/product/prdplan">생산계획</a></li>
                 </ul>
             </div>
         </li>
 
         <li>
-            <a class="nav-link" data-bs-toggle="collapse" href="#orderSubmenu" role="button" aria-expanded="false">
+            <a class="nav-link" data-bs-toggle="collapse" href="#purchaseSubmenu" role="button" aria-expanded="false">
                 <div class="icon-text">
-                    <i class="bi bi-journal-text"></i>
-                    <span class="menu-text ms-2">구매발주</span>
+                    <i class="bi bi-cart-check"></i>
+                    <span class="menu-text ms-2">구매 및 발주</span>
                 </div>
                 <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
-            <div class="collapse" id="orderSubmenu">
+
+            <div class="collapse" id="purchaseSubmenu">
                 <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="#">발주서 작성</a></li>
-                    <li><a class="nav-link" href="#">업체 관리</a></li>
+                    <li><a class="nav-link" href="/internal/procurement/procure">조달계획</a></li>
+                    <li><a class="nav-link" href="/internal/procurement/contract">계약 정보</a></li>
+                    <li><a class="nav-link" href="/internal/procurement/order">자재 발주</a></li>
+                    <li><a class="nav-link" href="/internal/procurement/inspect">진척 검수</a></li>
                 </ul>
             </div>
         </li>
+
         <li>
             <a class="nav-link" data-bs-toggle="collapse" href="#inSubmenu" role="button" aria-expanded="false">
                 <div class="icon-text">
                     <i class="bi bi-box-arrow-in-down"></i>
-                    <span class="menu-text ms-2">자재입고</span>
+                    <span class="menu-text ms-2">입고</span>
                 </div>
                 <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
             <div class="collapse" id="inSubmenu">
                 <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="#">입고 등록</a></li>
-                    <li><a class="nav-link" href="#">검수 현황</a></li>
+                    <li><a class="nav-link" href="/internal/incoming/planned">거래 명세</a></li>
+                    <li><a class="nav-link" href="/internal/incoming/planned">입고 예정</a></li>
+                    <li><a class="nav-link" href="/internal/incoming/inspection">입고 검수</a></li>
+                    <li><a class="nav-link" href="/internal/incoming/history">입고 이력</a></li>
+                    <li><a class="nav-link" href="/internal/incoming/status">입고 현황 조회</a></li>
                 </ul>
             </div>
         </li>
@@ -171,17 +177,37 @@
             <a class="nav-link" data-bs-toggle="collapse" href="#outSubmenu" role="button" aria-expanded="false">
                 <div class="icon-text">
                     <i class="bi bi-box-arrow-up"></i>
-                    <span class="menu-text ms-2">자재출고</span>
+                    <span class="menu-text ms-2">출고</span>
                 </div>
                 <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
             <div class="collapse" id="outSubmenu">
                 <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="#">출고 요청</a></li>
-                    <li><a class="nav-link" href="#">출고 이력</a></li>
+                    <li><a class="nav-link" href="/internal/outgoing/status">출고 조회</a></li>
+                    <li><a class="nav-link" href="/internal/outgoing/history">출고 이력</a></li>
+                    <li><a class="nav-link" href="/internal/outgoing/result">출고 처리 결과 조회</a></li>
                 </ul>
             </div>
         </li>
+
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false">
+                <div class="icon-text">
+                    <i class="bi bi-archive"></i>
+                    <span class="menu-text ms-2">재고</span>
+                </div>
+                <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
+            </a>
+            <div class="collapse" id="stockSubmenu">
+                <ul class="nav flex-column ms-4">
+                    <li><a class="nav-link" href="/internal/inventory/status">재고 조회</a></li>
+                    <li><a class="nav-link" href="/internal/inventory/history">재고 이력</a></li>
+                    <li><a class="nav-link" href="/internal/inventory/price">재고 금액</a></li>
+                </ul>
+            </div>
+        </li>
+
+
         <li>
             <a class="nav-link" data-bs-toggle="collapse" role="button">
                 <div class="icon-text">
@@ -194,11 +220,40 @@
     </ul>
 </div>
 
-<!--메인 start -->
+<!-- 내부 회원(구매부서, 생산부서, 관리자) 메인 start -->
 <div class="content">
     <!-- 여기에 추가 -->
     <div layout:fragment="internal-home"></div>
-    <div layout:fragment="external-home"></div>
+
+    <!-- 생산 -->
+    <div layout:fragment="product-pbom"></div>
+    <div layout:fragment="product-prdplan"></div>
+
+    <!-- 구매 및 발주 -->
+    <div layout:fragment="procurement-procure"></div>
+    <div layout:fragment="procurement-contract"></div>
+    <div layout:fragment="procurement-order"></div>
+    <div layout:fragment="procurement-inspect"></div>
+
+    <!-- 입고 -->
+    <div layout:fragment="incoming-trans"></div>
+
+    <div layout:fragment="incoming-planned"></div>
+    <div layout:fragment="incoming-inspection"></div>
+    <div layout:fragment="incoming-status"></div>
+    <div layout:fragment="incoming-history"></div>
+
+    <!-- 출고 -->
+    <div layout:fragment="outgoing-status"></div>
+    <div layout:fragment="outgoing-history"></div>
+    <div layout:fragment="outgoing-result"></div>
+
+
+    <!-- 재고 -->
+    <div layout:fragment="inventory-history"></div>
+    <div layout:fragment="inventory-price"></div>
+    <div layout:fragment="inventory-status"></div>
+
 </div>
 <!-- 메인 end -->
 

@@ -25,16 +25,9 @@ body {
 .main-content {
     /*padding: 2rem;*/
 }
-
-.card {
-    border-radius: 1rem;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.05);
-}
-
 .form-label {
     font-weight: 500;
 }
-
 
 
 @font-face {
@@ -299,4 +292,9 @@ body {
     background-color: #3182f6;
     color: white;
 }
+
 /* 필터 css end */
+
+h2 {
+    color: #212A3E;
+}

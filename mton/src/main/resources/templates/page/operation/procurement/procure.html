@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 구매 및 발주 > 조달 계획</title>
+    <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
+</head>
+<body>
+
+<th:block layout:fragment="procurement-procure">
+    <div class="container py-5">
+        <h2 class="mb-4">조달계획 등록</h2>
+
+        <div class="card p-4 mb-4">
+            <h5 class="mb-3">엑셀 일괄 등록</h5>
+            <div class="file-upload-area">
+                <label for="contract-file" class="file-box-label">파일 선택</label>
+                <input type="file" id="contract-file" multiple>
+                <button type="button" class="btn btn-outline-secondary btn-sm">
+                    <i class="bi bi-download"></i> 양식 다운로드
+                </button>
+            </div>
+            <div class="file-list" id="file-list"></div>
+        </div>
+
+        <div class="card p-4 mb-5">
+            <h5 class="mb-3">개별 등록</h5>
+            <form id="procure-input" class="row g-3">
+                <div class="col-md-3">
+                    <label for="mat" class="form-label">자재</label>
+                    <input type="text" class="form-control" id="mat">
+                </div>
+                <div class="col-md-3">
+                    <label for="mat-code" class="form-label">코드</label>
+                    <input type="text" class="form-control" id="mat-code">
+                </div>
+                <div class="col-md-3">
+                    <label for="procure-qty" class="form-label">소요량</label>
+                    <input type="number" class="form-control" id="procure-qty">
+                </div>
+                <div class="col-md-3">
+                    <label for="procure-date" class="form-label">납기일</label>
+                    <input type="date" class="form-control" id="procure-date">
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary">등록</button>
+                </div>
+            </form>
+        </div>
+
+        <h2 class="mb-4">등록된 생산계획</h2>
+        <div class="card p-4">
+            <table class="table table-bordered table-hover data-table">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">조달코드</th>
+                    <th scope="col">자재명</th>
+                    <th scope="col">소요량</th>
+                    <th scope="col">계획일자</th>
+                    <th scope="col">납기일</th>
+                    <th scope="col">상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>RP001A01</td>
+                    <td>가이던스 FV 그립 핸들</td>
+                    <td>200</td>
+                    <td>2025-04-20</td>
+                    <td>2025-05-20</td>
+                    <td><span class="badge bg-info text-dark">진행중</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script th:src="@{/js/util/file-preview.js}"></script>
+</th:block>
+
+</body>
+</html>

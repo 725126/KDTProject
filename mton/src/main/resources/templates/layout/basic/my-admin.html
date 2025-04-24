@@ -38,35 +38,37 @@
 
 
             <ul class="nav flex-column">
-                <li>
-                    <a class="nav-link d-flex" data-bs-toggle="collapse" href="#memberSubmenu" role="button"
-                       aria-expanded="false">
-                        <div class="icon-text">
-                            <i class="bi bi-person-gear"></i> <!-- 회원관리용 아이콘 -->
-                            <span class="menu-text ms-2">회원관리</span>
-                        </div>
-                        <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-people-fill me-3"></i>
+                        회원 목록
                     </a>
-                    <div class="collapse" id="memberSubmenu">
-                        <ul class="nav flex-column ms-4">
-                            <li><a class="nav-link" href="#">회원가입 승인</a></li>
-                            <li><a class="nav-link" href="#">회원 목록</a></li>
-                        </ul>
-                    </div>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link" href="#">
-                        <i class="bi bi-clipboard-data me-2"></i>
-                        로그 기록
+                        <i class="bi bi-person-plus-fill me-3"></i>
+                        회원가입 승인
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-person-dash-fill me-3"></i>
+                        회원탈퇴 승인
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">
+                        <i class="bi bi-clipboard-data me-3"></i>
+                        회원로그 기록
                     </a>
                 </li>
                 <li class="nav-item mt-4 border-top pt-3">
                     <a class="nav-link" href="#">
-                        <i class="bi bi-person me-2"></i>
-                        내 정보
+                        <i class="bi bi-person me-3"></i>
+                        관리자 정보
                     </a>
                     <a class="nav-link" href="#">
-                        <i class="bi bi-box-arrow-right me-2"></i>
+                        <i class="bi bi-box-arrow-right me-3"></i>
                         로그아웃
                     </a>
                 </li>
@@ -77,13 +79,17 @@
 
         <!-- Main content -->
         <div class="col-md-9 main-content">
+            <div layout:fragment="user-list"></div>
             <div layout:fragment="join-list"></div>
+            <div layout:fragment="delete-list"></div>
+            <div layout:fragment="log-list"></div>
+            <div layout:fragment="admin-edit"></div>
         </div>
 
     </div>
 </div>
 
-<script src="https://cdn.tailwindcss.com"></script>
+
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.9/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.9/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>

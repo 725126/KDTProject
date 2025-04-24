@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/my-admin.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>마이페이지(관리자) > 회원가입 승인</title>
+    <link rel="stylesheet" th:href="@{/css/page/user/join-list.css}">
+</head>
+<body>
+
+<th:block layout:fragment="admin-edit">
+
+    <div class="edit-container container border">
+        <h2 class="mb-4">회원정보 수정</h2>
+
+        <form>
+            <!-- 기본 정보 -->
+            <div class="mb-4">
+                <div class="form-section-title">기본 정보</div>
+                <div class="mb-3">
+                    <label class="form-label">이름</label>
+                    <input type="text" class="form-control" placeholder="회원 이름">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">이메일</label>
+                    <input type="email" class="form-control" placeholder="이메일 주소">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">전화번호</label>
+                    <input type="tel" class="form-control" placeholder="전화번호">
+                </div>
+            </div>
+
+            <!-- 소속 정보 -->
+            <div class="mb-4">
+                <div class="form-section-title">소속 정보</div>
+                <div class="mb-3">
+                    <label class="form-label">회사명</label>
+                    <input type="text" class="form-control" placeholder="회사명">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">부서명</label>
+                    <input type="text" class="form-control" placeholder="부서명">
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">회원 종류</label>
+                    <select class="form-select">
+                        <option selected>회원 종류 선택</option>
+                        <option value="partner">협력 업체</option>
+                        <option value="buyer">구매 부서</option>
+                        <option value="production">생산 부서</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- 상태 및 권한 -->
+            <div class="mb-4">
+                <div class="form-section-title">상태 및 권한</div>
+                <div class="mb-3">
+                    <label class="form-label">계정 상태</label>
+                    <select class="form-select">
+                        <option selected>정상</option>
+                        <option value="suspended">정지</option>
+                        <option value="withdrawn">탈퇴</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">권한</label>
+                    <select class="form-select">
+                        <option selected>일반 사용자</option>
+                        <option value="admin">관리자</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="text-end">
+                <button type="submit" class="btn btn-primary">저장</button>
+            </div>
+        </form>
+    </div>
+
+
+</th:block>
+
+</body>
+</html>

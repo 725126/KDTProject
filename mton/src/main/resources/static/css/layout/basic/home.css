@@ -1,6 +1,7 @@
 body {
     margin: 0;
     font-family: 'S-CoreDream-3Light';
+    background-color: #FBFBFB;
     padding: 0;
 }
 
@@ -26,6 +27,7 @@ body {
 }
 
 .sidebar {
+    background-color: #fff;
     width: 240px;
     border-right: 1px solid #ddd;
     /* background-color: #212529; */
@@ -65,7 +67,6 @@ body {
 }
 
 .content {
-    background-color: #FBFBFB;
     margin-left: 240px;
     margin-top: 60px;
     padding: 20px;
@@ -116,11 +117,6 @@ body {
     border: 1px solid #ddd;
 
 }
-
-.main-menu {
-    margin-top: 16px;
-}
-
 
 
 /* 헤더 스타일 */
@@ -194,6 +190,40 @@ body {
     /* 클릭 이벤트 막기 */
 }
 
+.main-menu {
+    margin-top: 16px;
+}
+
+.sidebar.collapsed .main-menu {
+    margin-top: 0 !important;
+    height: 89%;
+}
+
+.sidebar.collapsed .main-menu > li {
+    flex: 1 1 auto; /* flex-fill 역할 */
+    display: flex;
+}
+
+.sidebar.collapsed .main-menu > li > a {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center; /* 가운데 정렬 */
+    text-decoration: none;
+    padding: 0; /* 줄간격 없애기 */
+}
+
+.sidebar.collapsed .main-menu .icon-text {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+
+
 .sidebar.collapsed .sidebar-header {
     padding: 30px 0px 70px 20px;
     align-items: start !important;
@@ -256,11 +286,19 @@ body {
     /* 동그랗게 */
     font-size: 22px;
     /* 아이콘 크기 */
-    background-color: #EFB036 !important;
+    /*background-color: #EFB036 !important;*/
     /* 배경색 (light) */
     color: #fff !important;
     /* 텍스트/아이콘 색상 */
 
+}
+
+.buyer-profile {
+    background-color: #EFB036 !important;
+}
+
+.partner-profile {
+    background-color: #4C7B8B !important;
 }
 
 /* 구매 EFB036 생산 3B6790 협력업체 4C7B8B */
@@ -339,3 +377,4 @@ body {
     pointer-events: auto;
 }
 /* 툴팁 css end */
+
