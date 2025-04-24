@@ -12,12 +12,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 @RequestMapping("/internal/incoming")
 public class IncomingController { // 입고
 
-    // 거래 명세
-    @GetMapping("/trans")
-    public String transGet() {
-        return "/page/warehouse/incoming/trans";
-    }
-
     // 입고 예정
     @GetMapping("/planned")
     public String plannedGet() {

@@ -273,6 +273,14 @@ body {
     /* color: #00909E; */
 }
 
+.nav-link.active {
+    font-weight: 600;
+    color: #394867;
+    border-left: 4px solid #394867; /* 왼쪽에 포인트 바 */
+    transition: all 0.2s ease-in-out;
+}
+
+
 /* 프로필 css start */
 .profile-icon {
     display: inline-flex;
