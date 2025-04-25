@@ -34,10 +34,10 @@ public class IncomingItem {
   private DeliveryRequest deliveryRequest;
 
   @Column(nullable = false)
-  private int incomingQty = 0;
+  private int incomingQty;
 
   @Column(nullable = false)
-  private int incomingReturnQty = 0;
+  private int incomingReturnQty;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)

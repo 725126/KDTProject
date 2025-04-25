@@ -24,10 +24,10 @@ public class IncomingDate {
   private LocalDateTime incomingDate;
 
   @Column(nullable = false)
-  private int incomingDateQty = 0;
+  private int incomingDateQty;
 
   @Column(nullable = false)
-  private int incomingDateReturnQty = 0;
+  private int incomingDateReturnQty;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
