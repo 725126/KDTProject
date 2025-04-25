@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 구매 및 발주 > 진척 검수</title>
+</head>
+<body>
+
+<th:block layout:fragment="procurement-inspect">
+    <div class="container py-5">
+        <h2 class="mb-4">진척 검수</h2>
+        <div class="card p-4 mb-5">
+            <form id="inspection-input" class="row g-3">
+                <div class="col-md-3">
+                    <label for="ord-plan" class="form-label">발주</label>
+                    <input type="text" class="form-control" id="ord-plan">
+                </div>
+                <div class="col-md-3">
+                    <label for="ord-sply" class="form-label">업체명</label>
+                    <input type="text" class="form-control" id="ord-sply">
+                </div>
+                <div class="col-12 text-end mt-4">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> 등록</button>
+                </div>
+            </form>
+        </div>
+
+        <h2 class="mb-4">검수 정보</h2>
+        <div class="card p-4">
+            <table class="table table-bordered table-hover data-table text-center">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">검수코드</th>
+                    <th scope="col">발주코드</th>
+                    <th scope="col">자재명</th>
+                    <th scope="col">검수량</th>
+                    <th scope="col">생산량</th>
+                    <th scope="col">검수일</th>
+                    <th scope="col">종료일</th>
+                    <th scope="col">상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>IS001A01</td>
+                    <td>PO001-123</td>
+                    <td>가이던스 FV 그립 핸들</td>
+                    <td>200</td>
+                    <td>180</td>
+                    <td>2025-04-20</td>
+                    <td>2025-05-20</td>
+                    <td class="text-center"><span class="badge bg-warning text-dark">진행중</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 입고 > 입고 검수</title>
+    <link rel="stylesheet" th:href="@{/css/component/bottom-nav.css}">
+</head>
+<body>
+
+<th:block layout:fragment="incoming-inspection">
+    <div class="container py-5">
+        <h1 class="mb-4">입고 검수</h1>
+
+        <div class="card p-4 mb-4">
+            <form>
+                <div class="row g-3">
+                    <!-- 입고예정일 -->
+                    <div class="col-md-4 col-lg-4">
+                        <label class="form-label">입고예정일</label>
+                        <div class="d-flex gap-1">
+                            <input type="date" class="form-control" id="search-expected-start">
+                            <span class="pt-2">~</span>
+                            <input type="date" class="form-control" id="search-expected-end">
+                        </div>
+                    </div>
+
+                    <!-- 입고코드 -->
+                    <div class="col-md-2">
+                        <label class="form-label">입고코드</label>
+                        <input type="text" class="form-control" id="search-code">
+                    </div>
+
+                    <!-- 협력사 -->
+                    <div class="col-md-2">
+                        <label class="form-label">협력사</label>
+                        <input type="text" class="form-control" id="search-supplier">
+                    </div>
+
+                    <!-- 자재코드 -->
+                    <div class="col-md-2">
+                        <label class="form-label">자재코드</label>
+                        <input type="text" class="form-control" id="search-material-code">
+                    </div>
+
+                    <!-- 자재명 -->
+                    <div class="col-md-2">
+                        <label class="form-label">자재명</label>
+                        <input type="text" class="form-control" id="search-material-name">
+                    </div>
+
+                    <!-- 입고일 -->
+                    <div class="col-md-4 col-lg-4">
+                        <label class="form-label">입고일</label>
+                        <div class="d-flex gap-1">
+                            <input type="date" class="form-control" id="search-incoming-start">
+                            <span class="pt-2">~</span>
+                            <input type="date" class="form-control" id="search-incoming-end">
+                        </div>
+                    </div>
+
+                    <!-- 입고마감일 -->
+                    <div class="col-md-4 col-lg-4">
+                        <label class="form-label">입고마감일</label>
+                        <div class="d-flex gap-1">
+                            <input type="date" class="form-control" id="search-complete-start">
+                            <span class="pt-2">~</span>
+                            <input type="date" class="form-control" id="search-complete-end">
+                        </div>
+                    </div>
+
+                    <!-- 진행상태 -->
+                    <div class="col-md-2">
+                        <label class="form-label">진행상태</label>
+                        <input type="text" class="form-control" id="search-status">
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-primary" onclick="searchTable()"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetSearch()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+
+        <div class="card p-4">
+            <table class="table table-bordered table-hover data-table text-center">
+                <thead class="table-light">
+                <tr>
+                    <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
+                    <th>입고예정일</th>
+                    <th>입고코드</th>
+                    <th>협력사</th>
+                    <th>자재코드</th>
+                    <th>자재명</th>
+                    <th>입고예정수량</th>
+                    <th>입고수량</th>
+                    <th>반품수량</th>
+                    <th>잔여 입고 수량</th>
+                    <th>입고일</th>
+                    <th>입고마감일</th>
+                    <th>진행상태</th>
+                </tr>
+                </thead>
+                <tbody id="inspection-body">
+                <tr>
+                    <td><input type="checkbox" class="row-check"></td>
+                    <td>2025-04-10</td>
+                    <td>INC-24041001</td>
+                    <td>협력사A</td>
+                    <td>MAT-001</td>
+                    <td>전기자전거 모터</td>
+                    <td>100</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>100</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td class="text-center"><span class="badge bg-secondary">미입고</span></td>
+                </tr>
+                <tr>
+                    <td><input type="checkbox" class="row-check"></td>
+                    <td>2025-04-10</td>
+                    <td>INC-24041001</td>
+                    <td>협력사A</td>
+                    <td>MAT-002</td>
+                    <td>전기자전거 컨트롤러</td>
+                    <td>100</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td>100</td>
+                    <td>-</td>
+                    <td>-</td>
+                    <td class="text-center"><span class="badge bg-secondary">미입고</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <!-- 하단 고정 액션 버튼 바 -->
+        <nav class="bottom-navbar">
+            <a class="nav-item nav-link active" href="#" onclick="partialReceive()">
+                <i class="bi bi-box-arrow-in-down"></i>
+                <span>부분입고</span>
+            </a>
+            <a class="nav-item nav-link" href="#" onclick="returnItems()">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                <span>반품처리</span>
+            </a>
+            <a class="nav-item nav-link" href="#" onclick="fullReceive()">
+                <i class="bi bi-check-circle"></i>
+                <span>입고</span>
+            </a>
+            <a class="nav-item nav-link" href="#" onclick="finalizeReceive()">
+                <i class="bi bi-archive"></i>
+                <span>입고마감</span>
+            </a>
+        </nav>
+
+
+    </div>
+
+</th:block>
+
+</body>
+</html>

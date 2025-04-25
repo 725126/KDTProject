@@ -1,0 +1,281 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 홈(내부)</title>
+    <link rel="stylesheet" th:href="@{/css/page/user/home.css}">
+</head>
+<body>
+<th:block layout:fragment="internal-home">
+    <div class="alert-box bg-white danger-notice p-3 mb-4 rounded-3 d-flex align-items-center">
+        <i class="bi bi-exclamation-triangle-fill me-3 text-warning fs-4"></i>
+        <div class="flex-grow-1">
+            <div class="fw-semibold">입고 지연 발생</div>
+            <div class="text-muted small">자재 코드 A-1023 품목이 납기 지연되었습니다. 확인 바랍니다.</div>
+        </div>
+        <button class="btn btn-sm btn-outline-secondary ms-3" data-bs-toggle="modal" data-bs-target="#alertDetailModal">
+            자세히
+        </button>
+    </div>
+
+    <!-- 모달창 -->
+    <div class="modal fade" id="alertDetailModal" tabindex="-1" aria-labelledby="alertDetailModalLabel"
+         aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-lg">
+            <div class="modal-content rounded-4 shadow-sm">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" id="alertDetailModalLabel">입고 지연 상세 안내</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered align-middle mb-0">
+                        <tbody>
+                        <tr>
+                            <th style="width: 30%" class="bg-light">자재 코드</th>
+                            <td>A-1023</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">품목명</th>
+                            <td>고강도 스틸 플레이트</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">예정 입고일</th>
+                            <td>2025-04-10</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">지연 사유</th>
+                            <td>공급업체 운송 문제로 인한 2일 지연</td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">조치 사항</th>
+                            <td>대체 품목 전환 여부 검토 중</td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <div class="row g-4 mb-4">
+        <div class="col-md-2">
+            <div class="kpi-card">
+                <i class="bi bi-box-arrow-in-down kpi-icon"></i>
+                <div>
+                    <div class="kpi-title">오늘 입고 예정</div>
+                    <div class="kpi-value">24건</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="kpi-card">
+                <i class="bi bi-box-arrow-up kpi-icon"></i>
+                <div>
+                    <div class="kpi-title">오늘 출고 예정</div>
+                    <div class="kpi-value">18건</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="kpi-card">
+                <i class="bi bi-boxes kpi-icon"></i>
+                <div>
+                    <div class="kpi-title">가용 재고 수량</div>
+                    <div class="kpi-value">3,250개</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="kpi-card">
+                <i class="bi bi-exclamation-circle kpi-icon"></i>
+                <div>
+                    <div class="kpi-title">부족 품목</div>
+                    <div class="kpi-value">7건</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="kpi-card">
+                <i class="bi bi-cash-coin kpi-icon"></i>
+                <div>
+                    <div class="kpi-title">이번달 발주 총액</div>
+                    <div class="kpi-value">₩152,000,000</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-2">
+            <div class="kpi-card">
+                <i class="bi bi-graph-up-arrow kpi-icon"></i>
+                <div>
+                    <div class="kpi-title">월 발주 진행률</div>
+                    <div class="kpi-value">76%</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- 3. 작업 리스트/알림 -->
+    <div class="row g-3">
+
+        <div class="container-fluid pt-4">
+            <div class="row g-4">
+                <!-- 왼쪽 섹션 -->
+                <div class="col-md-4">
+                    <div class="left-section d-flex flex-column justify-content-start">
+                        <div class="card p-4 today-schedule">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-alarm"></i> 오늘의 일정</h5>
+
+                            <!-- 일정 항목 -->
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="fw-semibold">자재 입고 확인</div>
+                                    <div class="text-muted small">09:00 · 자재팀 · 창고 1</div>
+                                </div>
+                                <span class="badge rounded-pill bg-success-subtle text-success">완료</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-start mb-3">
+                                <div>
+                                    <div class="fw-semibold">발주 검토 회의</div>
+                                    <div class="text-muted small">11:00 · 구매팀 회의실</div>
+                                </div>
+                                <span class="badge rounded-pill bg-warning-subtle text-warning">진행 중</span>
+                            </div>
+
+                            <div class="d-flex justify-content-between align-items-start">
+                                <div>
+                                    <div class="fw-semibold">검수 계획 등록</div>
+                                    <div class="text-muted small">14:00 · 시스템 입력</div>
+                                </div>
+                                <span class="badge rounded-pill bg-primary-subtle text-primary">예정</span>
+                            </div>
+
+                        </div>
+
+                        <div class="spacer"></div>
+
+                        <div class="card p-4">
+                            <h5 class="fw-bold mb-3"><i class="bi bi-box-arrow-up-right"></i> 바로가기</h5>
+                            <div class="d-grid gap-2">
+                                <div class="col-12">
+                                    <a href="#"
+                                       class="btn btn-light border w-100 d-flex align-items-center justify-content-center gap-1 small rounded-3 py-2">
+                                        <i class="bi bi-search text-primary"></i> 자재 검색
+                                    </a>
+                                </div>
+                                <div class="col-12">
+                                    <a href="#"
+                                       class="btn btn-light border w-100 d-flex align-items-center justify-content-center gap-1 small rounded-3 py-2">
+                                        <i class="bi bi-upload text-success"></i> 엑셀 업로드
+                                    </a>
+                                </div>
+                                <div class="col-12">
+                                    <a href="#"
+                                       class="btn btn-light border w-100 d-flex align-items-center justify-content-center gap-1 small rounded-3 py-2">
+                                        <i class="bi bi-download text-info"></i> 재고 다운로드
+                                    </a>
+                                </div>
+                                <div class="col-12">
+                                    <a href="#"
+                                       class="btn btn-light border w-100 d-flex align-items-center justify-content-center gap-1 small rounded-3 py-2">
+                                        <i class="bi bi-question-circle text-danger"></i> 지원 요청
+                                    </a>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 오른쪽 섹션 -->
+                <div class="col-md-8 d-flex flex-column calendar-container">
+                    <div class="card p-4">
+                        <h5 class="fw-bold mb-3">
+                            <i class="bi bi-calendar"></i> 일정 캘린더
+                        </h5>
+                        <div class=" rounded p-4 text-center text-muted" id="calendar">
+                        </div>
+                    </div>
+                </div>
+
+
+                <!-- 그래프 -->
+                <div class="col-md-6">
+                    <div class="card p-3">
+                        <div class="section-title">
+                            <h5 class="fw-bold ms-2 mt-2">
+                                <i class="bi bi-bar-chart-line"></i> 입고 vs 출고 추이
+                            </h5>
+                        </div>
+                        <canvas id="inoutChart"></canvas>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="card p-3">
+                        <div class="section-title">
+                            <h5 class="fw-bold ms-2 mt-2">
+                                <i class="bi bi-box-seam"></i> 재고 금액 변화
+                            </h5>
+                        </div>
+                        <canvas id="stockChart"></canvas>
+                    </div>
+                </div>
+
+
+            </div>
+        </div>
+
+    </div>
+
+    <!-- Modal -->
+    <div class="modal fade" id="eventModal" tabindex="-1" aria-labelledby="eventModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered modal-md">
+            <div class="modal-content rounded-4 shadow-sm">
+                <div class="modal-header border-0">
+                    <h5 class="modal-title fw-bold" id="eventModalLabel">일정 상세</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body">
+                    <table class="table table-bordered align-middle mb-0">
+                        <tbody>
+                        <tr>
+                            <th class="bg-light" style="width: 30%">유형</th>
+                            <td><span id="modal-type"></span></td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">자재명</th>
+                            <td><span id="modal-item"></span></td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">기간</th>
+                            <td><span id="modal-dates"></span></td>
+                        </tr>
+                        <tr>
+                            <th class="bg-light">비고</th>
+                            <td><span id="modal-remarks"></span></td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <div class="modal-footer border-0">
+                    <button type="button" class="btn btn-outline-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script th:src="@{/js/page/user/internal-home.js}"></script>
+</th:block>
+</body>
+</html>

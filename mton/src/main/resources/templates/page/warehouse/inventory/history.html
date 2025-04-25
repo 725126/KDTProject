@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 재고 > 재고 이력</title>
+</head>
+<body>
+
+<th:block layout:fragment="inventory-history">
+    <div class="container py-5">
+        <h1 class="mb-4">재고 이력</h1>
+
+        <div class="card p-4 mb-4">
+            <form id="log-search-form">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="search-date-start" class="form-label">변경일</label>
+                        <div class="d-flex gap-1">
+                            <input type="date" class="form-control" id="search-date-start">
+                            <span class="pt-2">~</span>
+                            <input type="date" class="form-control" id="search-date-end">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="search-mat-id" class="form-label">자재코드</label>
+                        <input type="text" class="form-control" id="search-mat-id">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="search-category" class="form-label">카테고리</label>
+                        <input type="text" class="form-control" id="search-category">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="search-mat-name" class="form-label">자재명</label>
+                        <input type="text" class="form-control" id="search-mat-name">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="search-reason" class="form-label">변경이유</label>
+                        <input type="text" class="form-control" id="search-reason">
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-primary" onclick="searchLog()"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetLog()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card p-4">
+            <table class="table table-bordered table-hover data-table text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>자재코드</th>
+                    <th>카테고리</th>
+                    <th>자재명</th>
+                    <th>변경일</th>
+                    <th>변경이유</th>
+                    <th>변경수량</th>
+                    <th>변경된 금액</th>
+                    <th>총재고</th>
+                    <th>총재고금액</th>
+                </tr>
+                </thead>
+                <tbody id="stock-log-body">
+                <tr>
+                    <td>MAT-001</td>
+                    <td>모터</td>
+                    <td>전기자전거 모터</td>
+                    <td>2025-04-10</td>
+                    <td>입고</td>
+                    <td>+10</td>
+                    <td>1,200,000</td>
+                    <td>50</td>
+                    <td>6,000,000</td>
+                </tr>
+                <tr>
+                    <td>MAT-001</td>
+                    <td>모터</td>
+                    <td>전기자전거 모터</td>
+                    <td>2025-04-12</td>
+                    <td>출고</td>
+                    <td>-5</td>
+                    <td>-600,000</td>
+                    <td>45</td>
+                    <td>5,400,000</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

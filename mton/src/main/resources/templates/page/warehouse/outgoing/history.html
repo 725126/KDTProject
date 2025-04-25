@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+  <meta charset="UTF-8">
+  <title>자재ON - 출고 > 출고 이력</title>
+</head>
+<body>
+
+<th:block layout:fragment="outgoing-history">
+  <!-- 여기에 추가해주세요 -->
+  <div class="container py-5">
+    <h1 class="mb-4">출고 이력</h1>
+
+    <div class="card p-4 mb-4">
+      <form id="searchForm">
+        <div class="row g-3 align-items-end">
+          <div class="col-md-4">
+            <label class="form-label">출고일</label>
+            <div class="d-flex gap-1">
+              <input type="date" class="form-control" id="search-outgoing-start">
+              <span class="pt-2">~</span>
+              <input type="date" class="form-control" id="search-outgoing-end">
+            </div>
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">출고코드</label>
+            <input type="text" class="form-control" id="search-outgoing-code">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">생산계획코드</label>
+            <input type="text" class="form-control" id="search-outgoing-planCode">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">자재코드</label>
+            <input type="text" class="form-control" id="search-material-code">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">자재명</label>
+            <input type="text" class="form-control" id="search-material-name">
+          </div>
+          <div class="col-md-2">
+            <label class="form-label">상태</label>
+            <select id="search-status" class="form-select">
+              <option value="">전체</option>
+              <option value="부분출고">부분출고</option>
+              <option value="출고마감">출고마감</option>
+            </select>
+          </div>
+          <div class="col-12 d-flex justify-content-end gap-2">
+            <button type="button" class="btn btn-primary" onclick="searchTable()"><i class="bi bi-search"></i> 검색</button>
+            <button type="button" class="btn btn-outline-secondary" onclick="resetSearch()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+          </div>
+        </div>
+      </form>
+    </div>
+
+    <div class="card p-4">
+      <table class="table table-bordered table-hover data-table text-center">
+        <thead class="table-light">
+        <tr>
+          <th>출고코드</th>
+          <th>생산계획코드</th>
+          <th>출고일</th>
+          <th>자재코드</th>
+          <th>자재명</th>
+          <th>출고수량</th>
+          <th>상태</th>
+        </tr>
+        </thead>
+        <tbody id="outgoing-history-body">
+        <tr>
+          <td>OUT-24041001</td>
+          <td>OUT-24041001</td>
+          <td>2025-04-10</td>
+          <td>MAT-001</td>
+          <td>전기자전거 모터</td>
+          <td>2</td>
+          <td class="text-center"><span class="badge bg-warning text-dark">부분출고</span></td>
+        </tr>
+        <tr>
+          <td>OUT-24041001</td>
+          <td>OUT-24041001</td>
+          <td>2025-04-12</td>
+          <td>MAT-001</td>
+          <td>전기자전거 모터</td>
+          <td>8</td>
+          <td class="text-center"><span class="badge bg-success">출고마감</span></td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</th:block>
+
+</body>
+</html>

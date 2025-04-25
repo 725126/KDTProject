@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/ex-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON(협력업체 전용) - 진척 검수 수행</title>
+    <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
+</head>
+<body>
+
+<th:block layout:fragment="contmat">
+    <div class="container py-5">
+        <h2 class="mb-4">발주 내역</h2>
+        <div class="card p-4 mb-5">
+            <table id="ord-table" class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>조달코드</th>
+                    <th>자재명</th>
+                    <th>소요량</th>
+                    <th>제작 진척</th>
+                    <th>납기일</th>
+                    <th>진척도</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>OR001A01</td>
+                    <td>다이나볼트 축전지 (중형)</td>
+                    <td>100</td>
+                    <td>50</td>
+                    <td>2025-05-20</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-outline-primary btn-sm">진척도</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="mb-4">진척도</h2>
+
+        <div class="card p-4 mb-4">
+            <div class="col-md-3">
+                <label for="selected" class="form-label">선택한 발주</label>
+                <input type="text" class="form-control" id="selected" placeholder="예: OR001A01">
+            </div>
+            <div class="col-12 text-end">
+                <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
+            </div>
+        </div>
+
+        <div class="card p-4">
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>소요량</th>
+                    <th>제작 진척</th>
+                    <th>검수일</th>
+                    <th>검수 종료일</th>
+                    <th>진척 상황</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>100</td>
+                    <td>50</td>
+                    <td>2025-05-20</td>
+                    <td>2025-05-20</td>
+                    <td class="text-center"><span class="badge bg-success">정상</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+</th:block>
+
+</body>
+</html>

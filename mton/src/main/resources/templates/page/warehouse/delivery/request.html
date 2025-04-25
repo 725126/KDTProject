@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 납입지시 > 납입지시 요청</title>
+</head>
+<body>
+
+<th:block layout:fragment="delivery-request">
+    <div class="container py-5">
+        <h2 class="mb-4">납입지시 요청</h2>
+
+        <div class="card p-4 mb-5">
+            <div class="row g-3 align-items-end">
+                <!-- 발주코드 -->
+                <div class="col-md-2">
+                    <label for="orderCode" class="form-label">발주코드</label>
+                    <input type="text" name="orderCode" id="orderCode" class="form-control">
+                </div>
+
+                <!-- 자재명 -->
+                <div class="col-md-2">
+                    <label for="materialName" class="form-label">자재명</label>
+                    <input type="text" name="materialName" id="materialName" class="form-control">
+                </div>
+
+                <!-- 발주일자 -->
+                <div class="col-md-4">
+                    <label class="form-label">발주일자</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="date" name="orderDateFrom" class="form-control">
+                        <span class="px-1">~</span>
+                        <input type="date" name="orderDateTo" class="form-control">
+                    </div>
+                </div>
+
+                <!-- 납기일자 -->
+                <div class="col-md-4">
+                    <label class="form-label">납기일자</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="date" name="dueDateFrom" class="form-control">
+                        <span class="px-1">~</span>
+                        <input type="date" name="dueDateTo" class="form-control">
+                    </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="col-12 text-end mt-4">
+                    <button type="button" class="btn btn-primary me-2" onclick="search()"><i class="bi bi-search"></i> 검색</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="reset()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                </div>
+
+            </div>
+        </div>
+
+        <div class="card p-4">
+            <table class="table table-hover table-bordered text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>발주코드</th>
+                    <th>자재명</th>
+                    <th>발주일자</th>
+                    <th>납기일자</th>
+                    <th>발주량</th>
+                    <th>납입지시수량</th>
+                    <th>상태</th>
+                    <th>납입지시</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>PO202504001</td>
+                    <td>모터</td>
+                    <td>2025-04-10</td>
+                    <td>2025-04-30</td>
+                    <td>100</td>
+                    <td>30</td>
+                    <td class="text-center"><span class="badge bg-warning text-dark">진행중</span></td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary" onclick="goToInstruction('PO202504001')">납입지시
+                        </button>
+                    </td>
+                </tr>
+                <tr>
+                    <td>PO202504002</td>
+                    <td>컨트롤러</td>
+                    <td>2025-04-12</td>
+                    <td>2025-05-01</td>
+                    <td>50</td>
+                    <td>50</td>
+                    <td class="text-center"><span class="badge bg-success">완료</span></td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary" onclick="goToInstruction('PO202504002')">납입지시
+                        </button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+    <script>
+        //추가
+        function search() {
+            alert('검색 기능은 구현 예정입니다.');
+        }
+
+        function reset() {
+            document.querySelectorAll('input[type="text"], input[type="date"], select').forEach(input => input.value = '');
+        }
+
+        function goToInstruction(orderCode) {
+            window.location.href = `/internal/delivery/instruction?orderCode=${orderCode}`;
+        }
+    </script>
+</th:block>
+
+</body>
+</html>

@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/ex-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON(협력업체 전용) - 계약 정보 열람 </title>
+    <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
+</head>
+<body>
+
+<th:block layout:fragment="contract-view">
+    <div class="container py-5">
+        <h2 class="mb-4">계약 정보 열람</h2>
+        <div class="card p-4 mb-5">
+            <form class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label class="form-label">계약일 지정</label>
+                    <div class="d-flex gap-1">
+                        <input type="date" class="form-control">
+                        <span class="pt-2">~</span>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <label class="form-label">만료일 지정</label>
+                    <div class="d-flex gap-1">
+                        <input type="date" class="form-control">
+                        <span class="pt-2">~</span>
+                        <input type="date" class="form-control">
+                    </div>
+                </div>
+                <div class="col-md-4">
+                    <label for="filter-mat" class="form-label">자재 지정</label>
+                    <input type="text" id="filter-mat" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label for="filter-mat-code" class="form-label">코드</label>
+                    <input type="text" id="filter-mat-code" class="form-control">
+                </div>
+                <div class="col-md-4">
+                    <label for="filter-date" class="form-label">소요일정</label>
+                    <input type="text" id="filter-date" class="form-control">
+                </div>
+                <div class="col-12 d-flex justify-content-end gap-2">
+                    <button type="button" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
+                </div>
+            </form>
+        </div>
+
+        <h2 class="mb-4">계약 목록</h2>
+        <div class="card p-4">
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>계약코드</th>
+                    <th>계약자재코드</th>
+                    <th>계약자재</th>
+                    <th>단가</th>
+                    <th>소요일정</th>
+                    <th>계약일자</th>
+                    <th>만료일자</th>
+                    <th>상세</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>CN001A01</td>
+                    <td>PM001A01</td>
+                    <td>가이던스 FV 그립 핸들</td>
+                    <td>100,000</td>
+                    <td>3</td>
+                    <td>2025-04-20</td>
+                    <td>2025-05-20</td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-outline-primary btn-sm">상세</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

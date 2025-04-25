@@ -1,0 +1,27 @@
+/*span {*/
+/*    display: block;*/
+/*    !* overflow: hidden; *!*/
+/*    text-overflow: ellipsis;*/
+/*    white-space: nowrap;*/
+/*    width: 100%;*/
+/*}*/
+
+li {
+    white-space: nowrap;
+}
+
+.bg-custom-btn {
+    background-color: #526D82;
+}
+
+.bg-custom-btn:hover {
+    background-color: #27374D;
+}
+
+#withdrawBtn {
+    font-family: 'S-CoreDream-3Light';
+}
+
+.font-semibold {
+    font-size: 1.1rem;
+}

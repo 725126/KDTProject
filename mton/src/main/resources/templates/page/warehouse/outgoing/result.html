@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 출고 > 출고 처리 결과 조회</title>
+</head>
+<body>
+
+<th:block layout:fragment="outgoing-result">
+    <div class="container py-5">
+        <h1 class="mb-4">출고 처리 결과 조회</h1>
+
+        <div class="card p-4 mb-4">
+            <form id="searchForm">
+                <div class="row g-3 align-items-end">
+                    <div class="col-md-4">
+                        <label for="releaseDateStart" class="form-label">출고마감일</label>
+                        <div class="d-flex gap-1">
+                            <input type="date" class="form-control" id="releaseDateStart" name="releaseDateStart">
+                            <span class="pt-2">~</span>
+                            <input type="date" class="form-control" id="releaseDateEnd" name="releaseDateEnd">
+                        </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="releaseCode" class="form-label">출고코드</label>
+                        <input type="text" class="form-control" id="releaseCode" name="releaseCode">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="planCode" class="form-label">생산계획코드</label>
+                        <input type="text" class="form-control" id="planCode" name="planCode">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="productCode" class="form-label">자재코드</label>
+                        <input type="text" class="form-control" id="productCode" name="productCode">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="productName" class="form-label">자재명</label>
+                        <input type="text" class="form-control" id="productName" name="productName">
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                    </div>
+                </div>
+            </form>
+        </div>
+
+        <div class="card p-4">
+            <table class="table table-bordered table-hover data-table text-center" id="resultTable">
+                <thead class="table-light">
+                <tr>
+                    <th>출고마감일</th>
+                    <th>출고코드</th>
+                    <th>생산계획코드</th>
+                    <th>자재코드</th>
+                    <th>자재명</th>
+                    <th>출고수량</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>2025-04-15</td>
+                    <td>OUT-20250415-001</td>
+                    <td>PLAN-20250401-001</td>
+                    <td>MAT-001</td>
+                    <td>전기자전거 모터</td>
+                    <td>100</td>
+                </tr>
+                <tr>
+                    <td>2025-04-16</td>
+                    <td>OUT-20250416-002</td>
+                    <td>PLAN-20250402-002</td>
+                    <td>MAT-002</td>
+                    <td>전기자전거 프레임</td>
+                    <td>120</td>
+                </tr>
+                <tr>
+                    <td>2025-04-17</td>
+                    <td>OUT-20250417-003</td>
+                    <td>PLAN-20250403-003</td>
+                    <td>MAT-003</td>
+                    <td>10인치 튜브형 타이어</td>
+                    <td>80</td>
+                </tr>
+                <tr>
+                    <td>2025-04-18</td>
+                    <td>OUT-20250418-004</td>
+                    <td>PLAN-20250404-004</td>
+                    <td>MAT-004</td>
+                    <td>킥보드 핸들바</td>
+                    <td>60</td>
+                </tr>
+                <tr>
+                    <td>2025-04-19</td>
+                    <td>OUT-20250419-005</td>
+                    <td>PLAN-20250405-005</td>
+                    <td>MAT-005</td>
+                    <td>배터리 팩</td>
+                    <td>150</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

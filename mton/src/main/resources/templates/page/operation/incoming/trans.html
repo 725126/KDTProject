@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 입고 > 거래 명세</title>
+</head>
+<body>
+
+<th:block layout:fragment="incoming-trans">
+    <div class="container py-5">
+        <h2 class="mb-4">거래 명세 발행</h2>
+        <div class="card p-4 mb-3">
+            <form id="contract-form" class="row g-3">
+                <div class="col-md-3">
+                    <label for="contract-code" class="form-label">계약</label>
+                    <input type="text" class="form-control" id="contract-code">
+                </div>
+                <div class="col-md-3">
+                    <label for="supplier-name" class="form-label">업체명</label>
+                    <input type="text" class="form-control" id="supplier-name">
+                </div>
+                <div class="col-12 text-end">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
+                </div>
+            </form>
+        </div>
+
+        <div class="card p-4 mb-5">
+            <table class="table table-bordered table-hover data-table text-center">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col">자재명</th>
+                    <th scope="col">납입량</th>
+                    <th scope="col">날짜</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>가이던스 FV 그립 핸들</td>
+                    <td>200</td>
+                    <td>2025-04-20</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+        <h2 class="mb-4">명세서</h2>
+        <div class="card p-4">
+            <form id="statement-form" class="row g-3">
+                <div class="col-md-4">
+                    <label for="buyer" class="form-label">거래사</label>
+                    <input type="text" class="form-control" id="buyer">
+                </div>
+                <div class="col-md-4">
+                    <label for="vendor" class="form-label">협력사</label>
+                    <input type="text" class="form-control" id="vendor">
+                </div>
+                <div class="col-md-4">
+                    <label for="trade-date" class="form-label">거래일</label>
+                    <input type="date" class="form-control" id="trade-date">
+                </div>
+                <div class="col-12">
+                    <label for="details" class="form-label">거래 관련 세부 내용</label>
+                    <textarea class="form-control" id="details" rows="4" placeholder="거래 관련 세부 내용"></textarea>
+                </div>
+                <div class="col-12 text-end mt-4">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-file-earmark-check me-1"></i> 발행</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

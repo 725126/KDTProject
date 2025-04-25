@@ -1,0 +1,74 @@
+/* 회원가입 승인 요청 카드 css start */
+/* 구매 EFB036 생산 3B6790 협력업체 4C7B8B */
+
+.main-content {
+    padding: 2rem;
+}
+
+.card {
+    border-radius: 1rem;
+    transition: transform 0.2s ease;
+    border-color: #d7dce5 !important;
+}
+
+.card:hover {
+    transform: translateY(-4px);
+}
+
+.profile-circle {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: bold;
+    font-size: 1.5rem;
+    color: #fff;
+}
+
+.profile-circle-pur {
+    background-color: #EFB036;
+}
+
+.profile-circle-prod {
+    background-color: #3B6790;
+}
+
+.profile-circle-partner {
+    background-color: #A04747;
+}
+
+.profile-circle-admin {
+    background-color: #EEEDEB;
+}
+
+.approve-btn,
+.reject-btn {
+    border: none;
+    border-radius: 2rem;
+    padding: 0.4rem 1rem;
+    font-size: 0.9rem;
+}
+
+.approve-btn {
+    background-color: #394867;
+    color: white;
+}
+
+.approve-btn:hover {
+    background-color: #212A3E;
+    color: white;
+}
+
+.reject-btn {
+    background-color: #526D82;
+    color: white;
+}
+
+.reject-btn:hover {
+    background-color: #27374D;
+    color: white;
+}
+
+/* 회원가입 승인 요청 카드 css end */
