@@ -118,84 +118,58 @@
 
     <ul class="nav flex-column main-menu">
 
-        <li>
-            <a class="nav-link" data-bs-toggle="collapse" href="#contractSubmenu" role="button" aria-expanded="false">
+        <li class="ex-li">
+            <a class="nav-link" href="/external/contract/view" role="button" aria-expanded="false">
                 <div class="icon-text">
                     <i class="bi bi-file-earmark-text"></i>
-                    <span class="menu-text ms-2">계약 정보</span>
+                    <span class="menu-text ms-2">계약 정보 열람</span>
                 </div>
-                <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
-            <div class="collapse" id="contractSubmenu">
-                <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="#">계약 목록</a></li>
-                    <li><a class="nav-link" href="#">계약 세부사항</a></li>
-                </ul>
-            </div>
         </li>
 
-        <li>
-            <a class="nav-link" data-bs-toggle="collapse" href="#estimateSubmenu" role="button" aria-expanded="false">
+        <li class="ex-li">
+            <a class="nav-link" href="/external/contmat" role="button" aria-expanded="false">
                 <div class="icon-text">
-                    <i class="bi bi-pencil-square"></i>
-                    <span class="menu-text ms-2">자재 견적</span>
+                    <i class="bi bi-plus-square"></i>
+                    <span class="menu-text ms-2">계약 자재 등록</span>
                 </div>
-                <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
-            <div class="collapse" id="estimateSubmenu">
-                <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="#">견적 등록</a></li>
-                    <li><a class="nav-link" href="#">견적 이력</a></li>
-                </ul>
-            </div>
         </li>
 
-        <li>
-            <a class="nav-link" data-bs-toggle="collapse" href="#progressSubmenu" role="button" aria-expanded="false">
+        <li class="ex-li">
+            <a class="nav-link" href="/external/inspect" role="button" aria-expanded="false">
                 <div class="icon-text">
                     <i class="bi bi-clipboard-check"></i>
-                    <span class="menu-text ms-2">진척 검수</span>
+                    <span class="menu-text ms-2">진척 검수 수행</span>
                 </div>
-                <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
-            <div class="collapse" id="progressSubmenu">
-                <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="#">검수 요청 확인</a></li>
-                    <li><a class="nav-link" href="#">검수 결과 등록</a></li>
-                </ul>
-            </div>
         </li>
 
-        <li>
-            <a class="nav-link" data-bs-toggle="collapse" href="#stockSubmenu" role="button" aria-expanded="false">
+        <li class="ex-li">
+            <a class="nav-link" href="/external/mat/inventory" role="button" aria-expanded="false">
                 <div class="icon-text">
-                    <i class="bi bi-boxes"></i>
-                    <span class="menu-text ms-2">자재 재고</span>
+                    <i class="bi bi-box-seam"></i>
+                    <span class="menu-text ms-2">자재 재고 관리</span>
                 </div>
-                <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
-            <div class="collapse" id="stockSubmenu">
-                <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="#">보유 자재 현황</a></li>
-                    <li><a class="nav-link" href="#">출고 가능 수량</a></li>
-                </ul>
-            </div>
         </li>
 
-        <li>
-            <a class="nav-link" data-bs-toggle="collapse" href="#invoiceSubmenu" role="button" aria-expanded="false">
+        <li class="ex-li">
+            <a class="nav-link" href="/external/trans" role="button" aria-expanded="false">
                 <div class="icon-text">
-                    <i class="bi bi-receipt-cutoff"></i>
-                    <span class="menu-text ms-2">거래 명세</span>
+                    <i class="bi bi-receipt"></i>
+                    <span class="menu-text ms-2">거래 명세 확인</span>
                 </div>
-                <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
-            <div class="collapse" id="invoiceSubmenu">
-                <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="#">명세서 확인</a></li>
-                    <li><a class="nav-link" href="#">PDF 다운로드</a></li>
-                </ul>
-            </div>
+        </li>
+
+        <li class="ex-li">
+            <a class="nav-link" href="/external/delivery" role="button" aria-expanded="false">
+                <div class="icon-text">
+                    <i class="bi bi-truck"></i>
+                    <span class="menu-text ms-2">납품 지시 요청</span>
+                </div>
+            </a>
         </li>
 
     </ul>
@@ -205,6 +179,15 @@
 <div class="content">
     <!-- 여기에 추가 -->
     <div layout:fragment="external-home"></div>
+
+    <!-- 협력 업체 메뉴 -->
+    <div layout:fragment="contmat"></div>
+    <div layout:fragment="contract-view"></div>
+    <div layout:fragment="inspect"></div>
+    <div layout:fragment="mat-inventory"></div>
+    <div layout:fragment="partner-trans"></div>
+    <div layout:fragment="delivery"></div>
+
 </div>
 <!-- 메인 end -->
 

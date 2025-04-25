@@ -33,6 +33,7 @@
 .bottom-navbar .nav-link:hover {
     color: #123458;
     font-weight: 600;
+    border: none !important;
 }
 
 .bottom-navbar .nav-link i {

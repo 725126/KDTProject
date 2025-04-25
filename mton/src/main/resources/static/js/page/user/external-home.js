@@ -141,3 +141,34 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 });
+
+document.addEventListener('DOMContentLoaded', function () {
+    const currentPath = window.location.pathname;
+
+    document.querySelectorAll('.nav-link').forEach(link => {
+        const href = link.getAttribute('href');
+
+        if (href === currentPath) {
+            // a 태그에 active 클래스 추가
+            link.classList.add('active');
+
+            // li에도 active 클래스 추가
+            const parentLi = link.closest('li');
+            if (parentLi) {
+                parentLi.classList.add('active');
+            }
+
+            // 해당 링크가 속한 .collapse 부모 메뉴도 펼침
+            const parentCollapse = link.closest('.collapse');
+            if (parentCollapse) {
+                parentCollapse.classList.add('show');
+
+                const toggleBtn = document.querySelector(`[data-bs-toggle="collapse"][href="#${parentCollapse.id}"]`);
+                if (toggleBtn) {
+                    toggleBtn.setAttribute('aria-expanded', 'true');
+                }
+            }
+        }
+    });
+});
+

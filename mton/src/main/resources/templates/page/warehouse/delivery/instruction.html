@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON - 납입지시 > 납입지시 등록</title>
+</head>
+<body>
+
+<th:block layout:fragment="delivery-instruction">
+    <div class="container py-5">
+        <h2 class="mb-4">납입지시 등록</h2>
+
+        <!-- 발주 정보 테이블 -->
+        <div class="card p-4 mb-5">
+            <table class="info-table table table-bordered table-hover text-center">
+                <thead class="table-light">
+                    <tr>
+                        <th>발주코드</th>
+                        <th>자재명</th>
+                        <th>납기일자</th>
+                        <th>발주량</th>
+                    </tr>
+                </thead>
+                <tr>
+                    <td id="orderCode" class="value-box">OR-20250401</td>
+                    <td id="materialName" class="value-box">가이던스 FV 그립 핸들</td>
+                    <td id="dueDate" class="value-box">2025-05-20</td>
+                    <td id="orderQty" class="value-box">100</td>
+                </tr>
+            </table>
+        </div>
+
+        <!-- 납입지시 입력 및 버튼 영역 -->
+        <div class="card p-4 mb-4">
+            <div class="input-group d-flex gap-3 align-items-end flex-wrap">
+                <div class="col-md-2 form-item">
+                    <label for="deliveryDate" class="mb-2">납입지시일자</label>
+                    <input type="date" id="deliveryDate" class="form-control">
+                </div>
+                <div class="col-md-2 form-item">
+                    <label for="deliveryQty" class="mb-2">지시수량</label>
+                    <input type="number" id="deliveryQty" class="form-control" min="1">
+                </div>
+                <div class="col-12 text-end">
+                    <button id="addButton" class="btn btn-primary rounded me-1" onclick="addInstruction()">
+                        <i class="bi bi-plus-circle me-1"></i> 지시 추가
+                    </button>
+
+                    <button id="updateButton" class="btn btn-secondary rounded me-1" style="display: none;" onclick="updateInstruction()">
+                        <i class="bi bi-pencil-square me-1"></i> 수정 완료
+                    </button>
+
+                    <button class="btn btn-danger rounded me-1" onclick="deleteLastInstruction()">
+                        <i class="bi bi-trash me-1"></i> 지시 삭제
+                    </button>
+
+                    <button class="btn btn-outline-dark rounded me-1" onclick="goBackToRequestPage()">
+                        <i class="bi bi-arrow-left-circle me-1"></i> 요청페이지로 돌아가기
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4">
+            <!-- 납입지시 목록 테이블 -->
+            <table class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>납입지시코드</th>
+                    <th>납입지시일자</th>
+                    <th>지시수량</th>
+                    <th>납입지시등록일</th>
+                    <th>수정</th>
+                </tr>
+                </thead>
+                <tbody id="instructionTable">
+                <tr>
+                    <td>DEL-20250418-01</td>
+                    <td>2025-05-10</td>
+                    <td>50</td>
+                    <td>2025-04-18</td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary">수정</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- 총 지시수량 표시 -->
+            <div class="summary ms-auto">
+                총 지시수량: <span id="totalQty">50</span> / <span id="maxQty">100</span>
+            </div>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

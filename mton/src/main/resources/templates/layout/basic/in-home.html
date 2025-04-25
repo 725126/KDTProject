@@ -207,6 +207,21 @@
             </div>
         </li>
 
+        <li>
+            <a class="nav-link" data-bs-toggle="collapse" href="#deliverySubmenu" role="button" aria-expanded="false">
+                <div class="icon-text">
+                    <i class="bi bi-truck"></i>
+                    <span class="menu-text ms-2">납입지시</span>
+                </div>
+                <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
+            </a>
+            <div class="collapse" id="deliverySubmenu">
+                <ul class="nav flex-column ms-4">
+                    <li><a class="nav-link" href="/internal/delivery/request">납입지시 요청</a></li>
+                    <li><a class="nav-link" href="/internal/delivery/status">납입지시 조회</a></li>
+                </ul>
+            </div>
+        </li>
 
         <li>
             <a class="nav-link" data-bs-toggle="collapse" role="button">
@@ -253,6 +268,12 @@
     <div layout:fragment="inventory-history"></div>
     <div layout:fragment="inventory-price"></div>
     <div layout:fragment="inventory-status"></div>
+
+    <!-- 납입지시 -->
+    <div layout:fragment="delivery-instruction"></div>
+    <div layout:fragment="delivery-request"></div>
+    <div layout:fragment="delivery-status"></div>
+
 
 </div>
 <!-- 메인 end -->

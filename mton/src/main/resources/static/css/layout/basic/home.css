@@ -268,9 +268,22 @@ body {
 
 .nav-link[aria-expanded="true"] {
     background-color: #F1F6F9;
-    border-radius: 10px 0px 0px 10px;
+    /*border-radius: 10px 0px 0px 10px;*/
     /* margin: 5px; */
     /* color: #00909E; */
+}
+
+.ex-li.active {
+
+    background-color: #F1F6F9;
+}
+
+.ex-li.active i {
+    color: #394867 !important;
+}
+
+.ex-li .nav-link.active {
+    border: none !important;
 }
 
 .nav-link.active {
@@ -386,3 +399,11 @@ body {
 }
 /* 툴팁 css end */
 
+/* 사이드바가 접힌 상태에서 .active 하위 메뉴의 상위 메뉴 강조 */
+.sidebar.collapsed li.has-active-sub {
+    background-color: #F1F6F9;
+}
+
+.sidebar.collapsed li.has-active-sub i {
+    color: #394867 !important;
+}

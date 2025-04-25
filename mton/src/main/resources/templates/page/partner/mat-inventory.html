@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/ex-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON(협력업체 전용) - 자재 재고 관리</title>
+    <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
+</head>
+<body>
+
+<th:block layout:fragment="mat-inventory">
+    <div class="container py-5">
+        <h2 class="mb-4">재고 현황</h2>
+        <div class="card p-4">
+            <table id="mat-inventory-table" class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>자재코드</th>
+                    <th>자재명</th>
+                    <th>재고량</th>
+                    <th>예상 재고 변동</th>
+                    <th>최대 보관량</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td>PM001A01</td>
+                    <td>가이던스 FV 그립 핸들</td>
+                    <td>1000</td>
+                    <td class="positive">+200</td>
+                    <td>2000</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

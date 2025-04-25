@@ -1,10 +1,9 @@
 package org.zerock.b01.domain.operation;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.Date;
 
 @Entity
 @Getter
@@ -14,6 +13,18 @@ import lombok.*;
 @ToString
 public class Inspection {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String insId;
+
+    @ManyToOne
+    @JoinColumn(name = "order_id", nullable = false)
+    private Order order;
+
+    @Column(nullable = false)
+    private Date insStart;
+
+    @Column(nullable = false)
+    private Date insEnd;
+
+    @Column(nullable = false)
+    private int insQty;
 }

@@ -2,9 +2,7 @@ package org.zerock.b01.domain.user;
 
 import jakarta.persistence.*;
 import lombok.*;
-
-import java.util.HashSet;
-import java.util.Set;
+import org.zerock.b01.domain.BaseEntity;
 
 @Entity
 @Getter
@@ -12,17 +10,20 @@ import java.util.Set;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"userRole", "uPassword"})
-public class User {
+public class User extends BaseEntity {
     @Id
-    private String userId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long userId; // 일련번호
 
-    private String uEmail;
+    private String uEmail; // 회원 아이디
 
     private String uPassword;
 
     private String uName;
 
     private String uPhone;
+
+    private String uIsActive;
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole;

@@ -1,8 +1,7 @@
 package org.zerock.b01.domain.operation;
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import lombok.*;
 
@@ -14,6 +13,17 @@ import lombok.*;
 @ToString
 public class Product {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String prodId;
+
+    @Column(length = 120, nullable = false)
+    private String prodName;
+
+    @Column(length = 20, nullable = false)
+    private String prodMeasure;
+
+    @Column(length = 20, nullable = false)
+    private String prodUnit;
+
+    @Column(length = 20, nullable = false)
+    private String prodExplain;
 }

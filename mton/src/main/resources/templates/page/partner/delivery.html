@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/ex-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON(협력업체 전용) > 납품 지시 요청</title>
+</head>
+<body>
+
+<th:block layout:fragment="delivery">
+    <div class="container py-5">
+        <h2 class="mb-4">납품지시요청</h2>
+
+        <!-- 검색 영역 -->
+        <div class="card p-4 mb-4">
+            <div class="row g-3 align-items-end">
+
+                <!-- 납품지시코드 -->
+                <div class="col-md-2">
+                    <label for="deliveryCode" class="form-label">납품지시코드</label>
+                    <input type="text" class="form-control" id="deliveryCode" placeholder="납품지시코드">
+                </div>
+
+                <!-- 발주코드 -->
+                <div class="col-md-2">
+                    <label for="orderCode" class="form-label">발주코드</label>
+                    <input type="text" class="form-control" id="orderCode" placeholder="발주코드">
+                </div>
+
+                <!-- 자재명 -->
+                <div class="col-md-2">
+                    <label for="materialName" class="form-label">자재명</label>
+                    <input type="text" class="form-control" id="materialName" placeholder="자재명">
+                </div>
+
+                <!-- 납품요청일 -->
+                <div class="col-md-6">
+                    <label class="form-label">납품요청일</label>
+                    <div class="d-flex align-items-center gap-2">
+                        <input type="date" class="form-control" id="requestDateFrom">
+                        <span class="px-1">~</span>
+                        <input type="date" class="form-control" id="requestDateTo">
+                    </div>
+                </div>
+
+                <!-- 버튼 -->
+                <div class="col-12 text-end mt-4">
+                    <button class="btn btn-primary me-2" onclick="search()"><i class="bi bi-search"></i> 검색</button>
+                    <button class="btn btn-outline-secondary" onclick="resetSearch()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                </div>
+
+            </div>
+        </div>
+
+        <!-- 테이블 -->
+        <div class="card p-4">
+            <table id="requestTable" class="table table-bordered table-hover text-center">
+                <thead class="table-light">
+                <tr>
+                    <th><input type="checkbox" onclick="toggleAll(this)"></th>
+                    <th>납품지시코드</th>
+                    <th>발주코드</th>
+                    <th>자재명</th>
+                    <th>납품요청수량</th>
+                    <th>출고수량</th>
+                    <th>반품수량</th>
+                    <th>남은수량</th>
+                    <th>납품요청일</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody id="requestBody">
+                <tr>
+                    <td><input type="checkbox" class="rowCheck"></td>
+                    <td>D2025042401</td>
+                    <td>PO24041201</td>
+                    <td>배터리</td>
+                    <td>100</td>
+                    <td>0</td>
+                    <td>0</td>
+                    <td class="remaining">100</td>
+                    <td>2025-04-25</td>
+                    <td class="text-center"><span class="badge bg-warning text-dark">요청중</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</th:block>
+
+</body>
+</html>

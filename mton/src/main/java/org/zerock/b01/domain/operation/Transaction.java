@@ -1,10 +1,10 @@
 package org.zerock.b01.domain.operation;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
+import org.zerock.b01.domain.user.Partner;
+
+import java.util.Date;
 
 @Entity
 @Getter
@@ -14,6 +14,12 @@ import lombok.*;
 @ToString
 public class Transaction {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String tranId;
+
+    @ManyToOne
+    @JoinColumn(name = "partner_id", nullable = false)
+    private Partner partner;
+
+    @Column(nullable = false)
+    private Date tranDate;
 }

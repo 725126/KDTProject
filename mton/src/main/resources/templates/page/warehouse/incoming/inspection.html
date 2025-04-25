@@ -77,9 +77,9 @@
                     </div>
 
                     <!-- 버튼 -->
-                    <div class="col-12 d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-primary" onclick="searchTable()">검색</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="resetSearch()">초기화</button>
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-primary" onclick="searchTable()"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetSearch()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                     </div>
                 </div>
             </form>
@@ -87,7 +87,7 @@
 
 
         <div class="card p-4">
-            <table class="table table-bordered table-hover data-table">
+            <table class="table table-bordered table-hover data-table text-center">
                 <thead class="table-light">
                 <tr>
                     <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>

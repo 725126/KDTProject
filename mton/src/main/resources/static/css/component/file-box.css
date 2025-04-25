@@ -1,6 +1,7 @@
 /* 파일 업로드 버튼 관련 css start */
 .file-upload-area {
     display: flex;
+    margin-left: 15px;
     gap: 0.5rem;
     align-items: center;
 }

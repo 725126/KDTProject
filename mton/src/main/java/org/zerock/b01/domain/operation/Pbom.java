@@ -1,9 +1,6 @@
 package org.zerock.b01.domain.operation;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.*;
 
 @Entity
@@ -14,6 +11,16 @@ import lombok.*;
 @ToString
 public class Pbom {
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String pbomId;
+
+    @ManyToOne
+    @JoinColumn(name = "mat_id", nullable = false)
+    private Material material;
+
+    @ManyToOne
+    @JoinColumn(name = "prod_id", nullable = false)
+    private Product product;
+
+    @Column(nullable = false)
+    private int pbomQty;
 }

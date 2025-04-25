@@ -27,16 +27,16 @@
                         <label for="materialName" class="form-label">자재명</label>
                         <input type="text" class="form-control" id="materialName" name="materialName">
                     </div>
-                    <div class="col-12 d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-primary" onclick="search()">검색</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">초기화</button>
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                     </div>
                 </div>
             </form>
         </div>
 
         <div class="card p-4">
-            <table class="table table-bordered table-hover data-table" id="resultTable">
+            <table class="table table-bordered table-hover data-table text-center" id="resultTable">
                 <thead class="table-light">
                 <tr>
                     <th>자재코드</th>

@@ -39,9 +39,9 @@
                     <label for="search-material-name" class="form-label">자재명</label>
                     <input type="text" class="form-control" id="search-material-name">
                 </div>
-                <div class="col-12 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-primary" onclick="search()">검색</button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="resetForm()">초기화</button>
+                <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                    <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
+                    <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                 </div>
             </div>
         </div>
@@ -49,7 +49,7 @@
 
 
         <div class="card p-4">
-            <table class="table table-bordered table-hover" id="arrival-table">
+            <table class="table table-bordered table-hover text-center" id="arrival-table">
                 <thead class="table-light">
                 <tr>
                     <th>입고예정일</th>
