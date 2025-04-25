@@ -3,7 +3,7 @@ package org.zerock.b01.domain.warehouse;
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.b01.domain.BaseEntity;
-import org.zerock.b01.domain.operation.Order;
+import org.zerock.b01.domain.operation.Ordering;
 
 import java.util.Date;
 
@@ -20,7 +20,7 @@ public class DeliveryRequest extends BaseEntity {
 
   @ManyToOne
   @JoinColumn(nullable = false)
-  private Order order;
+  private Ordering ordering;
 
   @Column(nullable = false)
   private Date drDate;

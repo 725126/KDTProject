@@ -3,7 +3,7 @@ package org.zerock.b01.domain.warehouse;
 import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.b01.domain.operation.Material;
-import org.zerock.b01.domain.operation.Order;
+import org.zerock.b01.domain.operation.Ordering;
 
 @Entity
 @Getter
@@ -27,7 +27,7 @@ public class IncomingItem {
 
   @ManyToOne
   @JoinColumn(nullable = false)
-  private Order order;
+  private Ordering ordering;
 
   @ManyToOne
   @JoinColumn(nullable = false)
