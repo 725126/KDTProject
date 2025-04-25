@@ -34,7 +34,7 @@ public class IncomingItem {
   private DeliveryRequest deliveryRequest;
 
   @Column(nullable = false)
-  private int incomingQty = 0;
+  private int incomingQty = 0; // 에러 발생했던 구간
 
   @Column(nullable = false)
   private int incomingReturnQty = 0;

@@ -12,6 +12,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
+@Table(name = "ordering")
 public class Order {
     @Id
     private String orderId;

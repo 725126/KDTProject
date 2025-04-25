@@ -2,14 +2,17 @@ package org.zerock.b01.controller.user;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.zerock.b01.dto.user.InternalUserCreateDTO;
 
 @Controller
 @Log4j2
 @RequiredArgsConstructor
 public class UserController {
-
     // 회원 관리 - 인트로(로그인)
     @GetMapping("/intro")
     public String introGet() {
@@ -27,7 +30,6 @@ public class UserController {
     public String joinGet() {
         return "/page/user/join";
     }
-
 
     // 회원 관리 - 비밀번호 찾기
     @GetMapping("/find/pw")
