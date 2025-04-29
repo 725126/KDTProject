@@ -11,7 +11,56 @@
 
 <th:block layout:fragment="product-pbom">
     <div class="container py-5">
-        <h2 class="mb-4">품목 등록</h2>
+        <h2 class="mb-4">일괄 등록</h2>
+        <div class="row g-4 mb-5">
+            <!-- 자재 등록 -->
+            <div class="col-md-4">
+                <div class="card p-4 h-100">
+                    <h5 class="mb-3">자재 일괄 등록</h5>
+                    <div class="file-upload-area">
+                        <label for="material-file" class="file-box-label"><i class="bi bi-file-earmark-arrow-up me-1"></i> 파일 선택</label>
+                        <input type="file" id="material-file" multiple>
+                        <button type="button" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-download"></i> 양식 다운로드
+                        </button>
+                    </div>
+                    <div class="file-list" id="material-list"></div>
+                </div>
+            </div>
+
+            <!-- 상품 등록 -->
+            <div class="col-md-4">
+                <div class="card p-4 h-100">
+                    <h5 class="mb-3">상품 일괄 등록</h5>
+                    <div class="file-upload-area">
+                        <label for="product-file" class="file-box-label"><i class="bi bi-file-earmark-arrow-up me-1"></i> 파일 선택</label>
+                        <input type="file" id="product-file" multiple>
+                        <button type="button" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-download"></i> 양식 다운로드
+                        </button>
+                    </div>
+                    <div class="file-list" id="product-list"></div>
+                </div>
+            </div>
+
+            <!-- MBOM 등록 -->
+            <div class="col-md-4">
+                <div class="card p-4 h-100">
+                    <h5 class="mb-3">MBOM 일괄 등록</h5>
+                    <div class="file-upload-area">
+                        <label for="mbom-file" class="file-box-label"><i class="bi bi-file-earmark-arrow-up me-1"></i> 파일 선택</label>
+                        <input type="file" id="mbom-file" multiple>
+                        <button type="button" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-download"></i> 양식 다운로드
+                        </button>
+                    </div>
+                    <div class="file-list" id="mbom-list"></div>
+                </div>
+            </div>
+        </div>
+
+
+        <h2 class="mb-4">개별 등록</h2>
         <div class="card p-4 mb-5">
             <form id="type-filter" class="mb-3">
                 <div class="form-check form-check-inline">
@@ -108,7 +157,6 @@
     </div>
 
     <script th:src="@{/js/util/file-preview.js}"></script>
-    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 </th:block>
 
 </body>
