@@ -3,7 +3,7 @@ package org.zerock.b01.domain.operation;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -20,10 +20,10 @@ public class Inspection {
     private Ordering ordering;
 
     @Column(nullable = false)
-    private Date insStart;
+    private LocalDate insStart;
 
     @Column(nullable = false)
-    private Date insEnd;
+    private LocalDate insEnd;
 
     @Column(nullable = false)
     private int insQty;
