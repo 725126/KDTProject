@@ -83,13 +83,7 @@
             <table class="table table-bordered table-hover data-table text-center">
                 <thead class="table-light">
                 <tr>
-                    <th scope="col">품목코드</th>
-                    <th scope="col">자재명</th>
-                    <th scope="col">종별</th>
-                    <th scope="col">규격</th>
-                    <th scope="col">단위</th>
-                    <th scope="col">소요량</th>
-                    <th scope="col">완제품</th>
+                    <th scope="col" th:each="head: ${materialTH}">[[${head.getLabel()}]]</th>
                 </tr>
                 </thead>
                 <tbody>
@@ -109,6 +103,7 @@
 
     <script th:src="@{/js/util/file-preview.js}"></script>
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script th:src="@{/js/page/operation/excelParser.js}"></script>
 </th:block>
 
 </body>

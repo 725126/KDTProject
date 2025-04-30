@@ -1,3 +1,18 @@
+// TODO: 구현이 끝나면 아래 IIFE 구문으로 묶어 최소한의 보호조치를 할 것.
+// (function () {
+//     // 여기는 외부에서 접근할 수 없는 지역 스코프
+//     const secret = "비밀값";
+//
+//     function privateFunc() {
+//         console.log("이 함수도 콘솔에서 접근 불가");
+//     }
+//
+//     privateFunc(); // 내부에서 호출
+// })();
+
+// Codes below need sheetjs dependency:
+// <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
 // 파일을 읽은 다음 워크북을 리턴한다.
 async function parseExcel(file) {
     try {
@@ -24,23 +39,22 @@ function compareArrays(arr1, arr2) {
 }
 
 // 테이블 검증 및 내용을 삽입한다.
+// edit 에 true 를 입력하면 삽입된 td 가 수정 가능 상태가 된다.
 // 대상 테이블에는 thead, th, tbody 가 포함되어야 한다.
-function sheetToTable(file, table) {
+function sheetToTable(file, table, edit = false) {
     const workbook = parseExcel(file);
     workbook.then((value) => {
         const sheet = value.Sheets[value.SheetNames[0]];
 
         if (!compareArrays(sheetHeaders(sheet), tableHeaders(table))) {
             console.log("file does not match with table.");
-            return false;
         }
 
-        const htmlSheet = XLSX.utils.sheet_to_html(sheet, {editable: true});
+        const htmlSheet = XLSX.utils.sheet_to_html(sheet, {editable: edit});
         const startIndex = htmlSheet.indexOf("<tr", htmlSheet.indexOf("<tr") + 1);
 
         if (startIndex === -1) {
             console.log("file is match with table, but does not have data.");
-            return false;
         }
 
         const endIndex = htmlSheet.lastIndexOf("</tr>") + "</tr>".length;
@@ -48,7 +62,6 @@ function sheetToTable(file, table) {
 
         const tbody = table.querySelector("tbody");
         tbody.innerHTML = htmlRow;
-        return true;
     });
 }
 
@@ -70,9 +83,10 @@ function tableToFile(table, filename = "") {
         }
     }
 
-    // 열의 너비를 문자 단위로 설정
-    for (let i = 1; i < maxchar.length; i++) {
-        worksheet["!cols"][i] = {wch: maxchar[i]};
+    // 열의 너비를 px 단위로 설정
+    // 영문일 경우 wch 를 쓰면 되겠지만 그놈의 한글 너비가 문제다
+    for (let i = 0; i < maxchar.length; i++) {
+        worksheet["!cols"][i] = {wpx: maxchar[i] * 12};
     }
 
     let downFile = "document.xlsx";
@@ -83,5 +97,36 @@ function tableToFile(table, filename = "") {
     XLSX.writeFile(workbook, downFile);
 }
 
-// Codes above need this dependency:
-// <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+// JSON 데이터를 지정한 url 로 업로드.
+// 이후 response 데이터를 받아 json 으로 파싱한다.
+async function uploadJsonPost(dest, jdata) {
+    return await fetch(dest, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(jdata)
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        return data;
+    }).catch(error => {
+        console.log(error);
+    });
+}
+
+// 실제 보이는 테이블 데이터를 업로드.
+// 결과를 받아서 뭔가 더 할 예정이라면 그냥 이 함수를 복사해서 수정하면 된다.
+function tableUpload(dest, table) {
+    const sheet = XLSX.utils.table_to_sheet(table);
+    const jsheet = XLSX.utils.sheet_to_json(sheet);
+
+    const result = uploadJsonPost(dest, jsheet);
+    result.then((res) => {
+        // console.log(res) 를 지우고 원하는 코드를 넣을 것.
+        console.log(res);
+    }).catch(error => {
+        // console.log(error) 를 지우고 원하는 코드를 넣을 것.
+        console.log(error);
+    });
+}
