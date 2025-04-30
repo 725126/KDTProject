@@ -6,11 +6,60 @@
     <meta charset="UTF-8">
     <title>자재ON - 생산 > 품목 등록</title>
     <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
+    <link rel="styleSheet" th:href="@{/css/component/excelTable.css}">
 </head>
 <body>
 
 <th:block layout:fragment="product-pbom">
     <div class="container py-5">
+        <h2 class="mb-4">일괄 등록</h2>
+        <div class="row g-4 mb-5">
+            <!-- 자재 등록 -->
+            <div class="col-md-4">
+                <div class="card p-4 h-100">
+                    <h5 class="mb-3">자재 일괄 등록</h5>
+                    <div class="file-upload-area">
+                        <label for="material-file" class="file-box-label"><i class="bi bi-file-earmark-arrow-up me-1"></i> 파일 선택</label>
+                        <input type="file" id="material-file" accept=".xlsx">
+                        <button type="button" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-download"></i> 양식 다운로드
+                        </button>
+                    </div>
+                    <div class="file-list" id="material-list"></div>
+                </div>
+            </div>
+
+            <!-- 상품 등록 -->
+            <div class="col-md-4">
+                <div class="card p-4 h-100">
+                    <h5 class="mb-3">상품 일괄 등록</h5>
+                    <div class="file-upload-area">
+                        <label for="product-file" class="file-box-label"><i class="bi bi-file-earmark-arrow-up me-1"></i> 파일 선택</label>
+                        <input type="file" id="product-file" accept=".xlsx">
+                        <button type="button" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-download"></i> 양식 다운로드
+                        </button>
+                    </div>
+                    <div class="file-list" id="product-list"></div>
+                </div>
+            </div>
+
+            <!-- MBOM 등록 -->
+            <div class="col-md-4">
+                <div class="card p-4 h-100">
+                    <h5 class="mb-3">MBOM 일괄 등록</h5>
+                    <div class="file-upload-area">
+                        <label for="mbom-file" class="file-box-label"><i class="bi bi-file-earmark-arrow-up me-1"></i> 파일 선택</label>
+                        <input type="file" id="mbom-file" accept=".xlsx">
+                        <button type="button" class="btn btn-outline-secondary btn-sm">
+                            <i class="bi bi-download"></i> 양식 다운로드
+                        </button>
+                    </div>
+                    <div class="file-list" id="mbom-list"></div>
+                </div>
+            </div>
+        </div>
+
         <h2 class="mb-4">품목 등록</h2>
         <div class="card p-4 mb-5">
             <form id="type-filter" class="mb-3">
@@ -88,13 +137,9 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td>PM001A01</td>
-                    <td>가이던스 FV 그립 핸들</td>
-                    <td>조립품</td>
-                    <td>80×20×3</td>
-                    <td>cm</td>
-                    <td>1</td>
-                    <td>전기자전거A</td>
+                    <td th:each="i: ${#numbers.sequence(0, materialTH.length - 1)}">
+                        <span contenteditable="true"></span>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -103,7 +148,7 @@
 
     <script th:src="@{/js/util/file-preview.js}"></script>
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-    <script th:src="@{/js/page/operation/excelParser.js}"></script>
+    <script th:src="@{/js/page/operation/pbomMain.js}" type="module"></script>
 </th:block>
 
 </body>

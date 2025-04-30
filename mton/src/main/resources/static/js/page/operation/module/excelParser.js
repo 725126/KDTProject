@@ -1,15 +1,3 @@
-// TODO: 구현이 끝나면 아래 IIFE 구문으로 묶어 최소한의 보호조치를 할 것.
-// (function () {
-//     // 여기는 외부에서 접근할 수 없는 지역 스코프
-//     const secret = "비밀값";
-//
-//     function privateFunc() {
-//         console.log("이 함수도 콘솔에서 접근 불가");
-//     }
-//
-//     privateFunc(); // 내부에서 호출
-// })();
-
 // Codes below need sheetjs dependency:
 // <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
 
@@ -130,3 +118,5 @@ function tableUpload(dest, table) {
         console.log(error);
     });
 }
+
+export { sheetToTable, tableToFile, tableUpload };
