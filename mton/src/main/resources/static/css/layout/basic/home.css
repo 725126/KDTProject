@@ -314,7 +314,15 @@ body {
 
 }
 
-.buyer-profile {
+.admin-profile {
+    background-color: #EEEDEB !important;
+}
+
+.production-profile {
+    background-color: #3B6790 !important;
+}
+
+.purchasing-profile {
     background-color: #EFB036 !important;
 }
 

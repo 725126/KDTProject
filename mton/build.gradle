@@ -75,6 +75,10 @@ dependencies {
 
     // Spring Security 테스트용 의존성 - 인증 관련 테스트 기능 지원 (MockMvc와 함께 사용)
     testImplementation 'org.springframework.security:spring-security-test'
+
+    // Thymeleaf에서 Spring Security 기능 (인증/권한 정보)을 템플릿에서 사용할 수 있게 해주는 추가 모듈
+    implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
+
 }
 
 tasks.named('test') {

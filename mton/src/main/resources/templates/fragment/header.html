@@ -5,16 +5,45 @@
     <!-- 헤더 start -->
     <nav class="navbar fixed-top navbar-expand-lg border-bottom">
         <div class="container-fluid px-5">
-            <a class="navbar-brand d-flex align-items-center" href="/intro">
-                <!-- <img src="logo.svg" class="logo-img me-2"> -->
+            <!-- 로그인 안 한 경우 -->
+            <a class="navbar-brand d-flex align-items-center" th:if="${currentUserRole == null}" href="/intro">
+                           <span>
+                    <span class="logo"><i class="bi bi-box"></i>자재<span class="logo-on">ON</span></span>
+                </span>
+            </a>
+
+            <!-- 외부회원 PARTNER -->
+            <a class="navbar-brand d-flex align-items-center" th:if="${currentUserRole == 'PARTNER'}" href="/external/home">
+                            <span>
+                    <span class="logo"><i class="bi bi-box"></i>자재<span class="logo-on">ON</span></span>
+                </span>
+            </a>
+
+            <!-- 내부회원 (ADMIN, PRODUCTION, PURCHASING) -->
+            <a class="navbar-brand d-flex align-items-center"
+               th:if="${currentUserRole != null and currentUserRole != 'PARTNER'}"
+               href="/internal/home">
+
                 <span>
                     <span class="logo"><i class="bi bi-box"></i>자재<span class="logo-on">ON</span></span>
                 </span>
             </a>
             <div class="d-flex">
-                <a class="nav-link" href="/login">로그인</a>
-                <a class="nav-link" href="#">고객지원</a>
+                <!-- 로그인 안 한 상태 -->
+                <a class="nav-link" href="/login" th:if="${currentUserRole == null}">로그인</a>
+
+                <!-- 로그인 한 상태 -->
+                <form th:action="@{/logout}" method="post" th:if="${currentUserRole != null}" class="d-inline">
+                    <button type="submit" class="nav-link bg-transparent border-0 p-0">
+                        로그아웃
+                    </button>
+                </form>
             </div>
+
+            <!--            <div class="d-flex">-->
+<!--                <a class="nav-link" href="/login">로그인</a>-->
+<!--                <a class="nav-link" href="#">고객지원</a>-->
+<!--            </div>-->
         </div>
     </nav>
     <!-- 헤더 end -->

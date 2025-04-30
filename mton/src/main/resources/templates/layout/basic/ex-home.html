@@ -13,7 +13,7 @@
 </head>
 <body>
 
-<!-- *** 내부 회원용 home *** -->
+<!-- *** 외부 회원용 home *** -->
 
 <!-- 헤더 -->
 <nav class="navbar fixed-top navbar-expand-lg border-bottom">
@@ -25,31 +25,34 @@
         </a>
 
         <div class="d-flex ms-auto me-3">
-            <!-- <a class="nav-link" href="#">로그아웃</a>
-            <a class="nav-link" href="#">마이페이지</a> -->
         </div>
-
-        <!-- <li><i class="bi bi-cart-check me-2"></i>구매 부서</li>
-        <li><i class="bi bi-tools me-2"></i>생산 부서</li>
-        <li><i class="bi bi-building"></i>협력 업체</li> -->
 
         <!-- 알림 없앤다면 me-2 지우기 -->
         <div class="dropdown me-2">
             <button class="btn no-bootstrap-style d-flex align-items-center" type="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
-          <span class="profile-icon bg-light text-dark rounded-circle p-2 partner-profile">
-            <i class="bi bi-building"></i>
-          </span>
-                <span class="ms-2">(주)솔브릭 님</span>
+                <span class="profile-icon bg-light text-dark rounded-circle p-2"
+                      th:classappend="${currentUserRole.profileClass}">
+                    <i class="bi" th:classappend="${currentUserRole.iconClass}"></i>
+                </span>
+                        <span class="ms-2">
+                    <span th:text="${currentUserName}"></span>&nbsp;님
+                </span>
                 <span class="my-tog ms-2">▼</span>
             </button>
             <ul class="dropdown-menu border">
-                <li><a class="dropdown-item" href="#">마이페이지</a></li>
-                <li><a class="dropdown-item" href="#">설정</a></li>
+                <li><a class="dropdown-item" href="/external/my/account-edit">내 정보</a></li>
+                <li><a class="dropdown-item" href="/external/my/account-delete">회원 탈퇴</a></li>
                 <li>
                     <hr class="dropdown-divider">
                 </li>
-                <li><a class="dropdown-item" href="#">로그아웃</a></li>
+                <li>
+                    <form th:action="@{/logout}" method="post" class="d-inline">
+                        <button type="submit" class="dropdown-item bg-transparent border-0">
+                            로그아웃
+                        </button>
+                    </form>
+                </li>
             </ul>
         </div>
 

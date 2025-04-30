@@ -28,4 +28,14 @@ public class User extends BaseEntity { // 회원 (기본 회원 정보)
 
     @Enumerated(EnumType.STRING)
     private UserRole userRole; // 역할 (생산부서(내부), 구매부서(내부), 협력 업체(외부), 관리자(내부))
+
+    private String resetToken;
+
+    public void setResetToken(String resetToken) {
+        this.resetToken = resetToken;
+    }
+
+    public void setPassword(String uPassword) {
+        this.uPassword = uPassword;
+    }
 }

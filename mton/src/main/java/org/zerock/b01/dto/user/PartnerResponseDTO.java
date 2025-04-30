@@ -7,11 +7,10 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class PartnerResponseDTO { // 회원 조회 (외부)
     private Long partnerId;
     private String pCompany;
     private String pAddr;
     private String pBusinessNo;
-
-    private UserResponseDTO user;
 }

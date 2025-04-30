@@ -9,6 +9,7 @@ import org.zerock.b01.domain.user.UserStatus;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
+@ToString
 public class UserResponseDTO { // 회원 조회 (내부)
     private Long userId;
     private String uEmail;
@@ -16,4 +17,6 @@ public class UserResponseDTO { // 회원 조회 (내부)
     private String uPhone;
     private UserRole userRole;
     private UserStatus uIsActive;
+
+    private PartnerResponseDTO partnerResponse;
 }
