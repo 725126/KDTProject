@@ -31,16 +31,24 @@ function sheetToTable(file, table) {
         const sheet = value.Sheets[value.SheetNames[0]];
 
         if (!compareArrays(sheetHeaders(sheet), tableHeaders(table))) {
-            return;
+            console.log("file does not match with table.");
+            return false;
         }
 
         const htmlSheet = XLSX.utils.sheet_to_html(sheet, {editable: true});
         const startIndex = htmlSheet.indexOf("<tr", htmlSheet.indexOf("<tr") + 1);
+
+        if (startIndex === -1) {
+            console.log("file is match with table, but does not have data.");
+            return false;
+        }
+
         const endIndex = htmlSheet.lastIndexOf("</tr>") + "</tr>".length;
         const htmlRow = htmlSheet.substring(startIndex, endIndex);
 
         const tbody = table.querySelector("tbody");
         tbody.innerHTML = htmlRow;
+        return true;
     });
 }
 
