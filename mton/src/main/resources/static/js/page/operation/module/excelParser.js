@@ -119,4 +119,8 @@ function tableUpload(dest, table) {
     });
 }
 
-export { sheetToTable, tableToFile, tableUpload };
+export {
+    sheetToTable,
+    tableToFile,
+    tableUpload
+};

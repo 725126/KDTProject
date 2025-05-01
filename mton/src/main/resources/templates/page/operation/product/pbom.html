@@ -6,130 +6,46 @@
     <meta charset="UTF-8">
     <title>자재ON - 생산 > 품목 등록</title>
     <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
-    <link rel="styleSheet" th:href="@{/css/component/excelTable.css}">
+    <link rel="stylesheet" th:href="@{/css/page/operation/pbom.css}">
 </head>
 <body>
 
 <th:block layout:fragment="product-pbom">
     <div class="container py-5">
-        <h2 class="mb-4">일괄 등록</h2>
-        <div class="row g-4 mb-5">
-            <!-- 자재 등록 -->
-            <div class="col-md-4">
-                <div class="card p-4 h-100">
-                    <h5 class="mb-3">자재 일괄 등록</h5>
-                    <div class="file-upload-area">
-                        <label for="material-file" class="file-box-label"><i class="bi bi-file-earmark-arrow-up me-1"></i> 파일 선택</label>
-                        <input type="file" id="material-file" accept=".xlsx">
-                        <button type="button" class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-download"></i> 양식 다운로드
-                        </button>
-                    </div>
-                    <div class="file-list" id="material-list"></div>
+        <h2 class="mb-4" id="upload-test">품목 관리</h2>
+        <div class="row g-4 mb-3">
+            <form id="manage-mod" class="mb-3">
+                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-insert">
+                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-insert" checked>
+                    <label class="form-check-label btn btn-primary pe-none" for="mod-insert" id="insert-label">목록</label>
                 </div>
-            </div>
-
-            <!-- 상품 등록 -->
-            <div class="col-md-4">
-                <div class="card p-4 h-100">
-                    <h5 class="mb-3">상품 일괄 등록</h5>
-                    <div class="file-upload-area">
-                        <label for="product-file" class="file-box-label"><i class="bi bi-file-earmark-arrow-up me-1"></i> 파일 선택</label>
-                        <input type="file" id="product-file" accept=".xlsx">
-                        <button type="button" class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-download"></i> 양식 다운로드
-                        </button>
-                    </div>
-                    <div class="file-list" id="product-list"></div>
+                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-edit">
+                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-edit">
+                    <label class="form-check-label btn btn-outline-secondary" for="mod-edit" id="edit-label">수정</label>
                 </div>
-            </div>
-
-            <!-- MBOM 등록 -->
-            <div class="col-md-4">
-                <div class="card p-4 h-100">
-                    <h5 class="mb-3">MBOM 일괄 등록</h5>
-                    <div class="file-upload-area">
-                        <label for="mbom-file" class="file-box-label"><i class="bi bi-file-earmark-arrow-up me-1"></i> 파일 선택</label>
-                        <input type="file" id="mbom-file" accept=".xlsx">
-                        <button type="button" class="btn btn-outline-secondary btn-sm">
-                            <i class="bi bi-download"></i> 양식 다운로드
-                        </button>
-                    </div>
-                    <div class="file-list" id="mbom-list"></div>
-                </div>
-            </div>
-        </div>
-
-        <h2 class="mb-4">품목 등록</h2>
-        <div class="card p-4 mb-5">
-            <form id="type-filter" class="mb-3">
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="i-filter" id="filter-mat-i" checked>
-                    <label class="form-check-label" for="filter-mat-i">자재</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="i-filter" id="filter-prd-i">
-                    <label class="form-check-label" for="filter-prd-i">상품</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="i-filter" id="filter-mbom-i">
-                    <label class="form-check-label" for="filter-mbom-i">MBOM</label>
-                </div>
-            </form>
-
-            <form id="item-input" class="row g-3">
-                <div class="col-md-4">
-                    <label for="mat-code" class="form-label">자재 코드</label>
-                    <input type="text" class="form-control" id="mat-code">
-                </div>
-                <div class="col-md-4">
-                    <label for="mat-select" class="form-label">선택</label>
-                    <input type="text" class="form-control" id="mat-select">
-                </div>
-                <div class="col-md-4">
-                    <label for="mat-name" class="form-label">자재 명칭</label>
-                    <input type="text" class="form-control" id="mat-name">
-                </div>
-                <div class="col-md-4">
-                    <label for="mat-type" class="form-label">종별</label>
-                    <input type="text" class="form-control" id="mat-type">
-                </div>
-                <div class="col-md-4">
-                    <label for="mat-measure" class="form-label">규격</label>
-                    <input type="text" class="form-control" id="mat-measure">
-                </div>
-                <div class="col-md-4">
-                    <label for="mat-unit" class="form-label">단위</label>
-                    <input type="text" class="form-control" id="mat-unit">
-                </div>
-                <div class="col-12">
-                    <label for="mat-info" class="form-label">설명</label>
-                    <input type="text" class="form-control" id="mat-info">
-                </div>
-                <div class="col-12 text-end mt-4">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> 등록</button>
+                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-view">
+                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-view">
+                    <label class="form-check-label btn btn-outline-secondary" for="mod-view" id="view-label">등록</label>
                 </div>
             </form>
         </div>
-
-        <h2 class="mb-4">품목 등록 정보</h2>
         <div class="card p-4">
             <form id="view-filter" class="mb-3">
                 <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="v-filter" id="filter-pbom-v" checked>
-                    <label class="form-check-label" for="filter-pbom-v">자재</label>
-                </div>
-                <div class="form-check form-check-inline">
-                    <input class="form-check-input" type="radio" name="v-filter" id="filter-mat-v">
-                    <label class="form-check-label" for="filter-mat-v">상품</label>
+                    <input class="form-check-input" type="radio" name="v-filter" id="filter-mat-v" checked>
+                    <label class="form-check-label" for="filter-mat-v">자재</label>
                 </div>
                 <div class="form-check form-check-inline">
                     <input class="form-check-input" type="radio" name="v-filter" id="filter-prd-v">
-                    <label class="form-check-label" for="filter-prd-v">MBOM</label>
+                    <label class="form-check-label" for="filter-prd-v">상품</label>
+                </div>
+                <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="radio" name="v-filter" id="filter-pbom-v">
+                    <label class="form-check-label" for="filter-pbom-v">PBOM</label>
                 </div>
             </form>
 
-            <table class="table table-bordered table-hover data-table text-center">
+            <table class="table table-bordered table-hover data-table text-center table-excel" id="mat-table">
                 <thead class="table-light">
                 <tr>
                     <th scope="col" th:each="head: ${materialTH}">[[${head.getLabel()}]]</th>
@@ -137,7 +53,37 @@
                 </thead>
                 <tbody>
                 <tr>
-                    <td th:each="i: ${#numbers.sequence(0, materialTH.length - 1)}">
+                    <td class="" th:each="i: ${#numbers.sequence(0, materialTH.length - 1)}">
+                        <span contenteditable="true"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-bordered table-hover data-table text-center table-excel" id="prd-table">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col" th:each="head: ${productTH}">[[${head.getLabel()}]]</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="" th:each="i: ${#numbers.sequence(0, productTH.length - 1)}">
+                        <span contenteditable="true"></span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <table class="table table-bordered table-hover data-table text-center table-excel" id="pbom-table">
+                <thead class="table-light">
+                <tr>
+                    <th scope="col" th:each="head: ${pbomTH}">[[${head.getLabel()}]]</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr>
+                    <td class="" th:each="i: ${#numbers.sequence(0, pbomTH.length - 1)}">
                         <span contenteditable="true"></span>
                     </td>
                 </tr>

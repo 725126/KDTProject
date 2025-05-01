@@ -15,6 +15,5 @@ public class MaterialDTO {
     private String matType;
     private String matMeasure;
     private String matUnit;
-    private int matQty;
-    private String prod;
+    private String matExplain;
 }

@@ -6,6 +6,8 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.zerock.b01.domain.operation.tablehead.MaterialTableHead;
+import org.zerock.b01.domain.operation.tablehead.PbomTableHead;
+import org.zerock.b01.domain.operation.tablehead.ProductTableHead;
 import org.zerock.b01.dto.operation.MaterialDTO;
 
 import java.util.ArrayList;
@@ -20,6 +22,8 @@ public class ProductController {
     @GetMapping("/pbom")
     public String pbomGet(Model model) {
         model.addAttribute("materialTH", MaterialTableHead.values());
+        model.addAttribute("productTH", ProductTableHead.values());
+        model.addAttribute("pbomTH", PbomTableHead.values());
         return "/page/operation/product/pbom";
     }
 
@@ -42,8 +46,7 @@ public class ProductController {
                     .matType((String) map.get(MaterialTableHead.MAT_TYPE.getLabel()))
                     .matMeasure((String) map.get(MaterialTableHead.MAT_MEASURE.getLabel()))
                     .matUnit((String) map.get(MaterialTableHead.MAT_UNIT.getLabel()))
-                    .matQty((int) map.get(MaterialTableHead.MAT_QTY.getLabel()))
-                    .prod((String) map.get(MaterialTableHead.PROD.getLabel()))
+                    .matExplain((String) map.get(MaterialTableHead.MAT_EXPLAIN.getLabel()))
                     .build();
             materials.add(materialDTO);
         }

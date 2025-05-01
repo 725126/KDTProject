@@ -1,0 +1,37 @@
+#manage-mod {
+    width: fit-content;
+}
+
+.table-excel {
+    display: none;
+}
+
+.table-excel tr {
+    position: relative;
+}
+
+.table-excel td{
+    height: 41px;
+    min-width: 100px;
+    word-break: break-all;
+}
+
+.opacity-btn {
+    opacity: 0;
+    background-color: white;
+    transition: opacity 0.5s;
+}
+
+tr:hover .opacity-btn {
+    opacity: 1;
+}
+
+.opacity-btn:hover {
+    background-color: dodgerblue;
+    color: white;
+}
+
+.opacity-btn[red-button='true']:hover {
+    background-color: crimson;
+    color: white;
+}
