@@ -56,17 +56,17 @@ form {
     width: 80%;
 }
 
-/*.verify-btn {*/
-/*    background-color: #526D82;*/
-/*}*/
-
-/*.verify-btn:hover {*/
-/*    background-color: #27374D;*/
-/*}*/
-
 .resend-link {
     font-size: 0.875rem;
     margin-top: 1rem;
     color: #6c757d;
     text-align: right;
+}
+
+#userRole {
+    border-radius: 1rem;
+}
+
+.card-container {
+    margin-top: 64px;
 }

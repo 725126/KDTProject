@@ -25,4 +25,9 @@ public class Partner { // 협력업체 (추가 회원 정보)
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // (외래키) 회원 ID
+
+    public void updateCompanyInfo(String pCompany, String pAddr) {
+        this.pCompany = pCompany;
+        this.pAddr = pAddr;
+    }
 }

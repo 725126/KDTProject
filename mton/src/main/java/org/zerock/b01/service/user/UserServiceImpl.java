@@ -1,17 +1,17 @@
 package org.zerock.b01.service.user;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Bean;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zerock.b01.domain.user.Partner;
 import org.zerock.b01.domain.user.User;
 import org.zerock.b01.domain.user.UserRole;
 import org.zerock.b01.domain.user.UserStatus;
-import org.zerock.b01.dto.user.PartnerCreateDTO;
-import org.zerock.b01.dto.user.PartnerResponseDTO;
-import org.zerock.b01.dto.user.UserCreateDTO;
-import org.zerock.b01.dto.user.UserResponseDTO;
+import org.zerock.b01.dto.user.*;
 import org.zerock.b01.repository.user.PartnerRepository;
 import org.zerock.b01.repository.user.UserRepository;
 
@@ -116,9 +116,20 @@ public class UserServiceImpl implements UserService {
 
     // 이메일(회원 아이디 찾기)
     @Override
-    public Optional<String> findEmailByNameAndPhone(String name, String phone) {
-        return userRepository.findByNameAndPhone(name, phone)
-                .map(User::getUEmail); // 이메일만 Optional로 감싸서 리턴
+    public Optional<String> findEmailByFindIdDTO(FindIdDTO dto) {
+        UserRole roleEnum = UserRole.valueOf(dto.getUserRole());
+        Optional<User> userOptional = userRepository.findUserByNamePhoneAndRole(dto.getUName(), dto.getUPhone(), roleEnum);
+
+        if (userOptional.isPresent()) {
+            // 회원종류가 협력업체인 경우 사업자등록번호 검사
+            if (roleEnum.equals(UserRole.PARTNER)) {
+              Optional<Partner> partnerOptional = partnerRepository.findBypBusinessNo(dto.getPBusinessNo());
+              if (partnerOptional.isEmpty()) {
+                  return Optional.empty();
+              }
+            }
+        }
+        return userOptional.map(User::getUEmail);
     }
 
     // 회원 정보 불러오기
@@ -154,6 +165,41 @@ public class UserServiceImpl implements UserService {
         return userResponseDTO;
     }
 
+    @Override
+    public User getUserByEmail(String email) {
+        return userRepository.findByuEmail(email)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+    }
 
+    // 비밀번호 변경 > 비밀번호 일치 여부 확인
+    @Override
+    public boolean checkPasswordMatch(String currentPassword, String userPassword) {
+        return passwordEncoder.matches(currentPassword, userPassword);
+    }
+
+    // 비밀번호 변경
+    @Override
+    public void changePassword(User user, String newPassword) {
+        String encodedNewPassword = passwordEncoder.encode(newPassword);
+        user.setPassword(encodedNewPassword);
+        userRepository.save(user);
+    }
+
+    // 회원정보 수정 (기본정보)
+    @Override
+    @Transactional
+    public void updateUserInfo(String uEmail, UserUpdateDTO dto) {
+        User user = userRepository.findByuEmail(uEmail)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+
+        user.updateBasicInfo(dto.getName(), dto.getEmail(), dto.getPhone());
+
+        if (dto.getUserRole().equals(UserRole.PARTNER)) {
+            Partner partner = partnerRepository.findByUser(user)
+                    .orElseThrow(() -> new IllegalArgumentException("협력업체 정보 없음"));
+
+            partner.updateCompanyInfo(dto.getCompanyName(), dto.getAddress());
+        }
+    }
 
 }

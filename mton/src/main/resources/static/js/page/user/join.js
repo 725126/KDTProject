@@ -1,13 +1,13 @@
-// 연락처 입력 마스크
-Inputmask({
-    mask: "010-9999-9999",
-    placeholder: "",        // 언더바 없애기
-    showMaskOnHover: false,  // 마우스 오버 시 마스크 안보이게
-    showMaskOnFocus: true,   // 포커스하면만 마스크 적용
-    autoUnmask: false,       // 입력된 값만 표시
-    removeMaskOnSubmit: false, // 폼 제출할 때 마스크 유지
-    jitMasking: true         // 입력한 만큼만 마스크 적용 (✨핵심!)
-}).mask(".phone-mask");
+// // 연락처 입력 마스크
+// Inputmask({
+//     mask: "010-9999-9999",
+//     placeholder: "",        // 언더바 없애기
+//     showMaskOnHover: false,  // 마우스 오버 시 마스크 안보이게
+//     showMaskOnFocus: true,   // 포커스하면만 마스크 적용
+//     autoUnmask: false,       // 입력된 값만 표시
+//     removeMaskOnSubmit: false, // 폼 제출할 때 마스크 유지
+//     jitMasking: true         // 입력한 만큼만 마스크 적용 (✨핵심!)
+// }).mask(".phone-mask");
 
 // 사업자 번호 입력 마스크
 Inputmask({
@@ -33,115 +33,36 @@ window.addEventListener('DOMContentLoaded', function() {
     }
 });
 
-// 연락처 입력 검증
-const phoneInput = document.getElementById('uPhone');
-const phoneCheckResult = document.getElementById('phoneCheckResult');
+// // 연락처 입력 검증
+// const phoneInput = document.getElementById('uPhone');
+// const phoneCheckResult = document.getElementById('phoneCheckResult');
+//
+// let isPhoneChecked = false;
+//
+// function validatePhone() {
+//     const phone = phoneInput.value.trim();
+//
+//     // 기본 정규식 (010, 011, 016~019 / 3~4자리 / 4자리)
+//     const phoneRegex = /^01([0|1|6|7|8|9])-(\d{3,4})-(\d{4})$/;
+//
+//     if (phone.length === 0) {
+//         phoneCheckResult.textContent = "";
+//         return;
+//     }
+//
+//     if (!phoneRegex.test(phone)) {
+//         phoneCheckResult.textContent = "❌ 연락처 형식이 올바르지 않습니다.";
+//         phoneCheckResult.style.color = "red";
+//         isPhoneChecked = false;
+//     } else {
+//         phoneCheckResult.textContent = "";
+//         isPhoneChecked = true;
+//     }
+// }
 
-let isPhoneChecked = false;
-
-function validatePhone() {
-    const phone = phoneInput.value.trim();
-
-    // 기본 정규식 (010, 011, 016~019 / 3~4자리 / 4자리)
-    const phoneRegex = /^01([0|1|6|7|8|9])-(\d{3,4})-(\d{4})$/;
-
-    if (phone.length === 0) {
-        phoneCheckResult.textContent = "";
-        return;
-    }
-
-    if (!phoneRegex.test(phone)) {
-        phoneCheckResult.textContent = "❌ 연락처 형식이 올바르지 않습니다.";
-        phoneCheckResult.style.color = "red";
-        isPhoneChecked = false;
-    } else {
-        phoneCheckResult.textContent = "";
-        isPhoneChecked = true;
-    }
-}
-
-// 마스킹 썼으므로 input + keyup 둘 다 걸기
-phoneInput.addEventListener('keyup', validatePhone);
-phoneInput.addEventListener('input', validatePhone);
-
-// 사업자등록번호 검증
-const businessInput = document.getElementById('pBusinessNo');
-const businessCheckResult = document.getElementById('businessCheckResult');
-const checkBusinessBtn = document.getElementById('checkBusinessNoDuplicateBtn');
-
-let isBusinessChecked = false;
-
-// 1️⃣ 사업자등록번호 유효성 검증
-function isValidBusinessNoFormat(value) {
-    const multiply = [1, 3, 7, 1, 3, 7, 1, 3, 5];
-    let sum = 0;
-
-    for (let i = 0; i < 9; i++) {
-        sum += parseInt(value.charAt(i)) * multiply[i];
-    }
-    sum += Math.floor((parseInt(value.charAt(8)) * 5) / 10);
-
-    const checkDigit = (10 - (sum % 10)) % 10;
-    return checkDigit === parseInt(value.charAt(9));
-}
-
-// 2️⃣ 실시간 형식 검증
-function validateBusinessNo() {
-    const value = businessInput.value.replace(/-/g, ''); // 하이픈(-) 제거
-
-    isBusinessChecked = false;
-
-    if (value.length !== 10 || isNaN(value)) {
-        businessCheckResult.textContent = "❌ 올바른 사업자 등록번호 형식이 아닙니다.";
-        businessCheckResult.style.color = "red";
-        checkBusinessBtn.disabled = true;
-        return;
-    }
-
-    if (!isValidBusinessNoFormat(value)) {
-        businessCheckResult.textContent = "❌ 유효하지 않은 사업자 등록번호입니다.";
-        businessCheckResult.style.color = "red";
-        checkBusinessBtn.disabled = true;
-    } else {
-        businessCheckResult.textContent = "사업자등록번호 중복 확인을 해주세요.";
-        businessCheckResult.style.color = "gray";
-        checkBusinessBtn.disabled = false;
-    }
-}
-
-if (businessInput != null) {
-    // 마스킹 썼으므로 input + keyup 둘 다 걸기
-    businessInput.addEventListener('input', validateBusinessNo);
-    businessInput.addEventListener('keyup', validateBusinessNo);
-}
-
-// 3️⃣ 중복확인 버튼 클릭 시
-if (checkBusinessBtn != null) {
-    checkBusinessBtn.addEventListener('click', function () {
-        const raw = businessInput.value.trim();
-
-        // ✅ 서버에 중복 확인 요청
-        fetch(`/check/business-no?businessNo=${encodeURIComponent(raw)}`)
-            .then(response => response.json())
-            .then(available => {
-                if (available) {
-                    businessCheckResult.textContent = "✅ 사용 가능한 사업자등록번호입니다.";
-                    businessCheckResult.style.color = "green";
-                    isBusinessChecked = true;
-                } else {
-                    businessCheckResult.textContent = "❌ 이미 사용 중인 사업자등록번호입니다.";
-                    businessCheckResult.style.color = "red";
-                    isBusinessChecked = false;
-                }
-            })
-            .catch(error => {
-                console.error("Error:", error);
-                businessCheckResult.textContent = "❌ 서버 오류가 발생했습니다.";
-                businessCheckResult.style.color = "red";
-                isBusinessChecked = false;
-            });
-    });
-}
+// // 마스킹 썼으므로 input + keyup 둘 다 걸기
+// phoneInput.addEventListener('keyup', validatePhone);
+// phoneInput.addEventListener('input', validatePhone);
 
 // 이름 & 회사명 검증
 let isNameChecked = false;
@@ -215,6 +136,7 @@ const joinForm = document.getElementById('joinForm');
 // ✅ 회원가입 버튼 클릭 시 입력 값 체크
 joinForm.addEventListener('submit', function(event) {
 
+    // 아이디 검증 함수 호출
     if (!submitFormValidateEmail(event)) {
         return;
     }
@@ -232,18 +154,21 @@ joinForm.addEventListener('submit', function(event) {
     }
 
     // 연락처
-    if (!isPhoneChecked) {
-        event.preventDefault();
-        phoneInput.focus();
+    // if (!isPhoneChecked) {
+    //     event.preventDefault();
+    //     phoneInput.focus();
+    //     return;
+    // }
+    // 연락처 검증 함수 호출
+    if (!submitFormValidatePhone(event)) {
         return;
     }
 
-    // 사업자등록번호 (optional)
-    if (businessInput != null && !isBusinessChecked) {
-        event.preventDefault();
-        businessInput.focus();
+    // 사업자등록번호 검증 함수 호출
+    if (!submitFormValidateBusinessNo(event)) {
         return;
     }
+
 
     // 회사명 (optional)
     if (companyInput != null && !isCompanyChecked) {

@@ -5,6 +5,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.zerock.b01.domain.user.User;
+import org.zerock.b01.domain.user.UserRole;
 
 import java.util.Optional;
 
@@ -21,9 +22,13 @@ public interface UserRepository extends JpaRepository<User, Long> {
 
     Optional<User> findByResetToken(String token);
 
-    @Query("SELECT u FROM User u WHERE u.uName = :uName AND u.uPhone = :uPhone")
-    Optional<User> findByNameAndPhone(@Param("uName") String uName,
-                                      @Param("uPhone") String uPhone);
+    //    @Query("SELECT u FROM User u WHERE u.uName = :uName AND u.uPhone = :uPhone")
+//    Optional<User> findByNameAndPhone(@Param("uName") String uName,
+//                                      @Param("uPhone") String uPhone);
+    @Query("SELECT u FROM User u WHERE u.uName = :uName AND u.uPhone = :uPhone AND u.userRole = :userRole")
+    Optional<User> findUserByNamePhoneAndRole(@Param("uName") String uName,
+                                              @Param("uPhone") String uPhone,
+                                              @Param("userRole") UserRole userRole);
 
 
 }

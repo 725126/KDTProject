@@ -6,67 +6,192 @@
     <meta charset="UTF-8">
     <title>자재ON - 마이페이지 > 내 정보</title>
     <link rel="stylesheet" th:href="@{/css/page/user/account-edit.css}">
+    <link rel="stylesheet" th:href="@{/css/component/tab.css}">
 </head>
 <body>
 
 <th:block layout:fragment="account-edit">
     <div class="scale-wrapper min-h-screen scale-100 w-100">
-        <div class="tab-container rounded border">
-            <!-- Bootstrap 탭 버튼 -->
-            <ul class="nav nav-pills nav-fill border-bottom pt-3" id="myTab" role="tablist">
+        <div class="max-w-2xl w-full p-6 bg-white rounded-2xl border">
+            <!-- 부트스트랩 탭 메뉴 -->
+            <ul class="toss-tab nav mb-4" id="accountTab" role="tablist">
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link tab-nav-link active pb-3 fs-5" id="tab1-tab" data-bs-toggle="tab" data-bs-target="#tab1"
-                            type="button" role="tab" aria-controls="tab1" aria-selected="true">회원 정보</button>
+                    <button class="nav-link active fs-5" id="infoTab-btn" data-bs-toggle="tab" data-bs-target="#infoTab"
+                            type="button" role="tab">기본정보
+                    </button>
                 </li>
                 <li class="nav-item" role="presentation">
-                    <button class="nav-link tab-nav-link pb-3 fs-5" id="tab2-tab" data-bs-toggle="tab" data-bs-target="#tab2" type="button"
-                            role="tab" aria-controls="tab2" aria-selected="false">보안 설정</button>
+                    <button class="nav-link fs-5" id="passwordTab-btn" data-bs-toggle="tab"
+                            data-bs-target="#passwordTab" type="button" role="tab">비밀번호 변경
+                    </button>
                 </li>
             </ul>
 
-            <!-- 탭 콘텐츠 -->
-            <div class="tab-content">
-                <div class="tab-pane fade show active mx-auto" id="tab1" role="tabpanel" aria-labelledby="tab1-tab">
+            <meta name="active-tab" content="[[${activeTab}]]">
 
+            <div class="tab-content" id="accountTabContent">
+                <!-- 기본정보 탭 -->
+                <div class="tab-pane fade show active account-edit-tab" id="infoTab" role="tabpanel">
+                    <form action="/my/account-edit" method="post" id="accountEditForm">
+                        <!-- POST, PUT, DELETE 요청 시 CSRF(Cross-Site Request Forgery) 공격을 방지하기 위해 반드시 필요한 보호 장치-->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
 
-                    <div class="mb-3">
-                        <label for="name" class="form-label">이름</label>
-                        <input type="text" class="form-control" id="name" value="홍길동" />
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">이메일(아이디)</label>
-                        <div class="input-group">
-                            <input type="email" class="form-control" id="email" value="gil@example.com"
-                                   placeholder="example@email.com" />
-                            <button class="btn btn-outline-primary" type="button" id="checkDuplicateBtn">중복확인</button>
+                        <!-- 메시지 영역 -->
+                        <div th:if="${errorEdit}"
+                             class="mb-4 p-3 rounded-xl bg-red-100 text-red-800 text-sm font-medium text-center">
+                            <span th:text="${errorEdit}">에러 메시지</span>
                         </div>
-                    </div>
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">연락처</label>
-                        <input type="tel" class="form-control" id="phone" placeholder="010-1234-5678" />
-                    </div>
-                    <button class="btn edit-btn w-100 mt-3 py-3 px-5 fs-5">정보 수정</button>
+
+                        <div th:if="${successEdit}"
+                             class="mb-4 p-3 rounded-xl bg-green-100 text-green-800 text-sm font-medium text-center">
+                            <span th:text="${successEdit}">성공 메시지</span>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="name" class="block text-base text-gray-500 mb-1">이름</label>
+                            <input id="name" name="name" type="text"
+                                   class="w-full px-4 py-2 text-base border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                   placeholder="이름을 입력하세요" th:value="${userResponseDTO.getUName()}">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="uEmail" class="block text-base text-gray-500 mb-1">이메일</label>
+                            <div class="flex w-full">
+                                <input id="uEmail" name="email" type="email"
+                                       class="w-full px-4 py-2 text-base border border-gray-300 rounded-l-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                       placeholder="이메일 주소" th:value="${userResponseDTO.getUEmail()}">
+                                <button type="button"
+                                        id="checkEmailDuplicateBtn"
+                                        class="px-4 py-2 text-base border border-l-0 border-gray-300 rounded-r-xl bg-white text-gray-700 hover:bg-blue-50 text-nowrap disabled:opacity-50"
+                                        disabled>
+                                    중복확인
+                                </button>
+                            </div>
+                            <small id="emailCheckResult"></small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="uPhone" class="block text-base text-gray-500 mb-1">연락처</label>
+                            <input id="uPhone" name="phone" type="tel"
+                                   class="w-full px-4 py-2 text-base border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none phone-mask"
+                                   placeholder="연락처 입력 (예: 010-1234-5678)" th:value="${userResponseDTO.getUPhone()}">
+                            <small id="phoneCheckResult"></small>
+                        </div>
+
+                        <th:block th:if="${currentUserRole.name() == 'PARTNER'}">
+                            <div class="mb-4">
+                                <label class="block text-base text-gray-500 mb-1">사업자등록번호</label>
+                                <div class="flex items-center justify-between bg-gray-100 text-gray-700 text-base px-4 py-2 rounded-xl">
+                                    <span id="businessNoDisplay">123-45-67890</span>
+                                    <span class="text-xs text-gray-400 italic">수정 불가</span>
+                                </div>
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="companyName" class="block text-base text-gray-500 mb-1">회사명</label>
+                                <input id="companyName" name="companyName" type="text"
+                                       class="w-full px-4 py-2 text-base border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                       placeholder="회사명을 입력하세요" value="DG전동">
+                            </div>
+
+                            <div class="mb-4">
+                                <label for="address" class="block text-base text-gray-500 mb-1">주소</label>
+                                <input id="address" name="address" type="text"
+                                       class="w-full px-4 py-2 text-base border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                       placeholder="주소를 입력하세요">
+                            </div>
+                        </th:block>
+
+                        <input type="hidden" name="userRole" th:value="${currentUserRole}">
+
+                        <div class="text-center btn-div-margin">
+                            <button type="submit" id="accountEditBtn"
+                                    class="hover:bg-blue-700 text-white text-base font-medium px-5 py-3 rounded-xl fs-5 account-edit-btn">
+                                저장하기
+                            </button>
+                        </div>
+                    </form>
                 </div>
 
-                <div class="tab-pane fade mx-auto" id="tab2" role="tabpanel" aria-labelledby="tab2-tab">
-                    <div class="mb-3">
-                        <label for="currentPassword" class="form-label">현재 비밀번호</label>
-                        <input type="password" class="form-control" id="currentPassword" />
+                <!-- 비밀번호 변경 탭 -->
+                <div class="tab-pane fade account-edit-tab" id="passwordTab" role="tabpanel">
+                    <!-- 메시지 영역 -->
+                    <div th:if="${errorPw}"
+                         class="mb-4 p-3 rounded-xl bg-red-100 text-red-800 text-sm font-medium text-center">
+                        <span th:text="${errorPw}">에러 메시지</span>
                     </div>
-                    <div class="mb-3">
-                        <label for="newPassword" class="form-label">새 비밀번호</label>
-                        <input type="password" class="form-control" id="newPassword" />
+
+                    <div th:if="${successPw}"
+                         class="mb-4 p-3 rounded-xl bg-green-100 text-green-800 text-sm font-medium text-center">
+                        <span th:text="${successPw}">성공 메시지</span>
                     </div>
-                    <div class="mb-3">
-                        <label for="confirmPassword" class="form-label">비밀번호 확인</label>
-                        <input type="password" class="form-control" id="confirmPassword" />
-                    </div>
-                    <button class="btn edit-btn w-100 mt-3 py-3 px-5 fs-5">비밀번호 변경</button>
+
+                    <form action="/my/change-password" method="post" id="passwordChangeForm">
+                        <!-- POST, PUT, DELETE 요청 시 CSRF(Cross-Site Request Forgery) 공격을 방지하기 위해 반드시 필요한 보호 장치-->
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}">
+
+                        <div class="mb-4">
+                            <label for="currentPassword" class="block text-base text-gray-500 mb-1">현재 비밀번호</label>
+                            <input type="password" id="currentPassword" name="currentPassword"
+                                   class="w-full px-4 py-2 text-base border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                   placeholder="현재 비밀번호 입력">
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="password" class="block text-base text-gray-500 mb-1">새 비밀번호</label>
+                            <input type="password" id="password" name="newPassword"
+                                   class="w-full px-4 py-2 text-base border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                   placeholder="새 비밀번호 입력 (영문+숫자 6자 이상)">
+                            <small id="passwordStrength"></small>
+                        </div>
+
+                        <div class="mb-4">
+                            <label for="passwordConfirm" class="block text-base text-gray-500 mb-1">새 비밀번호 확인</label>
+                            <input type="password" id="passwordConfirm" name="confirmPassword"
+                                   class="w-full px-4 py-2 text-base border rounded-xl focus:ring-2 focus:ring-blue-500 focus:outline-none"
+                                   placeholder="다시 입력">
+                            <small id="passwordError"></small>
+                        </div>
+
+                        <div class="text-center btn-div-margin">
+                            <button type="submit" id="passwordEditBtn"
+                                    class="hover:bg-blue-700 text-white text-base font-medium px-5 py-3 rounded-xl fs-5 account-edit-btn">
+                                저장하기
+                            </button>
+                        </div>
+                    </form>
+
                 </div>
             </div>
+
+
         </div>
     </div>
-</th:block>
 
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"
+            integrity="sha512-efAcjYoYT0sXxQRtxGY37CKYmqsFVOIwMApaEbrxJr4RwqVVGw8o+Lfh/+59TU07+suZn1BWq4fDl5fdgyCNkw=="
+            crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script th:inline="javascript">
+        /*<![CDATA[*/
+        const activeTab = /*[[${activeTab}]]*/ null;
+
+        if (activeTab) {
+            const triggerEl = document.querySelector(`button[data-bs-toggle="tab"][data-bs-target="#${activeTab}"]`);
+            if (triggerEl) {
+                const tab = new bootstrap.Tab(triggerEl);
+                tab.show();
+            }
+        }
+        /*]]>*/
+    </script>
+
+    <script th:src="@{/js/util/password-check.js}"></script>
+    <script th:src="@{/js/util/email-check.js}"></script>
+    <script th:src="@{/js/util/phone-check.js}"></script>
+    <script th:src="@{/js/page/user/account-edit.js}"></script>
+</th:block>
 </body>
 </html>

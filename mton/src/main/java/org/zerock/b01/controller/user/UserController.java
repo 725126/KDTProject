@@ -10,8 +10,13 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.zerock.b01.domain.user.User;
+import org.zerock.b01.domain.user.UserRole;
+import org.zerock.b01.dto.user.FindIdDTO;
 import org.zerock.b01.dto.user.UserCreateDTO;
 import org.zerock.b01.dto.user.UserResponseDTO;
+import org.zerock.b01.dto.user.UserUpdateDTO;
 import org.zerock.b01.security.CustomUserDetails;
 import org.zerock.b01.service.user.UserService;
 
@@ -24,8 +29,9 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
 
-    // 마이페이지 링크
-    // 마이페이지 작업
+    // *** 회원정보 수정 ***
+    // 이메일 중복확인 버튼 disabled 일 때 대처
+    // 입력값 검증 (이름 검증 함수 분리)
 
     // 회원 관리 - 인트로(로그인)
     @GetMapping("/intro")
@@ -35,7 +41,7 @@ public class UserController {
 
     // [내부직원] 로그인 시 홈 화면
     @GetMapping("/internal/home")
-    public String homePageInternal(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+    public String homePageInternal(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         log.info("[내부직원] 로그인: {}", customUserDetails);
 
         // *** 중요 ***
@@ -50,7 +56,7 @@ public class UserController {
 
     // [협력업체] 회원 로그인 시 홈 화면
     @GetMapping("/external/home")
-    public String homePageExternal(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+    public String homePageExternal(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         log.info("[협력업체] 회원 로그인: {}", customUserDetails);
 
         // *** 중요 ***
@@ -152,7 +158,9 @@ public class UserController {
 
     // 회원 관리 - 비밀번호 찾기
     @GetMapping("/find/pw")
-    public String findPwGet() { return "page/user/find/find-pw"; }
+    public String findPwGet() {
+        return "page/user/find/find-pw";
+    }
 
     // 회원 관리 - 비밀번호 찾기 > 비밀번호 재설정
     @GetMapping("/reset/pw")
@@ -201,41 +209,109 @@ public class UserController {
 
     @PostMapping("/find/id")
     @ResponseBody
-    public Map<String, Object> findUserId(@RequestBody Map<String, String> request) {
-        String uName = request.get("uName");
-        String uPhone = request.get("uPhone");
+    public Map<String, Object> findUserId(@RequestBody FindIdDTO dto) {
 
-        log.info(uName + " " + uPhone);
+        log.info("[아이디 찾기]: {}", dto);
 
-        Optional<String> foundEmail = userService.findEmailByNameAndPhone(uName, uPhone);
+        if ("PARTNER".equals(dto.getUserRole())) {
+            String businessNo = Optional.ofNullable(dto.getPBusinessNo()).orElse("").trim();
+            if (businessNo.isEmpty()) {
+                return Map.of("notFound", true, "message", "사업자등록번호 누락");
+            }
 
-        return foundEmail.<Map<String, Object>>map(s -> Map.of("foundEmail", s)).orElseGet(() -> Map.of("notFound", true));
+            log.info("[아이디 찾기] 협력업체 > 사업자등록번호: {}", businessNo);
+        }
+
+        return userService.findEmailByFindIdDTO(dto)
+                .<Map<String, Object>>map(email -> Map.of("foundEmail", email))
+                .orElseGet(() -> Map.of("notFound", true));
     }
 
-    // 마이페이지 > 회원 탈퇴
+    // [내부직원] 마이페이지 > 회원 탈퇴
     @GetMapping("/internal/my/account-delete")
-    public String myPageAccountDeleteGetIn() {
+    public String myPageAccountDeleteGetIn(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+
+        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(customUserDetails.getUsername());
+        model.addAttribute("uEmail", userResponseDTO.getUEmail());
+
         return "page/user/my/account-delete";
     }
 
-    // 마이페이지 > 내 정보
+    // [내부직원] 마이페이지 > 내 정보
     @GetMapping("/internal/my/account-edit")
-    public String myPageAccountEditGetIn() {
+    public String myPageAccountEditGetIn(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+
+        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(customUserDetails.getUsername());
+        model.addAttribute("userResponseDTO", userResponseDTO);
+
         return "page/user/my/account-edit";
     }
 
-    // 마이페이지 > 회원 탈퇴
+    // [협력업체] 마이페이지 > 회원 탈퇴
     @GetMapping("/external/my/account-delete")
-    public String myPageAccountDeleteGetEx() {
+    public String myPageAccountDeleteGetEx(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+
+        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(customUserDetails.getUsername());
+        model.addAttribute("uEmail", userResponseDTO.getUEmail());
+
         return "page/user/my/account-delete";
     }
 
-    // 마이페이지 > 내 정보
+    // [협력업체] 마이페이지 > 내 정보
     @GetMapping("/external/my/account-edit")
-    public String myPageAccountEditGetEx() {
+    public String myPageAccountEditGetEx(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+
+        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(customUserDetails.getUsername());
+        model.addAttribute("userResponseDTO", userResponseDTO);
+
         return "page/user/my/account-edit";
     }
 
+    @PostMapping("/my/change-password")
+    public String changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                 @RequestParam String currentPassword,
+                                 @RequestParam String newPassword,
+                                 RedirectAttributes redirectAttributes) {
+
+        // 1. 사용자 정보 조회
+        User user = userService.getUserByEmail(userDetails.getUsername());
+
+        // 2. 현재 비밀번호 검증
+        if (!userService.checkPasswordMatch(currentPassword, user.getUPassword())) {
+            redirectAttributes.addFlashAttribute("errorPw", "현재 비밀번호가 일치하지 않습니다.");
+            redirectAttributes.addFlashAttribute("activeTab", "passwordTab");
+            return "redirect:/internal/my/account-edit";
+        }
+
+        // 3. 새 비밀번호 인코딩 및 저장
+        userService.changePassword(user, newPassword);
+
+        redirectAttributes.addFlashAttribute("successPw", "비밀번호가 변경되었습니다.");
+        redirectAttributes.addFlashAttribute("activeTab", "passwordTab");
+
+        return "redirect:/internal/my/account-edit";
+    }
+
+    @PostMapping("/my/account-edit")
+    public String updateAccount(@ModelAttribute UserUpdateDTO dto,
+                                @AuthenticationPrincipal CustomUserDetails userDetails,
+                                RedirectAttributes redirectAttributes) {
+        log.info("[공통] 회원정보(기본정보) 수정: {}", dto);
+
+        try {
+            userService.updateUserInfo(userDetails.getUsername(), dto);
+            redirectAttributes.addFlashAttribute("successEdit", "회원정보가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            redirectAttributes.addFlashAttribute("errorEdit", "회원정보 수정 중 오류가 발생했습니다.");
+        }
+
+        // [협력업체] 회원인 경우
+        if (dto.getUserRole().equals(UserRole.PARTNER)) {
+            return "redirect:/external/my/account-edit";
+        }
+
+        return "redirect:/internal/my/account-edit";
+    }
 
     // 마이페이지 - 관리자 > 회원가입 승인
     @GetMapping("/admin/my/join-list")

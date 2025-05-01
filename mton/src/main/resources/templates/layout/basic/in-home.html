@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <title>자재 관리의 시작, 자재ON</title>
     <link rel="stylesheet" th:href="@{/css/layout/basic/home.css}">
+    <link rel="stylesheet" th:href="@{/css/component/profile-img.css}">
 </head>
 <body>
 
@@ -31,7 +32,7 @@
         <div class="dropdown me-2">
             <button class="btn no-bootstrap-style d-flex align-items-center" type="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
-                <span class="profile-icon bg-light text-dark rounded-circle p-2"
+                <span class="profile-icon rounded-circle p-2"
                       th:classappend="${currentUserRole.profileClass}">
                     <i class="bi" th:classappend="${currentUserRole.iconClass}"></i>
                 </span>

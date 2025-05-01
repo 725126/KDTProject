@@ -55,23 +55,36 @@ public class CustomUserDetails implements UserDetails {
 
     @Override
     public String getPassword() {
+
         return user.getUPassword(); // 비밀번호 필드명
     }
 
     @Override
     public String getUsername() {
+
         return user.getUEmail(); // 로그인 아이디 (uEmail)
     }
 
+    // 회원 정보
+    public User getUser() {
+        return user;
+    }
+
+    // 회원 이름
     public String getUName() {
+
         return user.getUName();
     }
 
+    // 회원 종류 (String)
     public String getRole() {
+
         return user.getUserRole().name();
     }
 
+    // 회원 종류
     public UserRole getUserRole() {
+
         return user.getUserRole();
     }
 }

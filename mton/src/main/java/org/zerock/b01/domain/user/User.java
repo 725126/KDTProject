@@ -38,4 +38,10 @@ public class User extends BaseEntity { // 회원 (기본 회원 정보)
     public void setPassword(String uPassword) {
         this.uPassword = uPassword;
     }
+
+    public void updateBasicInfo(String name, String email, String phone) {
+        this.uName = name;
+        this.uEmail = email;
+        this.uPhone = phone;
+    }
 }

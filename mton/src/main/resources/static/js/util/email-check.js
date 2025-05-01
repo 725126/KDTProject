@@ -22,7 +22,7 @@ emailInput.addEventListener('input', function () {
         emailCheckResult.textContent = "❌ 이메일을 입력해 주세요.";
         emailCheckResult.style.color = "red";
 
-        if (path === "/join/partner" || path === "/join/inner") {
+        if (path === "/join/partner" || path === "/join/inner" || path === "/internal/my/account-edit") {
             checkEmailDuplicateBtn.disabled = true;
         } else if (path === "/find/pw") {
             pwResetMailSendBtn.disabled = true;
@@ -31,13 +31,13 @@ emailInput.addEventListener('input', function () {
         emailCheckResult.textContent = "❌ 이메일 형식이 올바르지 않습니다.";
         emailCheckResult.style.color = "red";
 
-        if (path === "/join/partner" || path === "/join/inner") {
+        if (path === "/join/partner" || path === "/join/inner" || path === "/internal/my/account-edit") {
             checkEmailDuplicateBtn.disabled = true;
         } else if (path === "/find/pw") {
             pwResetMailSendBtn.disabled = true;
         }
     } else {
-        if (path === "/join/partner" || path === "/join/inner") {
+        if (path === "/join/partner" || path === "/join/inner" || path === "/internal/my/account-edit") {
             emailCheckResult.textContent = "이메일 중복 확인을 해주세요.";
             emailCheckResult.style.color = "gray";
             checkEmailDuplicateBtn.disabled = false;

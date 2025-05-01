@@ -12,4 +12,7 @@ public interface PartnerRepository extends JpaRepository<Partner, Long> {
 
     // 사업자등록번호 중복 확인
     boolean existsBypBusinessNo(String pBusinessNo);
+
+    // 사업자등록번호로 회원 조회
+    Optional<Partner> findBypBusinessNo(String pBusinessNo);
 }

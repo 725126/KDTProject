@@ -48,6 +48,7 @@ public class SecurityConfig {
                         .requestMatchers("/internal/**").hasAnyRole("ADMIN", "PRODUCTION", "PURCHASING")
                         // '/my/external' 경로는 'ADMIN', 'PARTNER' 역할 중 하나라도 있으면 접근 허용
                         .requestMatchers("/external/**").hasAnyRole("ADMIN", "PARTNER")
+                        // 위에서 지정하지 않은 모든 요청은 인증된 사용자만 접근 가능
                         .anyRequest().authenticated()
                 )
                 .csrf((csrf) -> csrf
