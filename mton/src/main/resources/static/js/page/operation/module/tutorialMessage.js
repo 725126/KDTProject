@@ -1,5 +1,9 @@
 const tutorial = document.getElementById("tutorial-box");
 
+tutorial.addEventListener("click", function() {
+    tutorial.style.opacity = "0";
+});
+
 // 해당 요소에 새 튜토리얼 메시지 이벤트를 바인드한다.
 function bindTutorialMessage(element, message) {
     element.addEventListener("mouseenter", function () {

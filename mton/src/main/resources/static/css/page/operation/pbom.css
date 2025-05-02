@@ -14,6 +14,7 @@
     height: 41px;
     min-width: 100px;
     word-break: break-all;
+    position: relative;
 }
 
 .opacity-btn {
@@ -51,4 +52,18 @@ tr:hover .opacity-btn {
     z-index: 1000;
     transition: opacity 0.5s;
     opacity: 0;
+    cursor: default;
+}
+
+.indirect-time, .indirect-time::-webkit-calendar-picker-indicator {
+    background: transparent;
+    color: transparent;
+    cursor: pointer;
+    height: auto;
+    width: auto;
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
 }

@@ -1,4 +1,5 @@
 import * as tutorialMessage from "./tutorialMessage.js";
+import * as tmessage from "./tmessage.js";
 
 // 테이블 열 개수 파악하고 새 행과 열을 삽입
 function insertRowCells(table, index) {
@@ -14,6 +15,9 @@ function insertRowCells(table, index) {
         newSpan.setAttribute("contenteditable", "true");
         newCell.appendChild(newSpan);
     }
+
+    tutorialMessage.bindTutorialMessage(newRow.cells[0], tmessage.matIdCellTutorial);
+    newRow.cells[0].style.cursor = "help";
 
     addUtilButtons(table, newRow);
     return newRow;
@@ -71,8 +75,8 @@ function addUtilButtons(table, row) {
         tutorialMessage.forceHideMessage();
     });
 
-    tutorialMessage.bindTutorialMessage(addButton, "아래에 새 행을 추가합니다.");
-    tutorialMessage.bindTutorialMessage(dltButton, "빠르게 두 번 클릭하여 해당 행을 지웁니다.\n헤더에서 하면 모든 행을 지웁니다.")
+    tutorialMessage.bindTutorialMessage(addButton, tmessage.matRowAddTutorial);
+    tutorialMessage.bindTutorialMessage(dltButton, tmessage.matRowRemoveTutorial);
 
     row.appendChild(addButton);
     row.appendChild(dltButton);
@@ -81,20 +85,11 @@ function addUtilButtons(table, row) {
 function initEmptyTable(table) {
     for (const row of table.rows) {
         addUtilButtons(table, row);
-    }
-}
-
-// 테이블 행 개수 파악하고 선택한 행을 삭제한다.
-// 헤더를 제외하고 최소 1개의 행은 남아있어야 한다.
-function deleteRowCells(table, index) {
-    const rowCount = table.rows.length;
-    if (rowCount > 2) {
-        table.deleteRow(index);
+        tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.matIdCellTutorial);
+        table.rows[1].cells[0].style.cursor = "help";
     }
 }
 
 export {
-    insertRowCells,
-    deleteRowCells,
     initEmptyTable,
 };

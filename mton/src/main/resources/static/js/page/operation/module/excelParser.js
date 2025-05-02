@@ -86,7 +86,7 @@ function tableToFile(table, filename = "") {
 }
 
 // JSON 데이터를 지정한 url 로 업로드.
-// 이후 response 데이터를 받아 json 으로 파싱한다.
+// 이후 response 데이터를 받아 넘겨준다.
 async function uploadJsonPost(dest, jdata) {
     return await fetch(dest, {
         method: "POST",
@@ -104,7 +104,7 @@ async function uploadJsonPost(dest, jdata) {
 }
 
 // 실제 보이는 테이블 데이터를 업로드.
-// 결과를 받아서 뭔가 더 할 예정이라면 그냥 이 함수를 복사해서 수정하면 된다.
+// Response 받아서 뭔가 더 할 예정이라면 그냥 이 함수를 복사해서 수정하면 된다.
 function tableUpload(dest, table) {
     const sheet = XLSX.utils.table_to_sheet(table);
     const jsheet = XLSX.utils.sheet_to_json(sheet);
