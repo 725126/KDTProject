@@ -35,3 +35,20 @@ tr:hover .opacity-btn {
     background-color: crimson;
     color: white;
 }
+
+.tutorial {
+    position: fixed;
+    top: 80px;
+    right: 15px;
+    width: fit-content;
+    min-width: 36px;
+    max-width: 400px;
+    min-height: 36px;
+    word-break: break-all;
+    border-radius: 10px;
+    padding: 6px 10px;
+    background-color: white;
+    z-index: 1000;
+    transition: opacity 0.5s;
+    opacity: 0;
+}

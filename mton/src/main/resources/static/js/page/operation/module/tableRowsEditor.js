@@ -1,3 +1,5 @@
+import * as tutorialMessage from "./tutorialMessage.js";
+
 // 테이블 열 개수 파악하고 새 행과 열을 삽입
 function insertRowCells(table, index) {
     // 원하는 index 위치에 행 삽입
@@ -49,7 +51,7 @@ function addUtilButtons(table, row) {
         insertRowCells(table, currentRow + 1);
     });
 
-    dltButton.addEventListener("click", function (e) {
+    dltButton.addEventListener("dblclick", function (e) {
         e.preventDefault();
         e.stopPropagation();
 
@@ -65,7 +67,12 @@ function addUtilButtons(table, row) {
         } else {
             table.deleteRow(currentRow);
         }
-    })
+
+        tutorialMessage.forceHideMessage();
+    });
+
+    tutorialMessage.bindTutorialMessage(addButton, "아래에 새 행을 추가합니다.");
+    tutorialMessage.bindTutorialMessage(dltButton, "빠르게 두 번 클릭하여 해당 행을 지웁니다.\n헤더에서 하면 모든 행을 지웁니다.")
 
     row.appendChild(addButton);
     row.appendChild(dltButton);
