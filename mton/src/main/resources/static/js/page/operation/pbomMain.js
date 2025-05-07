@@ -8,6 +8,11 @@ const viewGroup = document.getElementById("tables-view");
 const editGroup = document.getElementById("tables-edit");
 const inputGroup = document.getElementById("tables-input");
 
+// 그룹 제어 버튼 div
+const inputManageBtn = document.getElementById("input-manage-btn");
+const editManageBtn = document.getElementById("edit-manage-btn");
+const viewManageBtn = document.getElementById("view-manage-btn");
+
 // 테이블 리스트
 const allTables = document.querySelectorAll(".table-excel");
 const viewTables = viewGroup.querySelectorAll("table");
@@ -30,9 +35,9 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
 // 품목관리 모드 라디오 버튼 이벤트 등록
 (function () {
     const manageMod = document.getElementById("manage-mod");
-    const insertLabel = manageMod.querySelector("#manage-insert");
-    const editLabel = manageMod.querySelector("#manage-edit");
-    const viewLabel = manageMod.querySelector("#manage-view");
+    const insertLabel = manageMod.querySelector("#mod-insert");
+    const editLabel = manageMod.querySelector("#mod-edit");
+    const viewLabel = manageMod.querySelector("#mod-view");
 
     manageMod.addEventListener("click", function (event) {
         const labels = manageMod.querySelectorAll("label");
@@ -55,6 +60,10 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         editGroup.style.display = "none";
         viewGroup.style.display = "none";
 
+        inputManageBtn.style.display = "flex";
+        editManageBtn.style.display = "none";
+        viewManageBtn.style.display = "none";
+
         const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
         initial.dispatchEvent(new Event('change'));
     });
@@ -62,7 +71,11 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
     editLabel.addEventListener("change", function (event) {
         inputGroup.style.display = "none";
         editGroup.style.display = "block";
-        viewGroup.style.display = "block";
+        viewGroup.style.display = "none";
+
+        inputManageBtn.style.display = "none";
+        editManageBtn.style.display = "flex";
+        viewManageBtn.style.display = "none";
 
         const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
         initial.dispatchEvent(new Event('change'));
@@ -73,6 +86,10 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         editGroup.style.display = "none";
         viewGroup.style.display = "block";
 
+        inputManageBtn.style.display = "none";
+        editManageBtn.style.display = "none";
+        viewManageBtn.style.display = "flex";
+
         const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
         initial.dispatchEvent(new Event('change'));
     });
@@ -80,6 +97,9 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
     tutorialMessage.bindTutorialMessage(insertLabel, tmessage.manageInsertTutorial);
     tutorialMessage.bindTutorialMessage(editLabel, tmessage.manageEditTutorial);
     tutorialMessage.bindTutorialMessage(viewLabel, tmessage.manageViewTutorial);
+
+    const initial = document.querySelector("input[type='radio'][name='i-filter']:checked");
+    initial.dispatchEvent(new Event('change'));
 })();
 
 // 등록용 테이블 뷰어 관련 이벤트 등록
@@ -154,22 +174,86 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
     }
 })();
 
-// 업로드 테스트. 품목 관리 버튼을 누르면 mat-table 이 업로드됨
+// 카드 버튼 이벤트
 (function () {
-    const test = document.getElementById("upload-test");
-    test.addEventListener("click", function (event) {
-        event.preventDefault();
-        event.stopPropagation();
+    const insertFileBtn = document.getElementById("insert-file");
+    const insertFileLabel = document.getElementById("insert-file-label");
+    const insertUploadBtn = document.getElementById("insert-upload");
+    const editRefreshBtn = document.getElementById("edit-refresh");
+    const editUploadBtn = document.getElementById("edit-upload");
+    const viewRefreshBtn = document.getElementById("view-refresh");
+    const viewDownloadBtn = document.getElementById("view-download");
 
-        excelParser.tableUpload("/internal/product/register/mat", document.getElementById("mat-table"));
+    insertFileBtn.addEventListener("change", function (e) {
+        const currentTable = document.querySelector("table[style='display: table;']");
+        const result = excelParser.sheetToTable(insertFileBtn.files[0], currentTable, true, -2);
+
+        result.then(value => {
+            tableRowsEditor.addTableUtilBtn(currentTable);
+        });
     });
 
-    tutorialMessage.bindTutorialMessage(test, "자재 테이블 임시 업로드 버튼으로 기능하고 있습니다.");
-    test.style.width = "fit-content";
-    test.style.cursor = "pointer";
+    insertUploadBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentTable = document.querySelector("table[style='display: table;']");
+        let dest = "";
+        switch (currentTable.id) {
+            case "mat-table":
+                dest = "/internal/product/register/mat";
+                break;
+            case "prd-table":
+                dest = "/internal/product/register/prd";
+                break;
+            case "pbom-table":
+                dest = "/internal/product/register/pbom"
+        }
+
+        if (dest.length === 0) {
+            console.log("테이블 참조가 잘못되었습니다.");
+            return;
+        }
+
+        const result = excelParser.tableUpload(dest, currentTable);
+        result.then((res) => {
+            alert(res.message);
+        });
+    });
+
+    viewRefreshBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const mtable = document.querySelector("#mat-table-view");
+        const ptable = document.querySelector("#prd-table-view");
+        const pbtable = document.querySelector("#pbom-table-view");
+        tableRowsEditor.viewTable(mtable, "material");
+        tableRowsEditor.viewTable(ptable, "product");
+        tableRowsEditor.viewTable(pbtable, "pbom");
+    });
+
+    viewDownloadBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentTable = document.querySelector("table[style='display: table;']");
+        excelParser.tableToFile(currentTable, currentTable.id + ".xlsx");
+    });
+
+    // 툴팁 메시지 바인딩
+    tutorialMessage.bindTutorialMessage(insertFileLabel, tmessage.insertFileBtnTutorial);
+    tutorialMessage.bindTutorialMessage(insertUploadBtn, tmessage.insertUploadBtnTutorial);
+    tutorialMessage.bindTutorialMessage(viewRefreshBtn, tmessage.viewRefreshBtnTutorial);
+    tutorialMessage.bindTutorialMessage(viewDownloadBtn, tmessage.viewDownloadBtnTutorial)
 })();
 
+// 테이블 뷰 관련 초기화
 (function () {
-    const table = document.querySelector("#mat-table-view");
-    tableRowsEditor.viewTable(table, "material");
+    const mtable = document.querySelector("#mat-table-view");
+    const ptable = document.querySelector("#prd-table-view");
+    const pbtable = document.querySelector("#pbom-table-view");
+    tableRowsEditor.viewTable(mtable, "material");
+    tableRowsEditor.viewTable(ptable, "product");
+    tableRowsEditor.viewTable(pbtable, "pbom");
 })();

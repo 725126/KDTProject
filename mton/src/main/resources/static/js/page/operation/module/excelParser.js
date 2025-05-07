@@ -29,13 +29,16 @@ function compareArrays(arr1, arr2) {
 // 테이블 검증 및 내용을 삽입한다.
 // edit 에 true 를 입력하면 삽입된 td 가 수정 가능 상태가 된다.
 // 대상 테이블에는 thead, th, tbody 가 포함되어야 한다.
-function sheetToTable(file, table, edit = false) {
+function sheetToTable(file, table, edit = false, end = 0) {
     const workbook = parseExcel(file);
-    workbook.then((value) => {
+    return workbook.then((value) => {
         const sheet = value.Sheets[value.SheetNames[0]];
+        const sheetH = sheetHeaders(sheet);
+        const tableH = end < 0 ? tableHeaders(table).slice(0, end) : tableHeaders(table);
 
-        if (!compareArrays(sheetHeaders(sheet), tableHeaders(table))) {
+        if (!compareArrays(sheetH, tableH)) {
             console.log("file does not match with table.");
+            return false;
         }
 
         const htmlSheet = XLSX.utils.sheet_to_html(sheet, {editable: edit});
@@ -43,6 +46,7 @@ function sheetToTable(file, table, edit = false) {
 
         if (startIndex === -1) {
             console.log("file is match with table, but does not have data.");
+            return false;
         }
 
         const endIndex = htmlSheet.lastIndexOf("</tr>") + "</tr>".length;
@@ -50,6 +54,8 @@ function sheetToTable(file, table, edit = false) {
 
         const tbody = table.querySelector("tbody");
         tbody.innerHTML = htmlRow;
+
+        return true;
     });
 }
 
@@ -117,6 +123,8 @@ function tableUpload(dest, table) {
         // console.log(error) 를 지우고 원하는 코드를 넣을 것.
         console.log(error);
     });
+
+    return result;
 }
 
 export {

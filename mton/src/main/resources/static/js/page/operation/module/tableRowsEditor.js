@@ -82,6 +82,14 @@ function addUtilButtons(table, row) {
     row.appendChild(dltButton);
 }
 
+function addTableUtilBtn(table) {
+    const rows = table.rows;
+
+    for (let i = 1; i < rows.length; i++) {
+        addUtilButtons(table, rows[i]);
+    }
+}
+
 function initEmptyTable(table) {
     for (const row of table.rows) {
         addUtilButtons(table, row);
@@ -142,4 +150,5 @@ function viewTable(table, request) {
 export {
     initEmptyTable,
     viewTable,
+    addTableUtilBtn,
 };

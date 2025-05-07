@@ -1,6 +1,10 @@
-export const manageInsertTutorial = "현재 등록된 품목 목록을 봅니다.";
+export const manageInsertTutorial = "새 항목을 엑셀 파일 또는 개별적으로 등록합니다.";
 export const manageEditTutorial = "등록된 품목을 개별적으로 수정합니다.";
-export const manageViewTutorial = "새 항목을 엑셀 파일 또는 개별적으로 등록합니다.";
+export const manageViewTutorial = "현재 등록된 품목 목록을 봅니다.";
 export const matIdCellTutorial = "자재코드를 비워두면 현재 등록된 자재 개수에 맞춰 자동으로 생성합니다. 오류를 방지하기 위해 이 열은 모두 비워놓거나 채워놓아야 합니다.";
 export const matRowAddTutorial = "아래에 새 행을 추가합니다.";
 export const matRowRemoveTutorial = "빠르게 두 번 클릭하여 해당 행을 지웁니다.\n헤더에서 하면 모든 행을 지웁니다.";
+export const insertFileBtnTutorial = "파일을 선택하고 해당 내용을 표에 삽입합니다."
+export const insertUploadBtnTutorial = "표에 입력한 내용을 데이터베이스에 반영합니다."
+export const viewRefreshBtnTutorial = "최신 데이터베이스를 반영해 표를 새로고침합니다."
+export const viewDownloadBtnTutorial = ".xlsx 확장자를 가진 스프레드시트 파일로 표를 다운로드합니다."

@@ -32,7 +32,8 @@ public class MaterialServiceImpl implements MaterialService {
                 .matMeasure(mat.getMatMeasure())
                 .matUnit(mat.getMatUnit())
                 .matExplain(mat.getMatExplain())
-                .build()).collect(Collectors.toList());
+                .build()
+        ).collect(Collectors.toList());
 
         boolean hasDuple = false;
         boolean hasTwin = false;
