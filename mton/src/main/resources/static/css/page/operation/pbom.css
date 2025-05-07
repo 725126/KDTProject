@@ -2,6 +2,13 @@
     width: fit-content;
 }
 
+#table-card {
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    max-height: calc(100vh - 300px);
+    position: relative;
+}
+
 .table-excel {
     display: none;
 }

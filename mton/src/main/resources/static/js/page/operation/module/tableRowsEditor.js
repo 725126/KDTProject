@@ -90,6 +90,56 @@ function initEmptyTable(table) {
     }
 }
 
+async function refreshTableView(dest, request = "") {
+    return await fetch(dest, {
+        method: "POST",
+        headers: {
+            "Content-Type": "text/plain",
+        },
+        body: request
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        return data;
+    }).catch(error => {
+        console.error(error);
+    })
+}
+
+function viewTable(table, request) {
+    let jsonData;
+
+    switch (request) {
+        case "mat":
+        case "material":
+            jsonData = refreshTableView("/internal/product/view/mat", "material");
+            break;
+        case "prd":
+        case "product":
+            jsonData = refreshTableView("/internal/product/view/prd", "product");
+            break;
+        case "pbom":
+            jsonData = refreshTableView("/internal/product/view/pbom", "pbom");
+            break;
+        default:
+            jsonData = null;
+    }
+
+    if (jsonData === null) { return; }
+
+    jsonData.then((result) => {
+        const sheet = XLSX.utils.json_to_sheet(result);
+        const htmlSheet = XLSX.utils.sheet_to_html(sheet);
+        const startIndex = htmlSheet.indexOf("<tr", htmlSheet.indexOf("<tr") + 1);
+        const endIndex = htmlSheet.lastIndexOf("</tr>") + "</tr>".length;
+        const htmlRow = htmlSheet.substring(startIndex, endIndex);
+
+        const tbody = table.querySelector("tbody");
+        tbody.innerHTML = htmlRow;
+    });
+}
+
 export {
     initEmptyTable,
+    viewTable,
 };

@@ -68,4 +68,19 @@ public class MaterialServiceImpl implements MaterialService {
         materialRepository.saveAll(materials);
         return new StatusTuple(true, "모든 자재를 등록하였습니다.");
     }
+
+    @Override
+    public List<MaterialDTO> viewAll() {
+
+        return materialRepository.findAll().stream().map(material ->
+                MaterialDTO.builder()
+                    .matId(material.getMatId())
+                    .matName(material.getMatName())
+                    .matType(material.getMatType())
+                    .matMeasure(material.getMatMeasure())
+                    .matUnit(material.getMatUnit())
+                    .matExplain(material.getMatExplain())
+                    .build()
+        ).collect(Collectors.toList());
+    }
 }

@@ -7,11 +7,13 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.zerock.b01.controller.operation.repository.MaterialRepository;
 import org.zerock.b01.controller.operation.service.MaterialService;
+import org.zerock.b01.controller.operation.service.ProductService;
 import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.domain.operation.tablehead.MaterialTableHead;
 import org.zerock.b01.domain.operation.tablehead.PbomTableHead;
 import org.zerock.b01.domain.operation.tablehead.ProductTableHead;
 import org.zerock.b01.dto.operation.MaterialDTO;
+import org.zerock.b01.dto.operation.ProductDTO;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -25,6 +27,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/internal/product")
 public class ProductController {
     private final MaterialService materialService;
+    private final ProductService productService;
     private final MaterialRepository materialRepository;
 
     // 품목 등록
@@ -44,8 +47,8 @@ public class ProductController {
 
     // 자재 등록
     @ResponseBody
-    @PostMapping("/register/pbom")
-    public StatusTuple test(@RequestBody ArrayList<HashMap<String, String>> list) {
+    @PostMapping("/register/mat")
+    public StatusTuple registerMat(@RequestBody ArrayList<HashMap<String, String>> list) {
         log.info(list.toString());
 
         if (list.isEmpty()) {
@@ -73,8 +76,20 @@ public class ProductController {
                     .build();
         }).collect(Collectors.toList());
 
-        StatusTuple result = materialService.registerAll(materialDTOList);
+        return materialService.registerAll(materialDTOList);
+    }
 
-        return result;
+    @ResponseBody
+    @PostMapping("/view/mat")
+    public List<MaterialDTO> viewMatTable(@RequestBody String str) {
+        log.info("View Material: " + str);
+        return materialService.viewAll();
+    }
+
+    @ResponseBody
+    @PostMapping("/view/mat")
+    public List<ProductDTO> viewPrdTable(@RequestBody String str) {
+        log.info("View Product: " + str);
+        return productService.viewAll();
     }
 }
