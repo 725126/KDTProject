@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.SessionManagementConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.rememberme.InMemoryTokenRepositoryImpl;
 import org.springframework.security.web.authentication.rememberme.JdbcTokenRepositoryImpl;
@@ -45,9 +46,9 @@ public class SecurityConfig {
                         // '/my/admin' 경로는 'ADMIN' 역할(Role)을 가진 사용자만 접근 허용
                         .requestMatchers("/admin/**").hasRole("ADMIN")
                         // '/my/internal' 경로는 'ADMIN', 'PRODUCTION', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
-                        .requestMatchers("/internal/**").hasAnyRole("ADMIN", "PRODUCTION", "PURCHASING")
+                        .requestMatchers("/internal/**").hasAnyRole("PRODUCTION", "PURCHASING", "ADMIN")
                         // '/my/external' 경로는 'ADMIN', 'PARTNER' 역할 중 하나라도 있으면 접근 허용
-                        .requestMatchers("/external/**").hasAnyRole("ADMIN", "PARTNER")
+                        .requestMatchers("/external/**").hasAnyRole("PARTNER")
                         // 위에서 지정하지 않은 모든 요청은 인증된 사용자만 접근 가능
                         .anyRequest().authenticated()
                 )
@@ -92,7 +93,7 @@ public class SecurityConfig {
 
 
     @Bean
-    public BCryptPasswordEncoder passwordEncoder() {
+    public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
 
@@ -102,4 +103,6 @@ public class SecurityConfig {
         repo.setDataSource(dataSource);
         return repo;
     }
+
+
 }

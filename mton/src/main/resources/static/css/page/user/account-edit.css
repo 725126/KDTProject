@@ -30,7 +30,7 @@
 }
 
 .tab-content {
-    padding: 1.5rem 2.5rem 1rem 2.5rem;
+    padding: 0rem 2.5rem 2rem 2.5rem;
     font-size: 1.05rem;
 }
 
@@ -94,7 +94,7 @@
 }
 
 .account-edit-btn {
-    background-color: #123458 !important;
+    background-color: #123458;
 }
 
 .account-edit-btn {

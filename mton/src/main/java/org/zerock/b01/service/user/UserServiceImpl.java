@@ -2,19 +2,24 @@ package org.zerock.b01.service.user;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Bean;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.zerock.b01.domain.user.Partner;
-import org.zerock.b01.domain.user.User;
-import org.zerock.b01.domain.user.UserRole;
-import org.zerock.b01.domain.user.UserStatus;
+import org.zerock.b01.domain.user.*;
 import org.zerock.b01.dto.user.*;
 import org.zerock.b01.repository.user.PartnerRepository;
+import org.zerock.b01.repository.user.UserLogRepository;
 import org.zerock.b01.repository.user.UserRepository;
+import org.zerock.b01.security.CustomUserDetails;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -24,7 +29,8 @@ public class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository;
     private final PartnerRepository partnerRepository;
-    private final BCryptPasswordEncoder passwordEncoder;
+    private final UserLogRepository userLogRepository;
+    private final PasswordEncoder passwordEncoder;
     private final EmailService emailService;
 
     @Override
@@ -46,7 +52,7 @@ public class UserServiceImpl implements UserService {
                 .uName(request.getUName())
                 .uPhone(request.getUPhone())
                 .userRole(UserRole.valueOf(request.getUserRole().toString()))
-                .uIsActive(UserStatus.ACTIVE)
+                .uIsActive(UserStatus.PENDING)
                 .build();
 
         userRepository.save(user);
@@ -132,10 +138,43 @@ public class UserServiceImpl implements UserService {
         return userOptional.map(User::getUEmail);
     }
 
-    // 회원 정보 불러오기
+    // (이메일로) 회원 정보 불러오기
     @Override
     public UserResponseDTO getUserInfoByEmail(String email) {
         User user = userRepository.findByuEmail(email)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+
+        UserResponseDTO userResponseDTO = UserResponseDTO.builder()
+                .userId(user.getUserId())
+                .uEmail(user.getUEmail())
+                .uName(user.getUName())
+                .uPhone(user.getUPhone())
+                .userRole(user.getUserRole())
+                .uIsActive(user.getUIsActive())
+                .build();
+
+        // 협력업체 회원인 경우 > 추가 회원 정보 조회 후 저장
+        if(user.getUserRole().equals(UserRole.PARTNER)) {
+            Partner partner = partnerRepository.findByUser(user)
+                    .orElseThrow(() -> new RuntimeException("협력업체 회원 정보를 찾을 수 없습니다."));
+
+            PartnerResponseDTO partnerResponseDTO = PartnerResponseDTO.builder()
+                    .partnerId(partner.getPartnerId())
+                    .pCompany(partner.getPCompany())
+                    .pBusinessNo(partner.getPBusinessNo())
+                    .pAddr(partner.getPAddr())
+                    .build();
+
+            userResponseDTO.setPartnerResponse(partnerResponseDTO);
+        }
+
+        return userResponseDTO;
+    }
+
+    // (회원 ID(일련번호)로) 회원 정보 불러오기
+    @Override
+    public UserResponseDTO getUserInfoById(Long userId) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
 
         UserResponseDTO userResponseDTO = UserResponseDTO.builder()
@@ -188,18 +227,62 @@ public class UserServiceImpl implements UserService {
     // 회원정보 수정 (기본정보)
     @Override
     @Transactional
-    public void updateUserInfo(String uEmail, UserUpdateDTO dto) {
-        User user = userRepository.findByuEmail(uEmail)
+    public void updateUserInfo(Long userId, UserUpdateDTO dto) {
+        User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
+        // 회원정보 수정
         user.updateBasicInfo(dto.getName(), dto.getEmail(), dto.getPhone());
 
+        // 협력업체 회원의 경우 추가 회원정보 수정
         if (dto.getUserRole().equals(UserRole.PARTNER)) {
             Partner partner = partnerRepository.findByUser(user)
                     .orElseThrow(() -> new IllegalArgumentException("협력업체 정보 없음"));
 
             partner.updateCompanyInfo(dto.getCompanyName(), dto.getAddress());
         }
+
+        // 인증 정보 갱신
+        CustomUserDetails updatedUserDetails = new CustomUserDetails(user);
+        Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                updatedUserDetails,
+                null,
+                updatedUserDetails.getAuthorities()
+        );
+        SecurityContextHolder.getContext().setAuthentication(newAuth);
     }
 
+    // 회원 탈퇴
+    @Override
+    @Transactional
+    public void deactivateUser(Long userId, String reason) {
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        user.setuIsActive(UserStatus.INACTIVE);
+
+        userLogRepository.save(UserLog.builder()
+                .user(user)
+                .sActionType("WITHDRAW")
+                .sActionContent("탈퇴 사유: " + reason)
+                .build());
+    }
+
+    // 회원가입 미승인 회원 목록 반환
+    @Override
+    public List<User> findByStatus(UserStatus status) {
+        return userRepository.findByuIsActive(UserStatus.PENDING);
+    }
+
+    @Override
+    public Page<User> getPendingUsers(Pageable pageable) {
+        return userRepository.findByuIsActive(UserStatus.PENDING, pageable);
+    }
+
+    @Override
+    @Transactional
+    public void activateUser(String uEmail) {
+        User user = userRepository.findByuEmail(uEmail)
+                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다."));
+        user.setuIsActive(UserStatus.ACTIVE);
+    }
 }

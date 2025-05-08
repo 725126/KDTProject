@@ -43,7 +43,20 @@
             </button>
             <ul class="dropdown-menu border">
                 <li><a class="dropdown-item" href="/internal/my/account-edit">내 정보</a></li>
-                <li><a class="dropdown-item" href="/internal/my/account-delete">회원 탈퇴</a></li>
+                <!-- import 필요 -->
+                <th:block th:with="ADMIN=${T(org.zerock.b01.domain.user.UserRole).ADMIN}">
+
+                    <!-- ADMIN이 아니면 탈퇴 링크 -->
+                    <li th:if="${currentUserRole != ADMIN}">
+                        <a class="dropdown-item" href="/internal/my/account-delete">회원 탈퇴</a>
+                    </li>
+
+                    <!-- ADMIN이면 관리자 페이지 링크 -->
+                    <li th:if="${currentUserRole == ADMIN}">
+                        <a class="dropdown-item" href="/admin/my/user-list">관리페이지</a>
+                    </li>
+
+                </th:block>
                 <li>
                     <hr class="dropdown-divider">
                 </li>

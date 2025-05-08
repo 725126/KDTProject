@@ -10,6 +10,7 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <title>자재 관리의 시작, 자재ON</title>
     <link rel="stylesheet" th:href="@{/css/layout/basic/my-admin.css}">
+    <link rel="stylesheet" th:href="@{/css/component/profile-img.css}">
 </head>
 <body>
 
@@ -22,7 +23,7 @@
                 <div class="ms-2">
             <span class="fs-2">
               <span class="logo"><i class="bi bi-box"></i>자재<span class="logo-on">ON</span></span>
-              <small>마이페이지</small>
+              <small>관리페이지</small>
             </span>
                 </div>
 
@@ -39,38 +40,37 @@
 
             <ul class="nav flex-column">
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="/admin/my/user-list">
                         <i class="bi bi-people-fill me-3"></i>
                         회원 목록
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="/admin/my/join-list">
                         <i class="bi bi-person-plus-fill me-3"></i>
                         회원가입 승인
                     </a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="#">
-                        <i class="bi bi-person-dash-fill me-3"></i>
-                        회원탈퇴 승인
-                    </a>
-                </li>
-                <li class="nav-item">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="/admin/my/log-list">
                         <i class="bi bi-clipboard-data me-3"></i>
                         회원로그 기록
                     </a>
                 </li>
                 <li class="nav-item mt-4 border-top pt-3">
-                    <a class="nav-link" href="#">
+                    <a class="nav-link" href="/internal/my/account-edit">
                         <i class="bi bi-person me-3"></i>
                         관리자 정보
                     </a>
-                    <a class="nav-link" href="#">
+                    <!-- 로그아웃 a태그 -->
+                    <a class="nav-link" href="#" onclick="document.getElementById('logoutForm').submit(); return false;">
                         <i class="bi bi-box-arrow-right me-3"></i>
                         로그아웃
                     </a>
+                    <!-- 숨겨진 로그아웃 form -->
+                    <form id="logoutForm" th:action="@{/logout}" method="post" th:if="${currentUserRole != null}" style="display: none;">
+                        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                    </form>
                 </li>
 
             </ul>

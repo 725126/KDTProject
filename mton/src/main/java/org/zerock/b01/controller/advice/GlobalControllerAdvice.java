@@ -1,6 +1,7 @@
 package org.zerock.b01.controller.advice;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ModelAttribute;
@@ -16,13 +17,17 @@ import java.util.Optional;
 
 @ControllerAdvice
 @RequiredArgsConstructor
+@Log4j2
 public class GlobalControllerAdvice {
     final PartnerRepository partnerRepository;
 
     // 권한
     @ModelAttribute("currentUserRole")
     public UserRole currentUserRole(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        log.info("Current user role: {}", userDetails);
+
         if (userDetails != null) {
+            log.info("Current user role: {}", userDetails.getUserRole());
             return userDetails.getUserRole(); // "ADMIN", "PARTNER" 등
         }
         return null;

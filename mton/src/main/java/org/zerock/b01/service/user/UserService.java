@@ -1,11 +1,16 @@
 package org.zerock.b01.service.user;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.zerock.b01.domain.user.User;
+import org.zerock.b01.domain.user.UserRole;
+import org.zerock.b01.domain.user.UserStatus;
 import org.zerock.b01.dto.user.FindIdDTO;
 import org.zerock.b01.dto.user.UserCreateDTO;
 import org.zerock.b01.dto.user.UserResponseDTO;
 import org.zerock.b01.dto.user.UserUpdateDTO;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface UserService {
@@ -13,6 +18,8 @@ public interface UserService {
     boolean createUser(UserCreateDTO request);
 
     UserResponseDTO getUserInfoByEmail(String email);
+
+    UserResponseDTO getUserInfoById(Long userId);
 
     User getUserByEmail(String email);
 
@@ -32,5 +39,13 @@ public interface UserService {
 
     void changePassword(User user, String newPassword);
 
-    void updateUserInfo(String uEmail, UserUpdateDTO dto);
+    void updateUserInfo(Long userId, UserUpdateDTO dto);
+
+    void deactivateUser(Long userId, String reason);
+
+    List<User> findByStatus(UserStatus status);
+
+    Page<User> getPendingUsers(Pageable pageable);
+
+    void activateUser(String uEmail);
 }

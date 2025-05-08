@@ -1,3 +1,14 @@
+// 사업자 번호 입력 마스크
+Inputmask({
+    mask: "999-99-99999",
+    placeholder: "",
+    showMaskOnHover: false,
+    showMaskOnFocus: true,
+    autoUnmask: false,
+    removeMaskOnSubmit: false,
+    jitMasking: true
+}).mask("#pBusinessNo");
+
 // 사업자등록번호 검증
 const businessInput = document.getElementById('pBusinessNo');
 const businessCheckResult = document.getElementById('businessCheckResult');

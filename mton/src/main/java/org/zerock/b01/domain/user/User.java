@@ -31,17 +31,29 @@ public class User extends BaseEntity { // 회원 (기본 회원 정보)
 
     private String resetToken;
 
+    // 비밀번호 재설정 권한 인증 토큰
     public void setResetToken(String resetToken) {
+
         this.resetToken = resetToken;
     }
 
+    // 비밀번호 재설정
     public void setPassword(String uPassword) {
+
         this.uPassword = uPassword;
     }
 
-    public void updateBasicInfo(String name, String email, String phone) {
+    // 기본 정보 재설정
+    public void updateBasicInfo(String name, String uEmail, String phone) {
         this.uName = name;
-        this.uEmail = email;
+        this.uEmail = uEmail;
         this.uPhone = phone;
     }
+
+    // 회원탈퇴를 위한 비활성화
+    public void setuIsActive(UserStatus uIsActive) {
+        this.uIsActive = uIsActive;
+    }
+
+
 }

@@ -1,26 +1,4 @@
 document.addEventListener("DOMContentLoaded", function () {
-    // 연락처 입력 마스크
-    Inputmask({
-        mask: "010-9999-9999",
-        placeholder: "",        // 언더바 없애기
-        showMaskOnHover: false,  // 마우스 오버 시 마스크 안보이게
-        showMaskOnFocus: true,   // 포커스하면만 마스크 적용
-        autoUnmask: false,       // 입력된 값만 표시
-        removeMaskOnSubmit: false, // 폼 제출할 때 마스크 유지
-        jitMasking: true         // 입력한 만큼만 마스크 적용 (✨핵심!)
-    }).mask(".phone-mask");
-
-    // 사업자 번호 입력 마스크
-    Inputmask({
-        mask: "999-99-99999",
-        placeholder: "",
-        showMaskOnHover: false,
-        showMaskOnFocus: true,
-        autoUnmask: false,
-        removeMaskOnSubmit: false,
-        jitMasking: true
-    }).mask("#pBusinessNo");
-
     // 회원종류 선택 > 협력업체 선택 시 사업자등록번호 입력창 생김
     const userRoleSelect = document.getElementById('userRole');
     // businessNoInput 선언
@@ -38,8 +16,8 @@ document.addEventListener("DOMContentLoaded", function () {
     });
 
     const form = document.querySelector("form");
-    const inputName = document.getElementById("inputName");
-    const inputPhone = document.getElementById("inputPhone");
+    const inputName = document.getElementById("uName");
+    const inputPhone = document.getElementById("uPhone");
     const findResult = document.getElementById("findResult");
     const inputUserRole = document.getElementById('userRole');
 
@@ -50,6 +28,16 @@ document.addEventListener("DOMContentLoaded", function () {
         const uPhone = inputPhone.value.trim();
         const userRole = inputUserRole.value;
         let businessNo = "";
+
+        // 이름 검증
+        if (!submitFormValidateName(event)) {
+            return;
+        }
+
+        // 연락처 검증
+        if (!submitFormValidatePhone(event)) {
+            return;
+        }
 
         // 회원종류: 협력업체 인 경우에만 사업자번호 입력 필수
         if (userRole === 'PARTNER') {

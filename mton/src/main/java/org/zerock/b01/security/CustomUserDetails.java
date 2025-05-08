@@ -53,16 +53,23 @@ public class CustomUserDetails implements UserDetails {
         return collection;
     }
 
+    // 비밀번호
     @Override
     public String getPassword() {
 
         return user.getUPassword(); // 비밀번호 필드명
     }
 
+    // 아이디 (이메일)
     @Override
     public String getUsername() {
 
         return user.getUEmail(); // 로그인 아이디 (uEmail)
+    }
+
+    // 회원 ID (일련번호)
+    public Long getUserId() {
+        return user.getUserId();
     }
 
     // 회원 정보
@@ -82,7 +89,7 @@ public class CustomUserDetails implements UserDetails {
         return user.getUserRole().name();
     }
 
-    // 회원 종류
+    // 회원 종류 (enum)
     public UserRole getUserRole() {
 
         return user.getUserRole();

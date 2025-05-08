@@ -41,12 +41,15 @@ phoneInput.addEventListener('keyup', validatePhone);
 phoneInput.addEventListener('input', validatePhone);
 
 function submitFormValidatePhone(event) {
+    validatePhone();
+
     if (!isPhoneChecked) {
         event.preventDefault();
         phoneInput.focus();
-        return true;
+        return false;
     }
 
     return true;
 }
+
 

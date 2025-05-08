@@ -1,11 +1,17 @@
 package org.zerock.b01.controller.user;
 
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
@@ -13,6 +19,7 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.zerock.b01.domain.user.User;
 import org.zerock.b01.domain.user.UserRole;
+import org.zerock.b01.domain.user.UserStatus;
 import org.zerock.b01.dto.user.FindIdDTO;
 import org.zerock.b01.dto.user.UserCreateDTO;
 import org.zerock.b01.dto.user.UserResponseDTO;
@@ -20,6 +27,7 @@ import org.zerock.b01.dto.user.UserUpdateDTO;
 import org.zerock.b01.security.CustomUserDetails;
 import org.zerock.b01.service.user.UserService;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -29,13 +37,25 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
 
-    // *** 회원정보 수정 ***
-    // 이메일 중복확인 버튼 disabled 일 때 대처
-    // 입력값 검증 (이름 검증 함수 분리)
+    // 관리자 마이페이지
 
     // 회원 관리 - 인트로(로그인)
     @GetMapping("/intro")
-    public String introGet() {
+    public String introGet(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails != null) {
+            String role = userDetails.getUserRole().name();
+            switch (role) {
+                case "ADMIN":
+                    return "redirect:/internal/home";  // 관리자 페이지
+                case "PRODUCTION":
+                    return "redirect:/internal/home";      // 생산부서 홈
+                case "PURCHASING":
+                    return "redirect:/internal/home";      // 구매부서 홈
+                case "PARTNER":
+                    return "redirect:/external/home";      // 협력업체 홈
+            }
+        }
+
         return "/page/user/intro";
     }
 
@@ -90,19 +110,61 @@ public class UserController {
 
     // 회원 관리 - 로그인
     @GetMapping("/login")
-    public String loginGet() {
+    public String loginGet(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails != null) {
+            String role = userDetails.getUserRole().name();
+            switch (role) {
+                case "ADMIN":
+                    return "redirect:/internal/home";  // 관리자 페이지
+                case "PRODUCTION":
+                    return "redirect:/internal/home";      // 생산부서 홈
+                case "PURCHASING":
+                    return "redirect:/internal/home";      // 구매부서 홈
+                case "PARTNER":
+                    return "redirect:/external/home";      // 협력업체 홈
+            }
+        }
+
         return "page/user/login";
     }
 
     // 회원 관리 - 회원가입
     @GetMapping("/join")
-    public String joinGet() {
+    public String joinGet(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails != null) {
+            String role = userDetails.getUserRole().name();
+            switch (role) {
+                case "ADMIN":
+                    return "redirect:/internal/home";  // 관리자 페이지
+                case "PRODUCTION":
+                    return "redirect:/internal/home";      // 생산부서 홈
+                case "PURCHASING":
+                    return "redirect:/internal/home";      // 구매부서 홈
+                case "PARTNER":
+                    return "redirect:/external/home";      // 협력업체 홈
+            }
+        }
+
         return "page/user/join";
     }
 
     // 회원 관리 - 내부직원 회원가입 (GET)
     @GetMapping("/join/inner")
-    public String joinInnerGet(Model model) {
+    public String joinInnerGet(Model model, @AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails != null) {
+            String role = userDetails.getUserRole().name();
+            switch (role) {
+                case "ADMIN":
+                    return "redirect:/internal/home";  // 관리자 페이지
+                case "PRODUCTION":
+                    return "redirect:/internal/home";      // 생산부서 홈
+                case "PURCHASING":
+                    return "redirect:/internal/home";      // 구매부서 홈
+                case "PARTNER":
+                    return "redirect:/external/home";      // 협력업체 홈
+            }
+        }
+
         model.addAttribute("userCreateDTO", new UserCreateDTO());
         return "page/user/inner-join";
     }
@@ -130,7 +192,21 @@ public class UserController {
 
     // 회원 관리 - 협력업체 회원가입 (GET)
     @GetMapping("/join/partner")
-    public String joinPartnerGet(Model model) {
+    public String joinPartnerGet(@AuthenticationPrincipal CustomUserDetails userDetails, Model model) {
+        if (userDetails != null) {
+            String role = userDetails.getUserRole().name();
+            switch (role) {
+                case "ADMIN":
+                    return "redirect:/internal/home";  // 관리자 페이지
+                case "PRODUCTION":
+                    return "redirect:/internal/home";      // 생산부서 홈
+                case "PURCHASING":
+                    return "redirect:/internal/home";      // 구매부서 홈
+                case "PARTNER":
+                    return "redirect:/external/home";      // 협력업체 홈
+            }
+        }
+
         model.addAttribute("userCreateDTO", new UserCreateDTO());
         return "page/user/partner-join";
     }
@@ -158,7 +234,21 @@ public class UserController {
 
     // 회원 관리 - 비밀번호 찾기
     @GetMapping("/find/pw")
-    public String findPwGet() {
+    public String findPwGet(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails != null) {
+            String role = userDetails.getUserRole().name();
+            switch (role) {
+                case "ADMIN":
+                    return "redirect:/internal/home";  // 관리자 페이지
+                case "PRODUCTION":
+                    return "redirect:/internal/home";      // 생산부서 홈
+                case "PURCHASING":
+                    return "redirect:/internal/home";      // 구매부서 홈
+                case "PARTNER":
+                    return "redirect:/external/home";      // 협력업체 홈
+            }
+        }
+
         return "page/user/find/find-pw";
     }
 
@@ -203,7 +293,21 @@ public class UserController {
 
     // 회원 관리 - 아이디 찾기
     @GetMapping("/find/id")
-    public String findIdGet() {
+    public String findIdGet(@AuthenticationPrincipal CustomUserDetails userDetails) {
+        if (userDetails != null) {
+            String role = userDetails.getUserRole().name();
+            switch (role) {
+                case "ADMIN":
+                    return "redirect:/internal/home";  // 관리자 페이지
+                case "PRODUCTION":
+                    return "redirect:/internal/home";      // 생산부서 홈
+                case "PURCHASING":
+                    return "redirect:/internal/home";      // 구매부서 홈
+                case "PARTNER":
+                    return "redirect:/external/home";      // 협력업체 홈
+            }
+        }
+
         return "page/user/find/find-id";
     }
 
@@ -231,7 +335,7 @@ public class UserController {
     @GetMapping("/internal/my/account-delete")
     public String myPageAccountDeleteGetIn(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
-        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(customUserDetails.getUsername());
+        UserResponseDTO userResponseDTO = userService.getUserInfoById(customUserDetails.getUserId());
         model.addAttribute("uEmail", userResponseDTO.getUEmail());
 
         return "page/user/my/account-delete";
@@ -241,7 +345,7 @@ public class UserController {
     @GetMapping("/internal/my/account-edit")
     public String myPageAccountEditGetIn(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
-        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(customUserDetails.getUsername());
+        UserResponseDTO userResponseDTO = userService.getUserInfoById(customUserDetails.getUserId());
         model.addAttribute("userResponseDTO", userResponseDTO);
 
         return "page/user/my/account-edit";
@@ -251,7 +355,7 @@ public class UserController {
     @GetMapping("/external/my/account-delete")
     public String myPageAccountDeleteGetEx(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
-        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(customUserDetails.getUsername());
+        UserResponseDTO userResponseDTO = userService.getUserInfoById(customUserDetails.getUserId());
         model.addAttribute("uEmail", userResponseDTO.getUEmail());
 
         return "page/user/my/account-delete";
@@ -261,12 +365,34 @@ public class UserController {
     @GetMapping("/external/my/account-edit")
     public String myPageAccountEditGetEx(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
-        UserResponseDTO userResponseDTO = userService.getUserInfoByEmail(customUserDetails.getUsername());
+        UserResponseDTO userResponseDTO = userService.getUserInfoById(customUserDetails.getUserId());
         model.addAttribute("userResponseDTO", userResponseDTO);
 
         return "page/user/my/account-edit";
     }
 
+    // [공통] 마이페이지 > 회원탈퇴
+    @PostMapping("/withdraw")
+    public String withdraw(@AuthenticationPrincipal CustomUserDetails userDetails,
+                           @RequestParam String reason,
+                           @RequestParam(required = false) String customReason,
+                           HttpServletRequest request) {
+
+        String finalReason = reason.equals("other") ? customReason : reason;
+
+        userService.deactivateUser(userDetails.getUserId(), finalReason);
+
+        // 로그아웃 처리
+        HttpSession session = request.getSession(false);
+        if (session != null) {
+            session.invalidate();
+        }
+        SecurityContextHolder.clearContext();
+
+        return "redirect:/login?logout";
+    }
+
+    // [공통] 마이페이지 > 내 정보 > 비밀번호 변경
     @PostMapping("/my/change-password")
     public String changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
                                  @RequestParam String currentPassword,
@@ -280,6 +406,12 @@ public class UserController {
         if (!userService.checkPasswordMatch(currentPassword, user.getUPassword())) {
             redirectAttributes.addFlashAttribute("errorPw", "현재 비밀번호가 일치하지 않습니다.");
             redirectAttributes.addFlashAttribute("activeTab", "passwordTab");
+
+            // [협력업체] 회원인 경우
+            if (userDetails.getUserRole().equals(UserRole.PARTNER)) {
+                return "redirect:/external/my/account-edit";
+            }
+
             return "redirect:/internal/my/account-edit";
         }
 
@@ -289,24 +421,30 @@ public class UserController {
         redirectAttributes.addFlashAttribute("successPw", "비밀번호가 변경되었습니다.");
         redirectAttributes.addFlashAttribute("activeTab", "passwordTab");
 
+        // [협력업체] 회원인 경우
+        if (userDetails.getUserRole().equals(UserRole.PARTNER)) {
+            return "redirect:/external/my/account-edit";
+        }
+
         return "redirect:/internal/my/account-edit";
     }
 
+    // [공통] 마이페이지 > 회원정보 수정
     @PostMapping("/my/account-edit")
     public String updateAccount(@ModelAttribute UserUpdateDTO dto,
                                 @AuthenticationPrincipal CustomUserDetails userDetails,
                                 RedirectAttributes redirectAttributes) {
-        log.info("[공통] 회원정보(기본정보) 수정: {}", dto);
+        log.info("[공통] 회원정보 수정: {}", dto);
 
         try {
-            userService.updateUserInfo(userDetails.getUsername(), dto);
+            userService.updateUserInfo(userDetails.getUserId(), dto);
             redirectAttributes.addFlashAttribute("successEdit", "회원정보가 성공적으로 수정되었습니다.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorEdit", "회원정보 수정 중 오류가 발생했습니다.");
         }
 
         // [협력업체] 회원인 경우
-        if (dto.getUserRole().equals(UserRole.PARTNER)) {
+        if (userDetails.getUserRole().equals(UserRole.PARTNER)) {
             return "redirect:/external/my/account-edit";
         }
 
@@ -315,8 +453,22 @@ public class UserController {
 
     // 마이페이지 - 관리자 > 회원가입 승인
     @GetMapping("/admin/my/join-list")
-    public String adminMyPageJoinListGet() {
+    public String adminMyPageJoinList(@PageableDefault(size = 3) Pageable pageable, Model model) {
+        Page<User> pendingUsers = userService.getPendingUsers(pageable);
+
+        model.addAttribute("pendingUsers", pendingUsers);
+        model.addAttribute("currentPage", pendingUsers.getNumber() + 1); // 1-based
+        model.addAttribute("totalPages", pendingUsers.getTotalPages());
+
         return "page/user/my/admin/join-list";
+    }
+
+    @PutMapping("/admin/my/approve")
+    @ResponseBody
+    public ResponseEntity<?> approveUser(@RequestBody Map<String, String> payload) {
+        String uEmail = payload.get("uEmail");
+        userService.activateUser(uEmail);
+        return ResponseEntity.ok().build();
     }
 
     // 마이페이지 - 관리자 > 회원탈퇴 승인

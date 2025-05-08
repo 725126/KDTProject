@@ -13,7 +13,7 @@
             </a>
 
             <!-- 외부회원 PARTNER -->
-            <a class="navbar-brand d-flex align-items-center" th:if="${currentUserRole == 'PARTNER'}" href="/external/home">
+            <a class="navbar-brand d-flex align-items-center" th:if="${currentUserRole == T(org.zerock.b01.domain.user.UserRole).PARTNER}" href="/external/home">
                             <span>
                     <span class="logo"><i class="bi bi-box"></i>자재<span class="logo-on">ON</span></span>
                 </span>
@@ -21,7 +21,7 @@
 
             <!-- 내부회원 (ADMIN, PRODUCTION, PURCHASING) -->
             <a class="navbar-brand d-flex align-items-center"
-               th:if="${currentUserRole != null and currentUserRole != 'PARTNER'}"
+               th:if="${currentUserRole != null and currentUserRole != T(org.zerock.b01.domain.user.UserRole).PARTNER}"
                href="/internal/home">
 
                 <span>
@@ -40,10 +40,6 @@
                 </form>
             </div>
 
-            <!--            <div class="d-flex">-->
-<!--                <a class="nav-link" href="/login">로그인</a>-->
-<!--                <a class="nav-link" href="#">고객지원</a>-->
-<!--            </div>-->
         </div>
     </nav>
     <!-- 헤더 end -->

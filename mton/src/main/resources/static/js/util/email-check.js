@@ -22,7 +22,7 @@ emailInput.addEventListener('input', function () {
         emailCheckResult.textContent = "❌ 이메일을 입력해 주세요.";
         emailCheckResult.style.color = "red";
 
-        if (path === "/join/partner" || path === "/join/inner" || path === "/internal/my/account-edit") {
+        if (path === "/join/partner" || path === "/join/inner" || path === "/internal/my/account-edit" || path === "/external/my/account-edit") {
             checkEmailDuplicateBtn.disabled = true;
         } else if (path === "/find/pw") {
             pwResetMailSendBtn.disabled = true;
@@ -31,13 +31,13 @@ emailInput.addEventListener('input', function () {
         emailCheckResult.textContent = "❌ 이메일 형식이 올바르지 않습니다.";
         emailCheckResult.style.color = "red";
 
-        if (path === "/join/partner" || path === "/join/inner" || path === "/internal/my/account-edit") {
+        if (path === "/join/partner" || path === "/join/inner" || path === "/internal/my/account-edit" || path === "/external/my/account-edit") {
             checkEmailDuplicateBtn.disabled = true;
         } else if (path === "/find/pw") {
             pwResetMailSendBtn.disabled = true;
         }
     } else {
-        if (path === "/join/partner" || path === "/join/inner" || path === "/internal/my/account-edit") {
+        if (path === "/join/partner" || path === "/join/inner" || path === "/internal/my/account-edit" || path === "/external/my/account-edit") {
             emailCheckResult.textContent = "이메일 중복 확인을 해주세요.";
             emailCheckResult.style.color = "gray";
             checkEmailDuplicateBtn.disabled = false;
@@ -89,11 +89,38 @@ if(checkEmailDuplicateBtn != null) {
 }
 
 function submitFormValidateEmail(event) {
-    if (!isEmailChecked) {
-        event.preventDefault();
-        emailInput.focus();
-        return false;
+    const email = emailInput.value.trim();
+
+    const originalEmailInput = document.getElementById("originalEmail");
+    const originalEmail = originalEmailInput ? originalEmailInput.value : null;
+
+    // originalEmail이 존재하면 수정 페이지라고 판단
+    if (originalEmail !== null) {
+        // 이메일을 변경한 경우엔 중복확인 필요
+        if (email !== originalEmail && !isEmailChecked) {
+            event.preventDefault();
+            emailInput.focus();
+            return false;
+        }
+    } else {
+        // 무조건 중복확인 필요
+        if (!isEmailChecked) {
+            event.preventDefault();
+            emailInput.focus();
+            return false;
+        }
     }
 
     return true;
 }
+//
+//
+// function submitFormValidateEmail(event) {
+//     if (!isEmailChecked) {
+//         event.preventDefault();
+//         emailInput.focus();
+//         return false;
+//     }
+//
+//     return true;
+// }
