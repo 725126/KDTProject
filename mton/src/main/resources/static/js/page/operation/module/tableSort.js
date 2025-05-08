@@ -19,3 +19,7 @@ function sortTable(table, columnIndex = 0, reverse = false) {
 
     rows.forEach(row => tbody.appendChild(row));
 }
+
+export {
+    sortTable,
+}

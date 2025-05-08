@@ -227,6 +227,8 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         const result = excelParser.tableUpload(dest, currentTable);
         result.then((res) => {
             alert(res.message);
+            viewRefreshBtn.dispatchEvent(new Event('click'));
+            editRefreshBtn.dispatchEvent(new Event('click'));
         });
     });
 
@@ -235,12 +237,9 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         e.preventDefault();
         e.stopPropagation();
 
-        const mtable = document.querySelector("#mat-table-view");
-        const ptable = document.querySelector("#prd-table-view");
-        const pbtable = document.querySelector("#pbom-table-view");
-        tableRowsEditor.viewTable(mtable, "material");
-        tableRowsEditor.viewTable(ptable, "product");
-        tableRowsEditor.viewTable(pbtable, "pbom");
+        tableRowsEditor.viewTable(matViewTable, "material");
+        tableRowsEditor.viewTable(prdViewTable, "product");
+        tableRowsEditor.viewTable(pbomViewTable, "pbom");
     });
 
     // 다운로드 버튼 클릭시 화면에 보이는 테이블을 .xlsx 확장자로 다운로드
@@ -252,20 +251,63 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         excelParser.tableToFile(currentTable, currentTable.id + ".xlsx");
     });
 
+    // 수정 새로고침 버튼
+    editRefreshBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        tableRowsEditor.viewEditTable(matEditTable, "material");
+        tableRowsEditor.viewEditTable(prdEditTable, "product");
+        tableRowsEditor.viewEditTable(pbomEditTable, "pbom");
+    });
+
+    // 수정 반영 버튼
+    editUploadBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentTable = document.querySelector("table[style='display: table;']");
+        let deleteResult = null;
+        switch (currentTable.id) {
+            case "mat-table-edit":
+                deleteResult = tableRowsEditor.uploadEditedTable(currentTable, "material");
+                break;
+            case "prd-table-edit":
+                deleteResult = tableRowsEditor.uploadEditedTable(currentTable, "product");
+                break;
+            case "pbom-table-edit":
+                deleteResult = tableRowsEditor.uploadEditedTable(currentTable, "pbom");
+        }
+
+        if (deleteResult === null) { console.log("테이블 참조가 잘못되었습니다."); return; }
+
+        deleteResult.then(res => {
+            alert(res.message);
+            editRefreshBtn.dispatchEvent(new Event("click"));
+            viewRefreshBtn.dispatchEvent(new Event("click"));
+        });
+    });
+
     // 툴팁 메시지 바인딩
     tutorialMessage.bindTutorialMessage(insertFileLabel, tmessage.insertFileBtnTutorial);
     tutorialMessage.bindTutorialMessage(insertUploadBtn, tmessage.insertUploadBtnTutorial);
     tutorialMessage.bindTutorialMessage(viewRefreshBtn, tmessage.viewRefreshBtnTutorial);
     tutorialMessage.bindTutorialMessage(viewDownloadBtn, tmessage.viewDownloadBtnTutorial)
+    tutorialMessage.bindTutorialMessage(editRefreshBtn, tmessage.editRefreshBtnTutorial);
+    tutorialMessage.bindTutorialMessage(editUploadBtn, tmessage.editUploadBtnTutorial);
 })();
 
 // 테이블 뷰 관련 초기화
 (function () {
-    // 목록 테이블들에 데이터 받아와서 집어넣음
-    const mtable = document.querySelector("#mat-table-view");
-    const ptable = document.querySelector("#prd-table-view");
-    const pbtable = document.querySelector("#pbom-table-view");
-    tableRowsEditor.viewTable(mtable, "material");
-    tableRowsEditor.viewTable(ptable, "product");
-    tableRowsEditor.viewTable(pbtable, "pbom");
+    tableRowsEditor.viewTable(matViewTable, "material");
+    tableRowsEditor.viewTable(prdViewTable, "product");
+    tableRowsEditor.viewTable(pbomViewTable, "pbom");
+
+    tableRowsEditor.viewEditTable(matEditTable, "material");
+    tableRowsEditor.viewEditTable(prdEditTable, "product");
+    tableRowsEditor.viewEditTable(pbomEditTable, "pbom");
+
+    for (const table of editTables) {
+        tableRowsEditor.initEditButtons(table);
+    }
 })();

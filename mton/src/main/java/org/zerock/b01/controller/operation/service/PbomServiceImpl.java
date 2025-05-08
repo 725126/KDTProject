@@ -11,6 +11,7 @@ import org.zerock.b01.domain.operation.Pbom;
 import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.dto.operation.PbomDTO;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -85,5 +86,39 @@ public class PbomServiceImpl implements PbomService {
                         .pbomQty(Integer.toString(pbom.getPbomQty()))
                         .build()
         ).collect(Collectors.toList());
+    }
+
+    @Override
+    public StatusTuple deleteAll(ArrayList<String> arrayList) {
+        try {
+            pbomRepository.deleteAllById(arrayList);
+            return new StatusTuple(true, "PBOM 삭제에 성공했습니다.");
+        } catch (Exception e) {
+            return new StatusTuple(false, "자재 삭제에 실패했습니다.");
+        }
+    }
+
+    @Override
+    public StatusTuple updateAll(List<PbomDTO> list) {
+        try {
+            var pboms = list.stream().map(pbom -> Pbom.builder()
+                    .pbomId(pbom.getPbomId())
+                    .material(materialRepository.findById(pbom.getMatId()).get())
+                    .product(productRepository.findById(pbom.getProdId()).get())
+                    .pbomQty(Integer.parseInt(pbom.getPbomQty()))
+                    .build()
+            ).collect(Collectors.toList());
+
+            var pbomNames = list.stream().map(PbomDTO::getPbomId).collect(Collectors.toList());
+
+            if (pboms.size() != pbomRepository.findAllById(pbomNames).size()) {
+                return new StatusTuple(false, "PBOM 수정사항 개수가 일치하지 않습니다.");
+            }
+
+            pbomRepository.saveAll(pboms);
+            return new StatusTuple(true, "모든 PBOM 수정사항을 반영하였습니다.");
+        } catch (NoSuchElementException e) {
+            return new StatusTuple(false, e.getMessage());
+        }
     }
 }

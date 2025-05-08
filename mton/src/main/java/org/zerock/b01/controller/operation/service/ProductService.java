@@ -8,4 +8,6 @@ import java.util.List;
 public interface ProductService {
     StatusTuple registerAll(List<ProductDTO> list);
     List<ProductDTO> viewAll();
+    StatusTuple deleteAll (List<String> arrayList);
+    StatusTuple updateAll(List<ProductDTO> list);
 }

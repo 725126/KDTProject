@@ -69,8 +69,13 @@ public class ProductController {
 
             if (id == null || id.isEmpty()) {
                 String count = materialRepository.findLastOrderIdByPrefix("EW");
-                int countId = Integer.parseInt(count.substring(count.indexOf("EW") + 2)) + atomicInteger.getAndIncrement();
-                id = "EW" + String.format("%3d", countId).replace(" ", "0");
+
+                if (count != null) {
+                    int countId = Integer.parseInt(count.substring(count.indexOf("EW") + 2)) + atomicInteger.getAndIncrement();
+                    id = "EW" + String.format("%3d", countId).replace(" ", "0");
+                } else {
+                    id = "EW001";
+                }
             }
 
             return MaterialDTO.builder()
@@ -102,8 +107,13 @@ public class ProductController {
 
             if (id == null || id.isEmpty()) {
                 String count = productRepository.findLastOrderIdByPrefix("P");
-                int countId = Integer.parseInt(count.substring(count.indexOf("P") + 1)) + atomicInteger.getAndIncrement();
-                id = "P" + String.format("%3d", countId).replace(" ", "0");
+
+                if (count != null) {
+                    int countId = Integer.parseInt(count.substring(count.indexOf("P") + 1)) + atomicInteger.getAndIncrement();
+                    id = "P" + String.format("%3d", countId).replace(" ", "0");
+                } else {
+                    id = "P001";
+                }
             }
 
             return ProductDTO.builder()
@@ -134,8 +144,12 @@ public class ProductController {
 
             if (id == null || id.isEmpty()) {
                 String count = pbomRepository.findLastOrderIdByPrefix("PBOM");
-                int countId = Integer.parseInt(count.substring(count.indexOf("PBOM") + 4)) + atomicInteger.getAndIncrement();
-                id = "PBOM" + String.format("%3d", countId).replace(" ", "0");
+                if (count != null) {
+                    int countId = Integer.parseInt(count.substring(count.indexOf("PBOM") + 4)) + atomicInteger.getAndIncrement();
+                    id = "PBOM" + String.format("%3d", countId).replace(" ", "0");
+                } else {
+                    id = "PBOM001";
+                }
             }
 
             return PbomDTO.builder()
@@ -147,6 +161,66 @@ public class ProductController {
         }).collect(Collectors.toList());
 
         return pbomService.registerAll(pbomDTOList);
+    }
+
+    @ResponseBody
+    @PostMapping("/update/mat")
+    public StatusTuple updateMat(@RequestBody ArrayList<HashMap<String, String>> list) {
+        log.info(list.toString());
+
+        if (list.isEmpty()) {
+            return new StatusTuple(false, "자재 수정사항은 없습니다.");
+        }
+
+        List<MaterialDTO> materialDTOList = list.stream().map(hashmap -> MaterialDTO.builder()
+                .matId(hashmap.get(MaterialTableHead.MAT_ID.getLabel()))
+                .matName(hashmap.get(MaterialTableHead.MAT_NAME.getLabel()))
+                .matType(hashmap.get(MaterialTableHead.MAT_TYPE.getLabel()))
+                .matMeasure(hashmap.get(MaterialTableHead.MAT_MEASURE.getLabel()))
+                .matUnit(hashmap.get(MaterialTableHead.MAT_UNIT.getLabel()))
+                .matExplain(hashmap.get(MaterialTableHead.MAT_EXPLAIN.getLabel()))
+                .build()).collect(Collectors.toList());
+
+        return materialService.updateAll(materialDTOList);
+    }
+
+    @ResponseBody
+    @PostMapping("/update/prd")
+    public StatusTuple updatePrd(@RequestBody ArrayList<HashMap<String, String>> list) {
+        log.info(list.toString());
+
+        if (list.isEmpty()) {
+            return new StatusTuple(false, "상품 수정사항은 업습니다.");
+        }
+
+        List<ProductDTO> productDTOList = list.stream().map(hashmap -> ProductDTO.builder()
+                .prodId(hashmap.get(ProductTableHead.PROD_ID.getLabel()))
+                .prodName(hashmap.get(ProductTableHead.PROD_NAME.getLabel()))
+                .prodMeasure(hashmap.get(ProductTableHead.PROD_MEASURE.getLabel()))
+                .prodUnit(hashmap.get(ProductTableHead.PROD_UNIT.getLabel()))
+                .prodExplain(hashmap.get(ProductTableHead.PROD_EXPLAIN.getLabel()))
+                .build()).collect(Collectors.toList());
+
+        return productService.updateAll(productDTOList);
+    }
+
+    @ResponseBody
+    @PostMapping("/update/pbom")
+    public StatusTuple updatePbom(@RequestBody ArrayList<HashMap<String, String>> list) {
+        log.info(list.toString());
+
+        if (list.isEmpty()) {
+            return new StatusTuple(false,"PBOM 수정사항은 없습니다.");
+        }
+
+        List<PbomDTO> pbomDTOList = list.stream().map(hashmap -> PbomDTO.builder()
+                .pbomId(hashmap.get(PbomTableHead.PBOM_ID.getLabel()))
+                .matId(hashmap.get(PbomTableHead.MAT_ID.getLabel()))
+                .prodId(hashmap.get(PbomTableHead.PROD_ID.getLabel()))
+                .pbomQty(hashmap.get(PbomTableHead.PBOM_QTY.getLabel()))
+                .build()).collect(Collectors.toList());
+
+        return pbomService.updateAll(pbomDTOList);
     }
 
     @ResponseBody
@@ -168,5 +242,26 @@ public class ProductController {
     public List<PbomDTO> viewPbomTable(@RequestBody String str) {
         log.info("View Product: " + str);
         return pbomService.viewAll();
+    }
+
+    @ResponseBody
+    @PostMapping("/delete/mat")
+    public StatusTuple deleteMatTable(@RequestBody ArrayList<String> arrayList) {
+        log.info("deleting ID: " + arrayList.toString());
+        return materialService.deleteAll(arrayList);
+    }
+
+    @ResponseBody
+    @PostMapping("/delete/prd")
+    public StatusTuple deletePrdTable(@RequestBody ArrayList<String> arrayList) {
+        log.info("deleting ID: " + arrayList.toString());
+        return productService.deleteAll(arrayList);
+    }
+
+    @ResponseBody
+    @PostMapping("/delete/pbom")
+    public StatusTuple deletePbomTable(@RequestBody ArrayList<String> arrayList) {
+        log.info("deleting ID: " + arrayList.toString());
+        return pbomService.deleteAll(arrayList);
     }
 }

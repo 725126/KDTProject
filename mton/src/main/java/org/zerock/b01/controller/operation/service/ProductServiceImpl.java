@@ -78,4 +78,39 @@ public class ProductServiceImpl implements ProductService {
                         .build()
                 ).collect(Collectors.toList());
     }
+
+    @Override
+    public StatusTuple deleteAll(List<String> arrayList) {
+        try {
+            productRepository.deleteAllById(arrayList);
+            return new StatusTuple(true, "상품 삭제에 성공했습니다.");
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
+    }
+
+    @Override
+    public StatusTuple updateAll(List<ProductDTO> list) {
+        try {
+            var products = list.stream().map(prd -> Product.builder()
+                    .prodId(prd.getProdId())
+                    .prodName(prd.getProdName())
+                    .prodMeasure(prd.getProdMeasure())
+                    .prodUnit(prd.getProdUnit())
+                    .prodExplain(prd.getProdExplain())
+                    .build()
+            ).collect(Collectors.toList());
+
+            var productNames = list.stream().map(ProductDTO::getProdId).collect(Collectors.toList());
+
+            if (products.size() != productRepository.findAllById(productNames).size()) {
+                return new StatusTuple(false, "상품 수정사항 개수가 일치하지 않습니다.");
+            }
+
+            productRepository.saveAll(products);
+            return new StatusTuple(true, "모든 상품 수정사항을 반영하였습니다.");
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
+    }
 }

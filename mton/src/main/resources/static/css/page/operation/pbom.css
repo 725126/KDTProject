@@ -43,23 +43,24 @@
 }
 
 .opacity-btn {
-    opacity: 0;
-    background-color: white;
-    transition: opacity 0.5s;
+    opacity: 0 !important;
+    background-color: transparent !important;
+    transition: opacity 0.5s !important;
+    --bs-table-bg-state: transparent !important;
 }
 
 tr:hover .opacity-btn {
-    opacity: 1;
+    opacity: 1 !important;
 }
 
 .opacity-btn:hover {
-    background-color: dodgerblue;
-    color: white;
+    background-color: dodgerblue !important;
+    color: white !important;
 }
 
 .opacity-btn[red-button='true']:hover {
-    background-color: crimson;
-    color: white;
+    background-color: crimson !important;
+    color: white !important;
 }
 
 .tutorial {

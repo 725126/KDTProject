@@ -84,4 +84,40 @@ public class MaterialServiceImpl implements MaterialService {
                     .build()
         ).collect(Collectors.toList());
     }
+
+    @Override
+    public StatusTuple deleteAll(ArrayList<String> arrayList) {
+        try {
+            materialRepository.deleteAllById(arrayList);
+            return new StatusTuple(true, "자재 삭제에 성공했습니다.");
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
+    }
+
+    @Override
+    public StatusTuple updateAll(List<MaterialDTO> list) {
+        try {
+            var materials = list.stream().map(mat -> Material.builder()
+                    .matId(mat.getMatId())
+                    .matName(mat.getMatName())
+                    .matType(mat.getMatType())
+                    .matMeasure(mat.getMatMeasure())
+                    .matUnit(mat.getMatUnit())
+                    .matExplain(mat.getMatExplain())
+                    .build()
+            ).collect(Collectors.toList());
+
+            var materialNames = list.stream().map(MaterialDTO::getMatId).collect(Collectors.toList());
+
+            if (materials.size() != materialRepository.findAllById(materialNames).size()) {
+                return new StatusTuple(false, "자재 수정사항 개수가 일치하지 않습니다.");
+            }
+
+            materialRepository.saveAll(materials);
+            return new StatusTuple(true, "모든 자재 수정사항을 반영하였습니다.");
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
+    }
 }
