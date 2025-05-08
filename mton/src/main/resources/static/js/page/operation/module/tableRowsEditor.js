@@ -86,6 +86,7 @@ function addUtilButtons(table, row) {
     row.appendChild(dltButton);
 }
 
+// 테이블에 행 추가와 삭제 버튼을 추가
 function addTableUtilBtn(table) {
     const rows = table.rows;
 
@@ -300,6 +301,7 @@ function addEditButtons(table, row, ...protectedCols) {
     tutorialMessage.bindTutorialMessage(revertButton, tmessage.editRevertBtnTutorial);
 }
 
+// 수정 테이블에 관련 버튼을 넣음
 function addTableEditButtons(table) {
     const rows = table.rows;
 
@@ -308,6 +310,7 @@ function addTableEditButtons(table) {
     }
 }
 
+// 테이블용 json Fetch 함수
 async function jsonFetcher(dest, jData) {
     return await fetch(dest, {
         method: "POST",
@@ -324,6 +327,7 @@ async function jsonFetcher(dest, jData) {
     });
 }
 
+// 수정 테이블의 사항을 데이터베이스에 반영한다.
 function uploadEditedTable(table, request) {
     let jsonData;
     let jsonFinalData;
@@ -384,6 +388,7 @@ function uploadEditedTable(table, request) {
     });
 }
 
+// 등록 테이블에 초기 버튼을 단다.
 function initEmptyTable(table) {
     for (const row of table.rows) {
         addUtilButtons(table, row);
@@ -392,6 +397,7 @@ function initEmptyTable(table) {
     }
 }
 
+// 목록 테이블용 fetch 함수
 async function refreshTableView(dest, request = "") {
     return await fetch(dest, {
         method: "POST",
@@ -408,6 +414,7 @@ async function refreshTableView(dest, request = "") {
     });
 }
 
+// 목록 테이블을 갱신한다.
 function viewTable(table, request) {
     let jsonData;
 
@@ -441,12 +448,38 @@ function viewTable(table, request) {
     });
 }
 
+// 수정 테이블을 갱신한다.
 function viewEditTable(table, request) {
     const result = viewTable(table, request);
     result.then((result) => {
         addTableEditButtons(table);
         originalValues = {};
     });
+}
+
+// 셀 안에 Select Element 넣기
+function makeSelect(cell, ...options) {
+    const select = document.createElement("select");
+    select.classList.add("indirect-select");
+
+    for (const option of options) {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.label = option;
+        select.appendChild(opt);
+    }
+
+    select.addEventListener("change", function (e) {
+        let span = cell.querySelector("span");
+        if (span === null) {
+            span = document.createElement("span");
+            cell.appendChild(span);
+        }
+
+        span.innerText = select.value;
+    });
+
+    cell.appendChild(select);
 }
 
 export {
