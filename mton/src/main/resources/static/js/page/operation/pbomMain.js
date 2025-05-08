@@ -39,6 +39,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
     const editLabel = manageMod.querySelector("#mod-edit");
     const viewLabel = manageMod.querySelector("#mod-view");
 
+    // 등록, 수정, 목록 라디오 간 전환 시각효과
     manageMod.addEventListener("click", function (event) {
         const labels = manageMod.querySelectorAll("label");
 
@@ -55,6 +56,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         }
     });
 
+    // 등록, 수정, 목록 버튼 클릭시 테이블과 우측 패널 전환 이벤트
     insertLabel.addEventListener("change", function (event) {
         inputGroup.style.display = "block";
         editGroup.style.display = "none";
@@ -94,10 +96,12 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         initial.dispatchEvent(new Event('change'));
     });
 
+    // 툴팁 메시지 바인딩
     tutorialMessage.bindTutorialMessage(insertLabel, tmessage.manageInsertTutorial);
     tutorialMessage.bindTutorialMessage(editLabel, tmessage.manageEditTutorial);
     tutorialMessage.bindTutorialMessage(viewLabel, tmessage.manageViewTutorial);
 
+    // 화면 초기화용 이벤트 발생
     const initial = document.querySelector("input[type='radio'][name='i-filter']:checked");
     initial.dispatchEvent(new Event('change'));
 })();
@@ -109,6 +113,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
     const filterPrd = document.getElementById("filter-prd-v");
     const filterPbom = document.getElementById("filter-pbom-v");
 
+    // 자재, 상품, PBOM 라디오 클릭시 테이블 전환 이벤트
     filterMat.addEventListener("change", function (event) {
         for (const table of allTables) {
             table.style.display = "none";
@@ -163,18 +168,20 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         }
     });
 
+    // 초기화용 이벤트 발생
     const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
     initial.dispatchEvent(new Event('change'));
 })();
 
 // 테이블 ROW 관련 버튼 이벤트 등록
 (function () {
+    // 등록 테이블들에 조작 버튼 달기
     for (const table of inputTables) {
         tableRowsEditor.initEmptyTable(table);
     }
 })();
 
-// 카드 버튼 이벤트
+// 카드 우측 패널 버튼 이벤트
 (function () {
     const insertFileBtn = document.getElementById("insert-file");
     const insertFileLabel = document.getElementById("insert-file-label");
@@ -184,6 +191,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
     const viewRefreshBtn = document.getElementById("view-refresh");
     const viewDownloadBtn = document.getElementById("view-download");
 
+    // 파일 선택 버튼에 새 파일 선택시 내용 삽입
     insertFileBtn.addEventListener("change", function (e) {
         const currentTable = document.querySelector("table[style='display: table;']");
         const result = excelParser.sheetToTable(insertFileBtn.files[0], currentTable, true, -2);
@@ -193,6 +201,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         });
     });
 
+    // 업로드 버튼 클릭시 서버로 테이블 데이터를 전송
     insertUploadBtn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -221,6 +230,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         });
     });
 
+    // 새로고침 버튼 클릭시 서버에서 목록 데이터를 받아옴
     viewRefreshBtn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -233,6 +243,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         tableRowsEditor.viewTable(pbtable, "pbom");
     });
 
+    // 다운로드 버튼 클릭시 화면에 보이는 테이블을 .xlsx 확장자로 다운로드
     viewDownloadBtn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -250,6 +261,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
 
 // 테이블 뷰 관련 초기화
 (function () {
+    // 목록 테이블들에 데이터 받아와서 집어넣음
     const mtable = document.querySelector("#mat-table-view");
     const ptable = document.querySelector("#prd-table-view");
     const pbtable = document.querySelector("#pbom-table-view");
