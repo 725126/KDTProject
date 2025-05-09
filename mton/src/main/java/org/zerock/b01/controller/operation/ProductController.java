@@ -8,17 +8,22 @@ import org.springframework.web.bind.annotation.*;
 import org.zerock.b01.controller.operation.repository.MaterialRepository;
 import org.zerock.b01.controller.operation.repository.PbomRepository;
 import org.zerock.b01.controller.operation.repository.ProductRepository;
+import org.zerock.b01.controller.operation.repository.ProductionPlanRepository;
 import org.zerock.b01.controller.operation.service.MaterialService;
 import org.zerock.b01.controller.operation.service.PbomService;
 import org.zerock.b01.controller.operation.service.ProductService;
+import org.zerock.b01.controller.operation.service.ProductionPlanService;
 import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.domain.operation.tablehead.MaterialTableHead;
 import org.zerock.b01.domain.operation.tablehead.PbomTableHead;
 import org.zerock.b01.domain.operation.tablehead.ProductTableHead;
+import org.zerock.b01.domain.operation.tablehead.ProductionPlanTableHead;
 import org.zerock.b01.dto.operation.MaterialDTO;
 import org.zerock.b01.dto.operation.PbomDTO;
 import org.zerock.b01.dto.operation.ProductDTO;
+import org.zerock.b01.dto.operation.ProductionPlanDTO;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -33,9 +38,12 @@ public class ProductController {
     private final MaterialService materialService;
     private final ProductService productService;
     private final PbomService pbomService;
+    private final ProductionPlanService productionPlanService;
+
     private final MaterialRepository materialRepository;
     private final ProductRepository productRepository;
     private final PbomRepository pbomRepository;
+    private final ProductionPlanRepository productionPlanRepository;
 
     // 품목 등록
     @GetMapping("/pbom")
@@ -48,8 +56,46 @@ public class ProductController {
 
     // 생산 계획
     @GetMapping("/prdplan")
-    public String prdplanGet() {
+    public String prdplanGet(Model model) {
+        model.addAttribute("prdplanTH", ProductionPlanTableHead.values());
         return "/page/operation/product/prdplan";
+    }
+
+    @ResponseBody
+    @PostMapping("/register/prdplan")
+    public StatusTuple registerPrdPlan(@RequestBody ArrayList<HashMap<String, String>> list) {
+        log.info(list.toString());
+
+        if (list.isEmpty()) {
+            return new StatusTuple(false, "등록할 생산계획이 없습니다.");
+        }
+
+        AtomicInteger atomicInteger = new AtomicInteger(1);
+
+        List<ProductionPlanDTO> productionPlanDTOList = list.stream().map(hashmap -> {
+            String id = hashmap.get(ProductionPlanTableHead.PRDPLAN_ID.getLabel());
+
+            if (id == null || id.isEmpty()) {
+                String count = productionPlanRepository.findLastOrderIdByPrefix("PRDPLAN");
+
+                if (count != null) {
+                    int coundId = Integer.parseInt(count.substring(count.indexOf("PRDPLAN") + 7)) + atomicInteger.getAndIncrement();
+                    id = "PRDPLAN" + String.format("%03d", coundId).replace(" ", "0");
+                } else {
+                    id = "PRDPLAN001";
+                }
+            }
+
+            return ProductionPlanDTO.builder()
+                    .prdplanId(id)
+                    .prodId(hashmap.get(ProductionPlanTableHead.PRDPLAN_ID.getLabel()))
+                    .prdplanDate(LocalDate.now())
+                    .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel())))
+                    .prdplanQty(Integer.parseInt(hashmap.get(ProductionPlanTableHead.PRDPLAN_QTY.getLabel())))
+                    .build();
+        }).collect(Collectors.toList());
+
+        return productionPlanService.registerAll(productionPlanDTOList);
     }
 
     // 자재 등록
@@ -242,6 +288,13 @@ public class ProductController {
     public List<PbomDTO> viewPbomTable(@RequestBody String str) {
         log.info("View Product: " + str);
         return pbomService.viewAll();
+    }
+
+    @ResponseBody
+    @PostMapping("/view/prdplan")
+    public List<ProductionPlanDTO> viewPrdPlanTable(@RequestBody String str) {
+        log.info("View Product: " + str);
+        return productionPlanService.viewAll();
     }
 
     @ResponseBody

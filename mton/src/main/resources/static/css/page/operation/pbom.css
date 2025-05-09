@@ -42,6 +42,10 @@
     position: relative;
 }
 
+.table-excel th {
+    position: relative;
+}
+
 .opacity-btn {
     opacity: 0 !important;
     background-color: transparent !important;
@@ -111,4 +115,21 @@ tr:hover .opacity-btn {
 
 td[contenteditable="true"] .indirect-select {
     pointer-events: auto;
+}
+
+th[sorting="true"][reverse="true"]::before {
+    content: "▵";
+    position: absolute;
+    left: 10px;
+}
+
+th[sorting="true"][reverse="false"]::before {
+    content: "▿";
+    position: absolute;
+    left: 10px;
+}
+
+/* 필터링용 태그들 */
+.filtered-mat, .filtered-prd, .filtered-pbom {
+    display: none;
 }

@@ -2,6 +2,7 @@ import * as excelParser from "./module/excelParser.js"
 import * as tableRowsEditor from "./module/tableRowsEditor.js"
 import * as tutorialMessage from "./module/tutorialMessage.js"
 import * as tmessage from "./module/tmessage.js"
+import * as tableFilter from "./module/tableFilter.js"
 
 // 그룹 div
 const viewGroup = document.getElementById("tables-view");
@@ -34,76 +35,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
 
 // 품목관리 모드 라디오 버튼 이벤트 등록
 (function () {
-    const manageMod = document.getElementById("manage-mod");
-    const insertLabel = manageMod.querySelector("#mod-insert");
-    const editLabel = manageMod.querySelector("#mod-edit");
-    const viewLabel = manageMod.querySelector("#mod-view");
-
-    // 등록, 수정, 목록 라디오 간 전환 시각효과
-    manageMod.addEventListener("click", function (event) {
-        const labels = manageMod.querySelectorAll("label");
-
-        for (const label of labels) {
-            if (label.control.checked) {
-                label.classList.add("pe-none");
-                label.classList.remove("btn-outline-secondary");
-                label.classList.add("btn-primary");
-            } else {
-                label.classList.remove("pe-none");
-                label.classList.add("btn-outline-secondary");
-                label.classList.remove("btn-primary");
-            }
-        }
-    });
-
-    // 등록, 수정, 목록 버튼 클릭시 테이블과 우측 패널 전환 이벤트
-    insertLabel.addEventListener("change", function (event) {
-        inputGroup.style.display = "block";
-        editGroup.style.display = "none";
-        viewGroup.style.display = "none";
-
-        inputManageBtn.style.display = "flex";
-        editManageBtn.style.display = "none";
-        viewManageBtn.style.display = "none";
-
-        const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
-        initial.dispatchEvent(new Event('change'));
-    });
-
-    editLabel.addEventListener("change", function (event) {
-        inputGroup.style.display = "none";
-        editGroup.style.display = "block";
-        viewGroup.style.display = "none";
-
-        inputManageBtn.style.display = "none";
-        editManageBtn.style.display = "flex";
-        viewManageBtn.style.display = "none";
-
-        const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
-        initial.dispatchEvent(new Event('change'));
-    });
-
-    viewLabel.addEventListener("change", function (event) {
-        inputGroup.style.display = "none";
-        editGroup.style.display = "none";
-        viewGroup.style.display = "block";
-
-        inputManageBtn.style.display = "none";
-        editManageBtn.style.display = "none";
-        viewManageBtn.style.display = "flex";
-
-        const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
-        initial.dispatchEvent(new Event('change'));
-    });
-
-    // 툴팁 메시지 바인딩
-    tutorialMessage.bindTutorialMessage(insertLabel, tmessage.manageInsertTutorial);
-    tutorialMessage.bindTutorialMessage(editLabel, tmessage.manageEditTutorial);
-    tutorialMessage.bindTutorialMessage(viewLabel, tmessage.manageViewTutorial);
-
-    // 화면 초기화용 이벤트 발생
-    const initial = document.querySelector("input[type='radio'][name='i-filter']:checked");
-    initial.dispatchEvent(new Event('change'));
+    tableRowsEditor.initPageTable();
 })();
 
 // 등록용 테이블 뷰어 관련 이벤트 등록
@@ -300,4 +232,11 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
     for (const table of editTables) {
         tableRowsEditor.initEditButtons(table);
     }
+})();
+
+// 뷰 테이블 소팅
+(function () {
+    tableFilter.applyTableSorting(matViewTable);
+    tableFilter.applyTableSorting(prdViewTable);
+    tableFilter.applyTableSorting(pbomViewTable);
 })();

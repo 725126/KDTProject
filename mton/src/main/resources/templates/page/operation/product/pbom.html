@@ -16,17 +16,17 @@
         <h2 class="mb-4" id="upload-test">품목 관리</h2>
         <div class="row g-4 mb-3">
             <form id="manage-mod" class="mb-3">
-                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-insert">
-                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-insert" checked>
-                    <label class="form-check-label btn btn-primary pe-none" for="mod-insert" id="insert-label">등록</label>
+                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-view">
+                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-view" checked>
+                    <label class="form-check-label btn btn-primary pe-none" for="mod-view" id="view-label">목록</label>
                 </div>
                 <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-edit">
                     <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-edit">
                     <label class="form-check-label btn btn-outline-secondary" for="mod-edit" id="edit-label">수정</label>
                 </div>
-                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-view">
-                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-view">
-                    <label class="form-check-label btn btn-outline-secondary" for="mod-view" id="view-label">목록</label>
+                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-insert">
+                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-insert">
+                    <label class="form-check-label btn btn-outline-secondary" for="mod-insert" id="insert-label">등록</label>
                 </div>
             </form>
         </div>
@@ -131,7 +131,7 @@
                     <tbody>
                     <tr>
                         <td class="" th:each="i: ${#numbers.sequence(0, productTH.length - 1)}">
-                            <span contenteditable="true"></span>
+                            <span contenteditable="false"></span>
                         </td>
                     </tr>
                     </tbody>
@@ -146,7 +146,7 @@
                     <tbody>
                     <tr>
                         <td th:each="i: ${#numbers.sequence(0, pbomTH.length - 1)}">
-                            <span contenteditable="true"></span>
+                            <span contenteditable="false"></span>
                         </td>
                     </tr>
                     </tbody>

@@ -7,13 +7,15 @@ import * as dbElementNames from "./dbElementNames.js";
 let matDBData;
 let prdDBData;
 let pbomDBData;
+let prdplanDBData;
+let prdplanDBEditData;
 
 
 // 수정 전 원래 값을 담는 변수와 삭제 전 삭제할 ID를 담는 변수
 let originalValues = {};
 
 // 테이블 열 개수 파악하고 새 행과 열을 삽입
-function insertRowCells(table, index) {
+function insertRowCells(table, index, ...optionFn) {
     // 원하는 index 위치에 행 삽입
     const newRow = table.insertRow(index);
     newRow.style.position = 'relative';
@@ -27,7 +29,7 @@ function insertRowCells(table, index) {
         newCell.appendChild(newSpan);
     }
 
-    tutorialMessage.bindTutorialMessage(newRow.cells[0], tmessage.matIdCellTutorial);
+    tutorialMessage.bindTutorialMessage(newRow.cells[0], tmessage.idCellTutorial);
     newRow.cells[0].style.cursor = "help";
 
     addUtilButtons(table, newRow);
@@ -35,7 +37,7 @@ function insertRowCells(table, index) {
 }
 
 // 행에 추가 버튼과 삭제 버튼을 넣음
-function addUtilButtons(table, row) {
+function addUtilButtons(table, row, ...optionFn) {
     // 행 추가 버튼
     const addButton = document.createElement("button");
     addButton.style.padding = "0";
@@ -63,7 +65,7 @@ function addUtilButtons(table, row) {
         e.stopPropagation();
 
         const currentRow = row.rowIndex;
-        insertRowCells(table, currentRow + 1);
+        insertRowCells(table, currentRow + 1, optionFn);
     });
 
     dltButton.addEventListener("dblclick", function (e) {
@@ -72,12 +74,12 @@ function addUtilButtons(table, row) {
 
         const currentRow = row.rowIndex;
         if (currentRow === 0) {
-            insertRowCells(table, 1);
+            insertRowCells(table, 1, optionFn);
             while (table.rows.length > 2) {
                 table.deleteRow(-1);
             }
         } else if (table.rows.length === 2) {
-            insertRowCells(table, 1);
+            insertRowCells(table, 1, optionFn);
             table.deleteRow(2);
         } else {
             table.deleteRow(currentRow);
@@ -100,6 +102,12 @@ function addTableUtilBtn(table) {
     for (let i = 1; i < rows.length; i++) {
         addUtilButtons(table, rows[i]);
     }
+}
+
+function addPbomTableUtilBtn(table) {
+    addTableUtilBtn(table);
+    makeTableCellDBSelect(table, 1, matDBData, dbElementNames.pbomMatId);
+    makeTableCellDBSelect(table, 2, prdDBData, dbElementNames.pbomProdId);
 }
 
 // 수정테이블의 헤더에 조작버튼 추가
@@ -411,7 +419,7 @@ function uploadEditedTable(table, request) {
 function initEmptyTable(table) {
     for (const row of table.rows) {
         addUtilButtons(table, row);
-        tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.matIdCellTutorial);
+        tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.idCellTutorial);
         table.rows[1].cells[0].style.cursor = "help";
     }
 }
@@ -481,6 +489,15 @@ function reloadTable(table, request) {
             break;
         case "pbom":
             targetDB = pbomDBData;
+            break;
+        case "prdplan":
+        case "productionplan":
+            targetDB = prdplanDBData;
+            break;
+        case "prdplanedit":
+        case "productionplanedit":
+            targetDB = prdplanDBEditData;
+            break;
     }
 
     const sheet = XLSX.utils.json_to_sheet(targetDB);
@@ -503,7 +520,7 @@ function viewEditTable(table, request) {
 }
 
 // DB Data 들을 갱신한다.
-async function refreshDBDataAll() {
+async function refreshProductDBDataAll() {
     const result = Promise.all([
         refreshTableView("/internal/product/view/mat", "material"),
         refreshTableView("/internal/product/view/prd", "product"),
@@ -524,11 +541,39 @@ async function refreshDBDataAll() {
     );
 }
 
-function viewAllProductTable() {
-    const refresh = refreshDBDataAll();
-    refresh.then(value => {
-        console.log(value);
+async function refreshPrdPlanDBDataAll() {
+    const result = Promise.all([
+        refreshTableView("/internal/product/view/prdplan", "prdplan"),
+        refreshTableView("/internal/product/view/prd", "product"),
+        ]);
 
+    return result.then(
+        (values) => {
+            prdplanDBData = values[0];
+            prdDBData = values[1];
+            prdplanDBEditData = Array.from(values[0]).map(prd => {
+                const keys = Object.keys(prd);
+                const ePrd = {};
+                ePrd[keys[0]] = prd[keys[0]];
+                ePrd[keys[1]] = prd[keys[1]];
+                ePrd[keys[2]] = prd[keys[3]];
+                ePrd[keys[3]] = prd[keys[5]];
+
+                return ePrd;
+            });
+
+            console.log(values[0]);
+            return values;
+        },
+        (reason) => {
+            return reason;
+        }
+    );
+}
+
+function viewAllProductTable() {
+    const refresh = refreshProductDBDataAll();
+    refresh.then(value => {
         const matViewTable = document.querySelector("#mat-table-view");
         const prdViewTable = document.querySelector("#prd-table-view");
         const pbomViewTable = document.querySelector("#pbom-table-view");
@@ -537,13 +582,20 @@ function viewAllProductTable() {
         const prdEditTable = document.querySelector("#prd-table-edit");
         const pbomEditTable = document.querySelector("#pbom-table-edit");
 
-        reloadTable(matViewTable, "material");
-        reloadTable(prdViewTable, "product");
-        reloadTable(pbomViewTable, "pbom");
+        if (value[0].length > 0) {
+            reloadTable(matViewTable, "material");
+            reloadTable(matEditTable, "material");
+        }
 
-        reloadTable(matEditTable, "material");
-        reloadTable(prdEditTable, "product");
-        reloadTable(pbomEditTable, "pbom");
+        if (value[1].length > 0) {
+            reloadTable(prdViewTable, "product");
+            reloadTable(prdEditTable, "product");
+        }
+
+        if (value[2].length > 0) {
+            reloadTable(pbomViewTable, "pbom");
+            reloadTable(pbomEditTable, "pbom");
+        }
 
         addTableEditButtons(matEditTable);
         addTableEditButtons(prdEditTable);
@@ -556,8 +608,25 @@ function viewAllProductTable() {
     });
 }
 
+function viewPrdPlanTable() {
+    const refresh = refreshPrdPlanDBDataAll();
+    refresh.then(value => {
+        const prdplanViewTable = document.querySelector("#prdplan-table-view");
+        const prdplanEditTable = document.querySelector("#prdplan-table-edit");
+
+        if (value[0].length > 0) {
+            reloadTable(prdplanViewTable, "prdplan");
+            reloadTable(prdplanEditTable, "prdplanedit");
+        }
+
+        addTableEditButtons(prdplanEditTable);
+
+        makeTableCellDBSelect(prdplanEditTable, 1, prdDBData, dbElementNames.prodId);
+    });
+}
+
 function makeSelectForRawCell(cell, ...options) {
-    const value = cell.innerText;
+    let value = cell.innerText;
     const span = document.createElement("span");
     span.innerText = value;
     cell.innerText = "";
@@ -611,10 +680,99 @@ function makeTableCellSelect(table, cellIndex, ...options) {
     }
 }
 
+function initPageTable() {
+    const viewGroup = document.getElementById("tables-view");
+    const editGroup = document.getElementById("tables-edit");
+    const inputGroup = document.getElementById("tables-input");
+
+    const inputManageBtn = document.getElementById("input-manage-btn");
+    const editManageBtn = document.getElementById("edit-manage-btn");
+    const viewManageBtn = document.getElementById("view-manage-btn");
+
+    const manageMod = document.getElementById("manage-mod");
+    const insertLabel = manageMod.querySelector("#mod-insert");
+    const editLabel = manageMod.querySelector("#mod-edit");
+    const viewLabel = manageMod.querySelector("#mod-view");
+
+    // 등록, 수정, 목록 라디오 간 전환 시각효과
+    manageMod.addEventListener("click", function (event) {
+        const labels = manageMod.querySelectorAll("label");
+
+        for (const label of labels) {
+            if (label.control.checked) {
+                label.classList.add("pe-none");
+                label.classList.remove("btn-outline-secondary");
+                label.classList.add("btn-primary");
+            } else {
+                label.classList.remove("pe-none");
+                label.classList.add("btn-outline-secondary");
+                label.classList.remove("btn-primary");
+            }
+        }
+    });
+
+    // 등록, 수정, 목록 버튼 클릭시 테이블과 우측 패널 전환 이벤트
+    insertLabel.addEventListener("change", function (event) {
+        inputGroup.style.display = "block";
+        editGroup.style.display = "none";
+        viewGroup.style.display = "none";
+
+        inputManageBtn.style.display = "flex";
+        editManageBtn.style.display = "none";
+        viewManageBtn.style.display = "none";
+
+        const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
+        if (initial !== null) {
+            initial.dispatchEvent(new Event('change'));
+        }
+    });
+
+    editLabel.addEventListener("change", function (event) {
+        inputGroup.style.display = "none";
+        editGroup.style.display = "block";
+        viewGroup.style.display = "none";
+
+        inputManageBtn.style.display = "none";
+        editManageBtn.style.display = "flex";
+        viewManageBtn.style.display = "none";
+
+        const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
+        if (initial !== null) {
+            initial.dispatchEvent(new Event('change'));
+        }
+    });
+
+    viewLabel.addEventListener("change", function (event) {
+        inputGroup.style.display = "none";
+        editGroup.style.display = "none";
+        viewGroup.style.display = "block";
+
+        inputManageBtn.style.display = "none";
+        editManageBtn.style.display = "none";
+        viewManageBtn.style.display = "flex";
+
+        const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
+        if (initial !== null) {
+            initial.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // 툴팁 메시지 바인딩
+    tutorialMessage.bindTutorialMessage(insertLabel, tmessage.manageInsertTutorial);
+    tutorialMessage.bindTutorialMessage(editLabel, tmessage.manageEditTutorial);
+    tutorialMessage.bindTutorialMessage(viewLabel, tmessage.manageViewTutorial);
+
+    // 화면 초기화용 이벤트 발생
+    const initial = document.querySelector("input[type='radio'][name='i-filter']:checked");
+    initial.dispatchEvent(new Event('change'));
+}
+
 export {
+    initPageTable,
     initEmptyTable,
     initEditButtons,
     viewAllProductTable,
+    viewPrdPlanTable,
     addTableUtilBtn,
     addTableEditButtons,
     uploadEditedTable,
