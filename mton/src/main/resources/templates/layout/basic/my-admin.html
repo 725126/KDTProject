@@ -29,7 +29,7 @@
 
                 <button type="button" class="profile-btn">
                     <div class="align-items-center justify-content-center d-inline-flex">
-              <span class="profile-icon">
+              <span class="profile-icon admin-profile">
                 <i class="bi bi-person-gear"></i>
               </span>
                         <span class="ms-2">관리자</span>
@@ -89,6 +89,18 @@
     </div>
 </div>
 
+<script>
+    // 현재 URL의 경로만 추출 (쿼리스트링 제외)
+    const currentPath = window.location.pathname;
+
+    // 모든 nav-link 요소 순회
+    document.querySelectorAll(".nav-link").forEach(link => {
+        // 현재 페이지 URL과 링크 href가 일치하면 active 클래스 추가
+        if (link.getAttribute("href") === currentPath) {
+            link.classList.add("active");
+        }
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/core@6.1.9/index.global.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/@fullcalendar/daygrid@6.1.9/index.global.min.js"></script>

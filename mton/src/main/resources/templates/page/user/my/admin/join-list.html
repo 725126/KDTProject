@@ -17,43 +17,53 @@
     <h2 class="ms-2 fw-bold"><i class="bi bi-person-plus-fill me-3"></i>회원가입 승인</h2>
     <div class="row g-3 align-items-end mb-5">
         <!-- 검색창 -->
-        <div class="col-md-6">
+        <div class="col-md-5">
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" placeholder="회원명 검색">
+                <input type="text" class="form-control"
+                       name="keyword"
+                       placeholder="회원명 검색"
+                       th:value="${keyword}">
             </div>
         </div>
 
         <!-- 회원 종류 -->
         <div class="col-md-2">
             <label for="departmentSelect" class="form-label mb-1 fw-semibold small text-muted">회원 종류</label>
-            <select class="form-select custom-select" id="departmentSelect">
-                <option disabled selected>회원 종류</option>
-                <option>협력 업체</option>
-                <option>구매 부서</option>
-                <option>생산 부서</option>
+            <select class="form-select custom-select" id="departmentSelect" name="role">
+                <option value="" disabled th:selected="${selectedRole == null}">회원 종류</option>
+                <option value="PARTNER" th:selected="${selectedRole == 'PARTNER'}">협력 업체</option>
+                <option value="PURCHASING" th:selected="${selectedRole == 'PURCHASING'}">구매 부서</option>
+                <option value="PRODUCTION" th:selected="${selectedRole == 'PRODUCTION'}">생산 부서</option>
             </select>
         </div>
 
         <!-- 정렬 기준 -->
         <div class="col-md-2">
             <label for="sortSelect" class="form-label mb-1 fw-semibold small text-muted">정렬 기준</label>
-            <select class="form-select custom-select" id="sortSelect">
-                <option selected>이름 순</option>
-                <option>최신 순</option>
-                <option>오래된 순</option>
+            <select class="form-select custom-select" id="sortSelect" name="sort">
+                <option value="nameAsc" th:selected="${selectedSort == 'nameAsc'}">이름 순</option>
+                <option value="newest" th:selected="${selectedSort == 'newest'}">최신 순</option>
+                <option value="oldest" th:selected="${selectedSort == 'oldest'}">오래된 순</option>
             </select>
         </div>
 
         <!-- 게시글 수 -->
         <div class="col-md-2">
             <label for="postCountSelect" class="form-label mb-1 fw-semibold small text-muted">게시글 수</label>
-            <select class="form-select custom-select" id="postCountSelect">
-                <option selected>12개 보기</option>
-                <option>24개 보기</option>
-                <option>36개 보기</option>
-                <option>48개 보기</option>
+            <select class="form-select custom-select" id="postCountSelect" name="size">
+                <option value="12" th:selected="${selectedSize == 12}">12개 보기</option>
+                <option value="24" th:selected="${selectedSize == 24}">24개 보기</option>
+                <option value="36" th:selected="${selectedSize == 36}">36개 보기</option>
+                <option value="48" th:selected="${selectedSize == 48}">48개 보기</option>
             </select>
+        </div>
+
+        <!-- 초기화 버튼 -->
+        <div class="col-md-1">
+            <button class="btn btn-outline-secondary btn-sm w-100 py-2" id="resetFilters">
+                <i class="bi bi-arrow-clockwise me-1"></i> 초기화
+            </button>
         </div>
     </div>
     <!-- 필터 end -->
@@ -69,7 +79,7 @@
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end border">
-                        <li><a class="dropdown-item" th:href="@{'/admin/my/user/' + ${user.userId}}">회원정보 수정</a></li>
+                        <li><a class="dropdown-item" th:href="@{'/admin/my/user/' + ${user.userId}}">회원정보 보기</a></li>
                     </ul>
                 </div>
 
@@ -93,34 +103,47 @@
 
     </div>
 
+    <!-- 승인 확인 모달 -->
+    <div class="modal fade" id="approveConfirmModal" tabindex="-1" aria-labelledby="approveConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">회원 승인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body text-center">
+                    해당 회원을 승인하시겠습니까?
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="confirmApproveBtn">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- 승인 결과 모달 -->
+    <div class="modal fade" id="approveResultModal" tabindex="-1" aria-labelledby="approveResultModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="approveResultModalLabel">처리 결과</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                </div>
+                <div class="modal-body text-center" id="approveResultModalBody">
+                    <!-- 메시지가 여기에 동적으로 들어감 -->
+                </div>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <!-- 페이지네이션 -->
     <th:block th:replace="fragment/pagination :: paginationFragment"></th:block>
 
-    <script>
-        document.querySelectorAll(".approve-btn").forEach(button => {
-            button.addEventListener("click", function () {
-                const email = this.closest(".card").querySelector(".text-muted").textContent.trim();
-
-                fetch("/admin/my/approve", {
-                    method: "PUT",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute('content')
-                    },
-                    body: JSON.stringify({ uEmail: email })
-                })
-                    .then(res => {
-                        if (res.ok) {
-                            alert("승인 완료!");
-                            location.reload();
-                        } else {
-                            alert("승인 실패!");
-                        }
-                    });
-            });
-        });
-    </script>
-
+    <script th:src="@{/js/page/user/join-list.js}"></script>
 </th:block>
 
 </body>

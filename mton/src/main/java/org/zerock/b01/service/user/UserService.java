@@ -48,4 +48,10 @@ public interface UserService {
     Page<User> getPendingUsers(Pageable pageable);
 
     void activateUser(String uEmail);
+
+    Page<User> getFilteredPendingUsers(String keyword, String role, Pageable pageable);
+
+    Page<User> getFilteredUsers(String keyword, String role, Pageable pageable);
+
+    Page<User> getFilteredListUsers(String keyword, String role, String status, Pageable pageable);
 }

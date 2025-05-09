@@ -38,6 +38,43 @@ public interface UserRepository extends JpaRepository<User, Long> {
     // 회원가입 승인 대기 회원 조회
     List<User> findByuIsActive(UserStatus status);
 
+    // 회원가입 승인 목록 페이징
     Page<User> findByuIsActive(UserStatus status, Pageable pageable);
 
+    @Query("SELECT u FROM User u WHERE u.uIsActive = :status AND u.userRole = :role")
+    Page<User> findPendingUsersByRole(@Param("status") UserStatus status,
+                                      @Param("role") UserRole role,
+                                      Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.uIsActive = :status AND LOWER(u.uName) LIKE LOWER(CONCAT('%', :uName, '%'))")
+    Page<User> searchByStatusAndName(@Param("status") UserStatus status,
+                                     @Param("uName") String uName,
+                                     Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.uIsActive = :status AND u.userRole = :role")
+    Page<User> searchByStatusAndRole(@Param("status") UserStatus status,
+                                     @Param("role") UserRole role,
+                                     Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE u.uIsActive = :status AND u.userRole = :role AND LOWER(u.uName) LIKE LOWER(CONCAT('%', :uName, '%'))")
+    Page<User> searchByStatusAndRoleAndName(@Param("status") UserStatus status,
+                                            @Param("role") UserRole role,
+                                            @Param("uName") String uName,
+                                            Pageable pageable);
+
+    @Query("SELECT u FROM User u WHERE " +
+            "(:keyword IS NULL OR LOWER(u.uName) LIKE LOWER(CONCAT('%', :keyword, '%'))) AND " +
+            "(:role IS NULL OR u.userRole = :role)")
+    Page<User> searchAllUsers(@Param("keyword") String keyword,
+                              @Param("role") UserRole role,
+                              Pageable pageable);
+
+    @Query("SELECT u FROM User u " +
+            "WHERE (:status IS NULL OR u.uIsActive = :status) " +
+            "AND (:role IS NULL OR u.userRole = :role) " +
+            "AND (:keyword IS NULL OR LOWER(u.uName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<User> searchUsers(@Param("status") UserStatus status,
+                           @Param("role") UserRole role,
+                           @Param("keyword") String keyword,
+                           Pageable pageable);
 }

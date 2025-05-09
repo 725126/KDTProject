@@ -1,6 +1,7 @@
 package org.zerock.b01.service.user;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -12,6 +13,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.zerock.b01.domain.user.*;
 import org.zerock.b01.dto.user.*;
 import org.zerock.b01.repository.user.PartnerRepository;
@@ -24,6 +26,7 @@ import java.util.Optional;
 import java.util.UUID;
 
 @Service
+@Log4j2
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
 
@@ -232,7 +235,7 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
 
         // 회원정보 수정
-        user.updateBasicInfo(dto.getName(), dto.getEmail(), dto.getPhone());
+        user.updateBasicInfo(dto.getName(), dto.getEmail(), dto.getPhone(), dto.getUserRole());
 
         // 협력업체 회원의 경우 추가 회원정보 수정
         if (dto.getUserRole().equals(UserRole.PARTNER)) {
@@ -243,13 +246,21 @@ public class UserServiceImpl implements UserService {
         }
 
         // 인증 정보 갱신
-        CustomUserDetails updatedUserDetails = new CustomUserDetails(user);
-        Authentication newAuth = new UsernamePasswordAuthenticationToken(
-                updatedUserDetails,
-                null,
-                updatedUserDetails.getAuthorities()
-        );
-        SecurityContextHolder.getContext().setAuthentication(newAuth);
+        // 인증 정보 갱신은 본인일 때만 수행
+        Authentication currentAuth = SecurityContextHolder.getContext().getAuthentication();
+        if (currentAuth != null && currentAuth.getPrincipal() instanceof CustomUserDetails currentUserDetails) {
+            // 현재 로그인한 사용자의 ID가 수정 대상과 같을 때만 인증 정보 갱신
+            if (currentUserDetails.getUserId().equals(user.getUserId())) {
+                CustomUserDetails updatedUserDetails = new CustomUserDetails(user);
+                Authentication newAuth = new UsernamePasswordAuthenticationToken(
+                        updatedUserDetails,
+                        null,
+                        updatedUserDetails.getAuthorities()
+                );
+                SecurityContextHolder.getContext().setAuthentication(newAuth);
+            }
+        }
+
     }
 
     // 회원 탈퇴
@@ -285,4 +296,79 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다."));
         user.setuIsActive(UserStatus.ACTIVE);
     }
+
+    @Override
+    public Page<User> getFilteredPendingUsers(String keyword, String role, Pageable pageable) {
+        if (StringUtils.hasText(keyword) && StringUtils.hasText(role)) {
+            try {
+                UserRole userRole = UserRole.valueOf(role.toUpperCase());
+                return userRepository.searchByStatusAndRoleAndName(UserStatus.PENDING, userRole, keyword, pageable);
+            } catch (IllegalArgumentException e) {
+                log.warn("잘못된 회원 종류 파라미터: {}", role); // or 무시
+                return Page.empty(pageable); // 빈 결과 반환 또는 전체 반환으로 대체 가능
+            }
+        } else if (StringUtils.hasText(keyword)) {
+            return userRepository.searchByStatusAndName(
+                    UserStatus.PENDING, keyword, pageable);
+        } else if (StringUtils.hasText(role)) {
+            try {
+                UserRole userRole = UserRole.valueOf(role.toUpperCase());
+                return userRepository.searchByStatusAndRole(UserStatus.PENDING, userRole, pageable);
+            } catch (IllegalArgumentException e) {
+                log.warn("잘못된 회원 종류 파라미터: {}", role);
+                return Page.empty(pageable);
+            }
+        } else {
+            return userRepository.findByuIsActive(UserStatus.PENDING, pageable);
+        }
+    }
+
+    @Override
+    public Page<User> getFilteredUsers(String keyword, String role, Pageable pageable) {
+        if (StringUtils.hasText(role)) {
+            try {
+                UserRole userRole = UserRole.valueOf(role.toUpperCase());
+                return userRepository.searchAllUsers(
+                        StringUtils.hasText(keyword) ? keyword : null,
+                        userRole,
+                        pageable);
+            } catch (IllegalArgumentException e) {
+                log.warn("잘못된 회원 역할: {}", role);
+                return Page.empty(pageable);
+            }
+        } else {
+            return userRepository.searchAllUsers(
+                    StringUtils.hasText(keyword) ? keyword : null,
+                    null,
+                    pageable);
+        }
+    }
+
+    @Override
+    public Page<User> getFilteredListUsers(String keyword, String role, String status, Pageable pageable) {
+        UserRole userRole = null;
+        UserStatus userStatus = null;
+
+        if (StringUtils.hasText(role)) {
+            try {
+                userRole = UserRole.valueOf(role.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                log.warn("잘못된 회원 역할: {}", role);
+            }
+        }
+
+        if (StringUtils.hasText(status)) {
+            try {
+                userStatus = UserStatus.valueOf(status.toUpperCase());
+            } catch (IllegalArgumentException e) {
+                log.warn("잘못된 계정 상태: {}", status);
+            }
+        } else {
+            userStatus = UserStatus.ACTIVE; // 👈 status 파라미터 없으면 기본 ACTIVE만 조회
+        }
+
+        return userRepository.searchUsers(userStatus, userRole,
+                StringUtils.hasText(keyword) ? keyword : null, pageable);
+    }
+
 }

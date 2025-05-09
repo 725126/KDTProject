@@ -1,5 +1,6 @@
 package org.zerock.b01.controller.advice;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -55,6 +56,12 @@ public class GlobalControllerAdvice {
             }
         }
         return null;
+    }
+
+    // 현재 페이지
+    @ModelAttribute("currentPath")
+    public String currentPath(HttpServletRequest request) {
+        return request.getRequestURI(); // e.g. "/admin/my/user-list"
     }
 
 

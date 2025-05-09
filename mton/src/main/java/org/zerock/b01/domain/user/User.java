@@ -44,10 +44,11 @@ public class User extends BaseEntity { // 회원 (기본 회원 정보)
     }
 
     // 기본 정보 재설정
-    public void updateBasicInfo(String name, String uEmail, String phone) {
+    public void updateBasicInfo(String name, String uEmail, String phone, UserRole userRole) {
         this.uName = name;
         this.uEmail = uEmail;
         this.uPhone = phone;
+        this.userRole = userRole;
     }
 
     // 회원탈퇴를 위한 비활성화

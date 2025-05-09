@@ -1,34 +1,3 @@
-// // 원래 값 저장
-// const originalValues = {
-//     name: document.getElementById('uName').value.trim(),
-//     email: document.getElementById('uEmail').value.trim(),
-//     phone: document.getElementById('uPhone').value.trim()
-// };
-//
-// const nameNewInput = document.getElementById('uName');
-// const emailNewInput = document.getElementById('uEmail');
-// const phoneNewInput = document.getElementById('uPhone');
-// const submitBtn = document.getElementById('accountEditBtn');
-//
-// // 입력 변경 감지 함수
-// function checkIfFormChanged() {
-//     const isChanged =
-//         nameNewInput.value.trim() !== originalValues.name ||
-//         emailNewInput.value.trim() !== originalValues.email ||
-//         normalizePhone(phoneNewInput.value.trim()) !== normalizePhone(originalValues.phone);
-//
-//     submitBtn.disabled = !isChanged;
-// }
-//
-// function normalizePhone(phone) {
-//     return phone.replace(/[^0-9]/g, ''); // 숫자만 남김
-// }
-//
-// // 모든 입력값에 이벤트 연결
-// [nameNewInput, emailNewInput, phoneNewInput].forEach(input => {
-//     input.addEventListener('input', checkIfFormChanged);
-//     input.addEventListener('keyup', checkIfFormChanged); // 마스킹용
-// });
 // 내부회원 공통
 const nameNewInput = document.getElementById('uName');
 const emailNewInput = document.getElementById('uEmail');

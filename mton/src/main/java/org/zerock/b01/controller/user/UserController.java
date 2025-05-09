@@ -7,7 +7,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,7 +39,10 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
 
-    // 관리자 마이페이지
+    // 관리자 마이페이지 > 회원정보 수정
+    // 헤더에 아이콘 메뉴 추가
+    // 관리자 탈퇴 기능 마무리 (사이드바 탈퇴 없애고 ... 비활성화 이런 거 넣어서 탈퇴 시키기)
+    // 관리페이지로 돌아가기 메뉴 추가
 
     // 회원 관리 - 인트로(로그인)
     @GetMapping("/intro")
@@ -397,6 +402,7 @@ public class UserController {
     public String changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
                                  @RequestParam String currentPassword,
                                  @RequestParam String newPassword,
+                                 @RequestParam Long userId,
                                  RedirectAttributes redirectAttributes) {
 
         // 1. 사용자 정보 조회
@@ -431,38 +437,63 @@ public class UserController {
 
     // [공통] 마이페이지 > 회원정보 수정
     @PostMapping("/my/account-edit")
-    public String updateAccount(@ModelAttribute UserUpdateDTO dto,
-                                @AuthenticationPrincipal CustomUserDetails userDetails,
+    public String updateAccount(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                @ModelAttribute UserUpdateDTO dto,
                                 RedirectAttributes redirectAttributes) {
         log.info("[공통] 회원정보 수정: {}", dto);
 
         try {
-            userService.updateUserInfo(userDetails.getUserId(), dto);
+            userService.updateUserInfo(dto.getUserId(), dto);
             redirectAttributes.addFlashAttribute("successEdit", "회원정보가 성공적으로 수정되었습니다.");
         } catch (Exception e) {
             redirectAttributes.addFlashAttribute("errorEdit", "회원정보 수정 중 오류가 발생했습니다.");
         }
 
-        // [협력업체] 회원인 경우
         if (userDetails.getUserRole().equals(UserRole.PARTNER)) {
+            // [협력업체] 회원인 경우
             return "redirect:/external/my/account-edit";
+        } else if (userDetails.getUserRole().equals(UserRole.ADMIN)) {
+            // [관리자]인 경우
+            return "redirect:/admin/my/user/" + dto.getUserId();
         }
 
         return "redirect:/internal/my/account-edit";
     }
 
-    // 마이페이지 - 관리자 > 회원가입 승인
+    // [관리자] 관리페이지 > 회원가입 승인
     @GetMapping("/admin/my/join-list")
-    public String adminMyPageJoinList(@PageableDefault(size = 3) Pageable pageable, Model model) {
-        Page<User> pendingUsers = userService.getPendingUsers(pageable);
+    public String showPendingUsers(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "12") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String role,
+            @RequestParam(defaultValue = "nameAsc") String sort,
+            Model model
+    ) {
+        Pageable pageable;
+
+        // 정렬 조건 분기
+        switch (sort) {
+            case "nameAsc" -> pageable = PageRequest.of(page, size, Sort.by("uName").ascending());
+            case "newest" -> pageable = PageRequest.of(page, size, Sort.by("creDate").descending());
+            case "oldest" -> pageable = PageRequest.of(page, size, Sort.by("creDate").ascending());
+            default -> pageable = PageRequest.of(page, size);
+        }
+
+        Page<User> pendingUsers = userService.getFilteredPendingUsers(keyword, role, pageable);
 
         model.addAttribute("pendingUsers", pendingUsers);
-        model.addAttribute("currentPage", pendingUsers.getNumber() + 1); // 1-based
+        model.addAttribute("currentPage", pendingUsers.getNumber() + 1);
         model.addAttribute("totalPages", pendingUsers.getTotalPages());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedRole", role);
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("selectedSize", size);
 
         return "page/user/my/admin/join-list";
     }
 
+    // [관리자] 관리페이지 > 회원가입 승인
     @PutMapping("/admin/my/approve")
     @ResponseBody
     public ResponseEntity<?> approveUser(@RequestBody Map<String, String> payload) {
@@ -485,8 +516,50 @@ public class UserController {
 
     // 마이페이지 - 관리자 > 회원 목록
     @GetMapping("/admin/my/user-list")
-    public String adminMyPageUserListGet() {
+    public String showUserList(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "15") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) String role,
+            @RequestParam(required = false) String status,
+            @RequestParam(defaultValue = "nameAsc") String sort,
+            Model model
+    ) {
+        Pageable pageable;
+
+        // 정렬 조건 분기
+        switch (sort) {
+            case "nameAsc" -> pageable = PageRequest.of(page, size, Sort.by("uName").ascending());
+            case "newest" -> pageable = PageRequest.of(page, size, Sort.by("creDate").descending());
+            case "oldest" -> pageable = PageRequest.of(page, size, Sort.by("creDate").ascending());
+            default -> pageable = PageRequest.of(page, size);
+        }
+
+        Page<User> userPage = userService.getFilteredListUsers(keyword, role, status, pageable);
+
+        model.addAttribute("userList", userPage.getContent());
+        model.addAttribute("currentPage", userPage.getNumber() + 1);
+        model.addAttribute("totalPages", userPage.getTotalPages());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedRole", role);
+        model.addAttribute("selectedStatus", status);
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("selectedSize", size);
+
         return "page/user/my/admin/user-list";
+    }
+
+    @GetMapping("/admin/my/user/{id}")
+    public String viewUser(@PathVariable("id") Long userId, Model model) {
+        UserResponseDTO userDto = userService.getUserInfoById(userId);
+        model.addAttribute("userResponseDTO", userDto);
+        model.addAttribute("isAdminEdit", true);
+        return "page/user/my/account-edit";
+    }
+
+    @GetMapping("/admin/my/user-deleted")
+    public String deleteUser(@PathVariable("id") Long userId, Model model) {
+        return "page/user/my/account-delete";
     }
 
     // 마이페이지 - 관리자 > 관리자 정보

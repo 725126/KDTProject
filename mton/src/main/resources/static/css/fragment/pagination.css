@@ -27,7 +27,7 @@
     display: flex;
     align-items: center;
     gap: 0.4rem;
-    background-color: #F1F6F9;
+    background-color: #F4F4F2;
     padding: 0.5rem 1rem;
     border-radius: 16px;
 }
@@ -48,17 +48,18 @@
 
 .page-btn:hover,
 .nav-btn:hover {
-    background-color: #9BA4B5;
+    border: 1px solid #BBBFCA;
+    background-color: #E8E8E8;
 }
 
 .page-btn.active {
-    border: 1px solid #9BA4B5;
+    border: 1px solid #BBBFCA;
     background-color: #ffffff;
     font-weight: 600;
 }
 
 .nav-btn {
-    background-color: #394867;
+    background-color: #495464;
     color: #ffffff;
     padding: 0.6rem 0.9rem;
     display: flex;
@@ -81,13 +82,13 @@
 .goto-page select {
     padding: 0.4rem 0.9rem;
     border-radius: 999px;
-    border: 1px solid #b2b8a3;
+    border: 1px solid #BBBFCA;
     background-color: #f9faf7;
     font-size: 14px;
 }
 
 .goto-page button {
-    background-color: #394867;
+    background-color: #495464;
     color: white;
     padding: 0.5rem 1rem;
     border: none;

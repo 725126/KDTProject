@@ -11,6 +11,7 @@ import org.zerock.b01.domain.user.UserStatus;
 @Builder
 @ToString
 public class UserUpdateDTO { // 회원정보 수정(공통)
+    private Long userId;
     private String name;
     private String email;
     private String phone;
