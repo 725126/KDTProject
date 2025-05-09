@@ -237,9 +237,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         e.preventDefault();
         e.stopPropagation();
 
-        tableRowsEditor.viewTable(matViewTable, "material");
-        tableRowsEditor.viewTable(prdViewTable, "product");
-        tableRowsEditor.viewTable(pbomViewTable, "pbom");
+        tableRowsEditor.viewAllProductTable();
     });
 
     // 다운로드 버튼 클릭시 화면에 보이는 테이블을 .xlsx 확장자로 다운로드
@@ -256,9 +254,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         e.preventDefault();
         e.stopPropagation();
 
-        tableRowsEditor.viewEditTable(matEditTable, "material");
-        tableRowsEditor.viewEditTable(prdEditTable, "product");
-        tableRowsEditor.viewEditTable(pbomEditTable, "pbom");
+        tableRowsEditor.viewAllProductTable();
     });
 
     // 수정 반영 버튼
@@ -299,13 +295,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
 
 // 테이블 뷰 관련 초기화
 (function () {
-    tableRowsEditor.viewTable(matViewTable, "material");
-    tableRowsEditor.viewTable(prdViewTable, "product");
-    tableRowsEditor.viewTable(pbomViewTable, "pbom");
-
-    tableRowsEditor.viewEditTable(matEditTable, "material");
-    tableRowsEditor.viewEditTable(prdEditTable, "product");
-    tableRowsEditor.viewEditTable(pbomEditTable, "pbom");
+    tableRowsEditor.viewAllProductTable();
 
     for (const table of editTables) {
         tableRowsEditor.initEditButtons(table);

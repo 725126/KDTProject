@@ -95,8 +95,9 @@ tr:hover .opacity-btn {
 }
 
 .indirect-select {
+    border: none;
     background: transparent;
-    color: transparent;
+    opacity: 0;
     cursor: pointer;
     height: auto;
     width: auto;

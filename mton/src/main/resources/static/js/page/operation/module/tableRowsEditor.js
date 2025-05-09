@@ -1,6 +1,13 @@
 import * as tutorialMessage from "./tutorialMessage.js";
 import * as tmessage from "./tmessage.js";
 import * as excelParser from "./excelParser.js";
+import * as dbElementNames from "./dbElementNames.js";
+
+// DB 에서 가져온 각 테이블 데이터들
+let matDBData;
+let prdDBData;
+let pbomDBData;
+
 
 // 수정 전 원래 값을 담는 변수와 삭제 전 삭제할 ID를 담는 변수
 let originalValues = {};
@@ -277,7 +284,19 @@ function addEditButtons(table, row, ...protectedCols) {
         if (originalValues.hasOwnProperty(id)) {
             for (let i = 1; i < cells.length; i++) {
                 const origin = originalValues[id];
-                cells[i].innerText = origin[i - 1];
+                const span = cells[i].querySelector("span");
+
+                if (span !== null) {
+                    span.innerText = origin[i - 1];
+                } else {
+                    cells[i].innerText = origin[i - 1];
+                }
+
+                const select = cells[i].querySelector("select");
+                if (select !== null) {
+                    select.value = "";
+                }
+
                 cells[i].setAttribute("contenteditable", "false");
             }
         }
@@ -448,6 +467,32 @@ function viewTable(table, request) {
     });
 }
 
+function reloadTable(table, request) {
+    let targetDB;
+
+    switch (request) {
+        case "mat":
+        case "material":
+            targetDB = matDBData;
+            break;
+        case "prd":
+        case "product":
+            targetDB = prdDBData;
+            break;
+        case "pbom":
+            targetDB = pbomDBData;
+    }
+
+    const sheet = XLSX.utils.json_to_sheet(targetDB);
+    const htmlSheet = XLSX.utils.sheet_to_html(sheet);
+    const startIndex = htmlSheet.indexOf("<tr", htmlSheet.indexOf("<tr") + 1);
+    const endIndex = htmlSheet.lastIndexOf("</tr>") + "</tr>".length;
+    const htmlRow = htmlSheet.substring(startIndex, endIndex);
+
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = htmlRow;
+}
+
 // 수정 테이블을 갱신한다.
 function viewEditTable(table, request) {
     const result = viewTable(table, request);
@@ -457,12 +502,75 @@ function viewEditTable(table, request) {
     });
 }
 
+// DB Data 들을 갱신한다.
+async function refreshDBDataAll() {
+    const result = Promise.all([
+        refreshTableView("/internal/product/view/mat", "material"),
+        refreshTableView("/internal/product/view/prd", "product"),
+        refreshTableView("/internal/product/view/pbom", "pbom"),
+    ]);
+
+    return result.then(
+        (values) => {
+            matDBData = values[0];
+            prdDBData = values[1];
+            pbomDBData = values[2];
+
+            return values;
+        },
+        (reason) => {
+            return reason;
+        },
+    );
+}
+
+function viewAllProductTable() {
+    const refresh = refreshDBDataAll();
+    refresh.then(value => {
+        console.log(value);
+
+        const matViewTable = document.querySelector("#mat-table-view");
+        const prdViewTable = document.querySelector("#prd-table-view");
+        const pbomViewTable = document.querySelector("#pbom-table-view");
+
+        const matEditTable = document.querySelector("#mat-table-edit");
+        const prdEditTable = document.querySelector("#prd-table-edit");
+        const pbomEditTable = document.querySelector("#pbom-table-edit");
+
+        reloadTable(matViewTable, "material");
+        reloadTable(prdViewTable, "product");
+        reloadTable(pbomViewTable, "pbom");
+
+        reloadTable(matEditTable, "material");
+        reloadTable(prdEditTable, "product");
+        reloadTable(pbomEditTable, "pbom");
+
+        addTableEditButtons(matEditTable);
+        addTableEditButtons(prdEditTable);
+        addTableEditButtons(pbomEditTable);
+
+        makeTableCellDBSelect(pbomEditTable, 1, matDBData, dbElementNames.pbomMatId);
+        makeTableCellDBSelect(pbomEditTable, 2, prdDBData, dbElementNames.pbomProdId);
+
+        originalValues = {};
+    });
+}
+
+function makeSelectForRawCell(cell, ...options) {
+    const value = cell.innerText;
+    const span = document.createElement("span");
+    span.innerText = value;
+    cell.innerText = "";
+    cell.appendChild(span);
+    makeSelect(cell, options[0]);
+}
+
 // 셀 안에 Select Element 넣기
 function makeSelect(cell, ...options) {
     const select = document.createElement("select");
     select.classList.add("indirect-select");
 
-    for (const option of options) {
+    for (const option of options[0]) {
         const opt = document.createElement("option");
         opt.value = option;
         opt.label = option;
@@ -478,15 +586,35 @@ function makeSelect(cell, ...options) {
 
         span.innerText = select.value;
     });
-
+    select.value = "";
     cell.appendChild(select);
+}
+
+// DB 데이터를 참조하여 셀을 Select 로 만든다.
+function makeTableCellDBSelect(table, cellIndex, dbData, dbElement) {
+    const rows = table.rows;
+    const options = dbData.map(data => data[dbElement]);
+
+    for (let i = 1; i < rows.length; i++) {
+        const cell = rows[i].cells[cellIndex];
+        makeSelectForRawCell(cell, options);
+    }
+}
+
+// 임의의 option 을 사용하여 셀을 select 로 만든다.
+function makeTableCellSelect(table, cellIndex, ...options) {
+    const rows = table.rows;
+
+    for (let i = 1; i < rows.length; i++) {
+        const cell = rows[i].cells[cellIndex];
+        makeSelectForRawCell(cell, options);
+    }
 }
 
 export {
     initEmptyTable,
     initEditButtons,
-    viewTable,
-    viewEditTable,
+    viewAllProductTable,
     addTableUtilBtn,
     addTableEditButtons,
     uploadEditedTable,
