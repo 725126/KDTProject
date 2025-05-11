@@ -223,10 +223,13 @@ body {
     font-size: 1.2rem;
 }
 
-.sidebar .nav-link.active,
-.sidebar .nav-link:hover {
+.sidebar .nav-link.active {
     background-color: #F4F4F2;
     border-radius: 0.375rem;
+}
+
+.sidebar .nav-link:hover {
+    color: #0f5ec6;
 }
 
 .toggle-arrow {

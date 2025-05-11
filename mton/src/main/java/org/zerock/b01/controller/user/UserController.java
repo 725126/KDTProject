@@ -10,7 +10,6 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
-import org.springframework.data.web.PageableDefault;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,7 +20,6 @@ import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.zerock.b01.domain.user.User;
 import org.zerock.b01.domain.user.UserRole;
-import org.zerock.b01.domain.user.UserStatus;
 import org.zerock.b01.dto.user.FindIdDTO;
 import org.zerock.b01.dto.user.UserCreateDTO;
 import org.zerock.b01.dto.user.UserResponseDTO;
@@ -29,7 +27,6 @@ import org.zerock.b01.dto.user.UserUpdateDTO;
 import org.zerock.b01.security.CustomUserDetails;
 import org.zerock.b01.service.user.UserService;
 
-import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -296,7 +293,7 @@ public class UserController {
         return Map.of("success", true);
     }
 
-    // 회원 관리 - 아이디 찾기
+    // 회원 관리 - 아이디 찾기 Get
     @GetMapping("/find/id")
     public String findIdGet(@AuthenticationPrincipal CustomUserDetails userDetails) {
         if (userDetails != null) {
@@ -316,6 +313,7 @@ public class UserController {
         return "page/user/find/find-id";
     }
 
+    // 회원 관리 - 아이디 찾기 Post
     @PostMapping("/find/id")
     @ResponseBody
     public Map<String, Object> findUserId(@RequestBody FindIdDTO dto) {
@@ -467,7 +465,7 @@ public class UserController {
             @RequestParam(defaultValue = "12") int size,
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String role,
-            @RequestParam(defaultValue = "nameAsc") String sort,
+            @RequestParam(defaultValue = "newest") String sort,
             Model model
     ) {
         Pageable pageable;
@@ -480,7 +478,7 @@ public class UserController {
             default -> pageable = PageRequest.of(page, size);
         }
 
-        Page<User> pendingUsers = userService.getFilteredPendingUsers(keyword, role, pageable);
+        Page<User> pendingUsers = userService.getPendingUsersWithFilter(keyword, role, pageable);
 
         model.addAttribute("pendingUsers", pendingUsers);
         model.addAttribute("currentPage", pendingUsers.getNumber() + 1);
@@ -522,7 +520,7 @@ public class UserController {
             @RequestParam(required = false) String keyword,
             @RequestParam(required = false) String role,
             @RequestParam(required = false) String status,
-            @RequestParam(defaultValue = "nameAsc") String sort,
+            @RequestParam(defaultValue = "newest") String sort,
             Model model
     ) {
         Pageable pageable;
@@ -535,7 +533,7 @@ public class UserController {
             default -> pageable = PageRequest.of(page, size);
         }
 
-        Page<User> userPage = userService.getFilteredListUsers(keyword, role, status, pageable);
+        Page<User> userPage = userService.findUsersByFilters(keyword, role, status, pageable);
 
         model.addAttribute("userList", userPage.getContent());
         model.addAttribute("currentPage", userPage.getNumber() + 1);
@@ -557,7 +555,7 @@ public class UserController {
         return "page/user/my/account-edit";
     }
 
-    @GetMapping("/admin/my/user-deleted")
+    @GetMapping("/admin/my/user-deleted/{id}")
     public String deleteUser(@PathVariable("id") Long userId, Model model) {
         return "page/user/my/account-delete";
     }

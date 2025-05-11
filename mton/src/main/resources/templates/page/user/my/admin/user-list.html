@@ -53,10 +53,9 @@
         <div class="col-md-2">
             <label for="sortSelect" class="form-label mb-1 fw-semibold small text-muted">정렬 기준</label>
             <select class="form-select custom-select" id="sortSelect" name="sort">
-                <option value="" th:selected="${selectedStatus == null}">전체</option>
-                <option value="nameAsc" th:selected="${selectedSort == 'nameAsc'}">이름 순</option>
                 <option value="newest" th:selected="${selectedSort == 'newest'}">최신 순</option>
                 <option value="oldest" th:selected="${selectedSort == 'oldest'}">오래된 순</option>
+                <option value="nameAsc" th:selected="${selectedSort == 'nameAsc'}">이름 순</option>
             </select>
         </div>
 

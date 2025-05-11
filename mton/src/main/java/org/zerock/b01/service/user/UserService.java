@@ -3,7 +3,6 @@ package org.zerock.b01.service.user;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.zerock.b01.domain.user.User;
-import org.zerock.b01.domain.user.UserRole;
 import org.zerock.b01.domain.user.UserStatus;
 import org.zerock.b01.dto.user.FindIdDTO;
 import org.zerock.b01.dto.user.UserCreateDTO;
@@ -49,9 +48,9 @@ public interface UserService {
 
     void activateUser(String uEmail);
 
-    Page<User> getFilteredPendingUsers(String keyword, String role, Pageable pageable);
+    Page<User> getPendingUsersWithFilter(String keyword, String role, Pageable pageable);
 
-    Page<User> getFilteredUsers(String keyword, String role, Pageable pageable);
+    Page<User> findUsersByKeywordAndRole(String keyword, String role, Pageable pageable);
 
-    Page<User> getFilteredListUsers(String keyword, String role, String status, Pageable pageable);
+    Page<User> findUsersByFilters(String keyword, String role, String status, Pageable pageable);
 }

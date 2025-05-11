@@ -213,13 +213,26 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
     }
 
-    // 비밀번호 변경 > 비밀번호 일치 여부 확인
+    /**
+     * [공통] 현재 비밀번호 일치 여부 확인
+     * - 사용자 입력값(현재 비밀번호)과 저장된 암호화된 비밀번호 비교
+     *
+     * @param currentPassword 사용자가 입력한 현재 비밀번호 (평문)
+     * @param userPassword    DB에 저장된 암호화된 비밀번호
+     * @return 비밀번호가 일치하면 true, 일치하지 않으면 false
+     */
     @Override
     public boolean checkPasswordMatch(String currentPassword, String userPassword) {
         return passwordEncoder.matches(currentPassword, userPassword);
     }
 
-    // 비밀번호 변경
+    /**
+     * [공통] 비밀번호 변경 처리
+     * - 새 비밀번호를 암호화하여 저장
+     *
+     * @param user        대상 사용자 객체
+     * @param newPassword 새 비밀번호 (평문)
+     */
     @Override
     public void changePassword(User user, String newPassword) {
         String encodedNewPassword = passwordEncoder.encode(newPassword);
@@ -227,7 +240,15 @@ public class UserServiceImpl implements UserService {
         userRepository.save(user);
     }
 
-    // 회원정보 수정 (기본정보)
+    /**
+     * [공통] 회원 기본정보 수정
+     * - 이름, 이메일, 연락처, 회원 역할 등 수정
+     * - 협력업체(PARTNER) 회원은 회사 정보도 함께 수정
+     * - 현재 로그인된 사용자 본인일 경우, 인증 정보도 갱신
+     *
+     * @param userId 수정 대상 회원의 ID
+     * @param dto    수정할 회원 정보 DTO
+     */
     @Override
     @Transactional
     public void updateUserInfo(Long userId, UserUpdateDTO dto) {
@@ -263,14 +284,24 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    // 회원 탈퇴
+    /**
+     * [공통] 회원 탈퇴 처리
+     * - 회원 상태를 INACTIVE(비활성화)로 변경
+     * - 탈퇴 사유를 회원 로그(UserLog)에 기록
+     *
+     * @param userId 탈퇴할 회원의 ID
+     * @param reason 탈퇴 사유 (예: 자발적 탈퇴, 미사용 등)
+     */
     @Override
     @Transactional
     public void deactivateUser(Long userId, String reason) {
+        // [1] 사용자 조회 (없으면 예외 발생)
         User user = userRepository.findById(userId)
                 .orElseThrow(() -> new IllegalArgumentException("유저를 찾을 수 없습니다."));
+        // [2] 상태 변경: ACTIVE → INACTIVE (비활성화 처리)
         user.setuIsActive(UserStatus.INACTIVE);
 
+        // [3] 탈퇴 사유 로그 기록 (WITHDRAW 타입)
         userLogRepository.save(UserLog.builder()
                 .user(user)
                 .sActionType("WITHDRAW")
@@ -284,11 +315,26 @@ public class UserServiceImpl implements UserService {
         return userRepository.findByuIsActive(UserStatus.PENDING);
     }
 
+    /**
+     * [관리자] 가입 승인 대기 사용자 목록 조회
+     * - 상태값이 PENDING인 사용자만 조회
+     * - 페이징 적용
+     *
+     * @param pageable 페이징 정보
+     * @return 가입 대기 상태의 회원 목록
+     */
     @Override
     public Page<User> getPendingUsers(Pageable pageable) {
         return userRepository.findByuIsActive(UserStatus.PENDING, pageable);
     }
 
+    /**
+     * [관리자] 가입 승인 처리
+     * - 이메일 기준으로 사용자 조회
+     * - 상태값을 ACTIVE로 변경
+     *
+     * @param uEmail 승인 대상 사용자의 이메일
+     */
     @Override
     @Transactional
     public void activateUser(String uEmail) {
@@ -297,19 +343,30 @@ public class UserServiceImpl implements UserService {
         user.setuIsActive(UserStatus.ACTIVE);
     }
 
+    /**
+     * [관리자] 가입 승인 대기 사용자 목록 조회
+     * - 상태: 고정값(PENDING)
+     * - 조건: 이름(keyword), 회원 종류(role)
+     */
     @Override
-    public Page<User> getFilteredPendingUsers(String keyword, String role, Pageable pageable) {
+    public Page<User> getPendingUsersWithFilter(String keyword, String role, Pageable pageable) {
+        // [1] 이름 + 회원 종류 둘 다 있을 경우
         if (StringUtils.hasText(keyword) && StringUtils.hasText(role)) {
             try {
+                // [2] 역할 문자열을 enum으로 변환
                 UserRole userRole = UserRole.valueOf(role.toUpperCase());
+                // [3] 상태: PENDING + 역할 + 이름 조건으로 검색
                 return userRepository.searchByStatusAndRoleAndName(UserStatus.PENDING, userRole, keyword, pageable);
             } catch (IllegalArgumentException e) {
-                log.warn("잘못된 회원 종류 파라미터: {}", role); // or 무시
-                return Page.empty(pageable); // 빈 결과 반환 또는 전체 반환으로 대체 가능
+                log.warn("잘못된 회원 종류 파라미터: {}", role);
+                // 잘못된 enum이면 빈 페이지 반환
+                return Page.empty(pageable);
             }
+        // [4] 이름만 있을 경우
         } else if (StringUtils.hasText(keyword)) {
             return userRepository.searchByStatusAndName(
                     UserStatus.PENDING, keyword, pageable);
+        // [5] 회원 종류만 있을 경우
         } else if (StringUtils.hasText(role)) {
             try {
                 UserRole userRole = UserRole.valueOf(role.toUpperCase());
@@ -318,45 +375,65 @@ public class UserServiceImpl implements UserService {
                 log.warn("잘못된 회원 종류 파라미터: {}", role);
                 return Page.empty(pageable);
             }
+            // [6] 아무 필터도 없으면 상태값 PENDING 전체 조회
         } else {
             return userRepository.findByuIsActive(UserStatus.PENDING, pageable);
         }
     }
 
+    /**
+     * [관리자] 회원 상태 필터 없이 이름 + 역할 기반 검색
+     * - 상태 필터 없음 (e.g. ACTIVE/INACTIVE 구분 안함)
+     * - 조건: 이름(keyword), 회원 종류(role)
+     */
     @Override
-    public Page<User> getFilteredUsers(String keyword, String role, Pageable pageable) {
+    public Page<User> findUsersByKeywordAndRole(String keyword, String role, Pageable pageable) {
+        // [1] 회원 종류가 있으면 필터링 수행
         if (StringUtils.hasText(role)) {
             try {
                 UserRole userRole = UserRole.valueOf(role.toUpperCase());
+                // [2] 회원 종류 + 이름(있으면)으로 검색
                 return userRepository.searchAllUsers(
                         StringUtils.hasText(keyword) ? keyword : null,
                         userRole,
                         pageable);
             } catch (IllegalArgumentException e) {
                 log.warn("잘못된 회원 역할: {}", role);
+                // 회원 종류 값이 enum으로 변환 안되면 빈 결과 반환
                 return Page.empty(pageable);
             }
+        // [3] 회원 종류 없이 이름만 있을 경우
         } else {
             return userRepository.searchAllUsers(
                     StringUtils.hasText(keyword) ? keyword : null,
-                    null,
+                    null, // 회원 종류 없음
                     pageable);
         }
     }
 
+    /**
+     * [관리자] 회원 목록 페이지 필터링 검색
+     * - 전체 회원 대상 (가입 승인 완료된 사용자 포함)
+     * - 조건: 계정 상태(status), 이름(keyword), 회원 역할(role)
+     */
     @Override
-    public Page<User> getFilteredListUsers(String keyword, String role, String status, Pageable pageable) {
+    public Page<User> findUsersByFilters(String keyword, String role, String status, Pageable pageable) {
+        // [1] 변수 초기화: 역할과 상태는 enum으로 변환할 예정
         UserRole userRole = null;
         UserStatus userStatus = null;
 
+        // [2] 회원 종류가 넘어온 경우 처리 (예: "PARTNER" → UserRole.PARTNER)
         if (StringUtils.hasText(role)) {
             try {
+                // enum으로 안전 변환
                 userRole = UserRole.valueOf(role.toUpperCase());
             } catch (IllegalArgumentException e) {
+                // 잘못된 값일 경우 경고 로그 출력
                 log.warn("잘못된 회원 역할: {}", role);
             }
         }
 
+        // [3] 계정 상태가 넘어온 경우 처리 (예: "ACTIVE" → UserStatus.ACTIVE)
         if (StringUtils.hasText(status)) {
             try {
                 userStatus = UserStatus.valueOf(status.toUpperCase());
@@ -364,7 +441,8 @@ public class UserServiceImpl implements UserService {
                 log.warn("잘못된 계정 상태: {}", status);
             }
         } else {
-            userStatus = UserStatus.ACTIVE; // 👈 status 파라미터 없으면 기본 ACTIVE만 조회
+            // [4] 👈 status 파라미터 없으면 기본 ACTIVE만 조회
+            userStatus = UserStatus.ACTIVE;
         }
 
         return userRepository.searchUsers(userStatus, userRole,
