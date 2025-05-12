@@ -109,6 +109,9 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
 (function () {
     // 등록 테이블들에 조작 버튼 달기
     for (const table of inputTables) {
+        if (table.id === "pbom-table") {
+            continue;
+        }
         tableRowsEditor.initEmptyTable(table);
     }
 })();

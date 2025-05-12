@@ -10,11 +10,11 @@ let pbomDBData;
 let prdplanDBData;
 let prdplanDBEditData;
 
-
 // 수정 전 원래 값을 담는 변수와 삭제 전 삭제할 ID를 담는 변수
 let originalValues = {};
 
-// 테이블 열 개수 파악하고 새 행과 열을 삽입
+// 테이블 열 개수 파악하고 새 행과 열을 삽입.
+// 일반적으로 등록 테이블에서만 사용한다.
 function insertRowCells(table, index, ...optionFn) {
     // 원하는 index 위치에 행 삽입
     const newRow = table.insertRow(index);
@@ -32,7 +32,7 @@ function insertRowCells(table, index, ...optionFn) {
     tutorialMessage.bindTutorialMessage(newRow.cells[0], tmessage.idCellTutorial);
     newRow.cells[0].style.cursor = "help";
 
-    addUtilButtons(table, newRow);
+    addUtilButtons(table, newRow, optionFn.flat());
     return newRow;
 }
 
@@ -65,7 +65,7 @@ function addUtilButtons(table, row, ...optionFn) {
         e.stopPropagation();
 
         const currentRow = row.rowIndex;
-        insertRowCells(table, currentRow + 1, optionFn);
+        insertRowCells(table, currentRow + 1, optionFn.flat());
     });
 
     dltButton.addEventListener("dblclick", function (e) {
@@ -74,12 +74,12 @@ function addUtilButtons(table, row, ...optionFn) {
 
         const currentRow = row.rowIndex;
         if (currentRow === 0) {
-            insertRowCells(table, 1, optionFn);
+            insertRowCells(table, 1, optionFn.flat());
             while (table.rows.length > 2) {
                 table.deleteRow(-1);
             }
         } else if (table.rows.length === 2) {
-            insertRowCells(table, 1, optionFn);
+            insertRowCells(table, 1, optionFn.flat());
             table.deleteRow(2);
         } else {
             table.deleteRow(currentRow);
@@ -93,6 +93,14 @@ function addUtilButtons(table, row, ...optionFn) {
 
     row.appendChild(addButton);
     row.appendChild(dltButton);
+
+    for (const option of optionFn.flat()) {
+        console.log(typeof(option));
+        const cell = option(row);
+        cell.setAttribute("contenteditable", "true");
+    }
+
+    return row;
 }
 
 // 테이블에 행 추가와 삭제 버튼을 추가
@@ -102,12 +110,6 @@ function addTableUtilBtn(table) {
     for (let i = 1; i < rows.length; i++) {
         addUtilButtons(table, rows[i]);
     }
-}
-
-function addPbomTableUtilBtn(table) {
-    addTableUtilBtn(table);
-    makeTableCellDBSelect(table, 1, matDBData, dbElementNames.pbomMatId);
-    makeTableCellDBSelect(table, 2, prdDBData, dbElementNames.pbomProdId);
 }
 
 // 수정테이블의 헤더에 조작버튼 추가
@@ -424,6 +426,26 @@ function initEmptyTable(table) {
     }
 }
 
+function initEmptyPbomTable(table) {
+    const matOptions = matDBData.map(data => data[dbElementNames.pbomMatId]);
+    const prdOptions = prdDBData.map(data => data[dbElementNames.pbomProdId]);
+
+    const makeMatSelect = (row) => {
+        makeSelectForRawCell(row.cells[1], matOptions);
+        return row.cells[1];
+    }
+    const makePrdSelect = (row) => {
+        makeSelectForRawCell(row.cells[2], prdOptions);
+        return row.cells[2];
+    }
+
+    for (const row of table.rows) {
+        addUtilButtons(table, row, makeMatSelect, makePrdSelect);
+        tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.idCellTutorial);
+        table.rows[1].cells[0].style.cursor = "help";
+    }
+}
+
 // 목록 테이블용 fetch 함수
 async function refreshTableView(dest, request = "") {
     return await fetch(dest, {
@@ -475,6 +497,7 @@ function viewTable(table, request) {
     });
 }
 
+// DB 받아온 내용으로 테이블을 갱신한다.
 function reloadTable(table, request) {
     let targetDB;
 
@@ -519,7 +542,7 @@ function viewEditTable(table, request) {
     });
 }
 
-// DB Data 들을 갱신한다.
+// Product 페이지에 필요한 DB 갱신한다.
 async function refreshProductDBDataAll() {
     const result = Promise.all([
         refreshTableView("/internal/product/view/mat", "material"),
@@ -541,6 +564,7 @@ async function refreshProductDBDataAll() {
     );
 }
 
+// 생산계획 페이지에 필요한 DB 갱신
 async function refreshPrdPlanDBDataAll() {
     const result = Promise.all([
         refreshTableView("/internal/product/view/prdplan", "prdplan"),
@@ -571,6 +595,7 @@ async function refreshPrdPlanDBDataAll() {
     );
 }
 
+// Product 페이지의 모든 수정 및 목록 테이블 갱신
 function viewAllProductTable() {
     const refresh = refreshProductDBDataAll();
     refresh.then(value => {
@@ -605,9 +630,12 @@ function viewAllProductTable() {
         makeTableCellDBSelect(pbomEditTable, 2, prdDBData, dbElementNames.pbomProdId);
 
         originalValues = {};
+
+        initEmptyPbomTable(document.getElementById("pbom-table"));
     });
 }
 
+// 생산계획 테이블 목록 갱신
 function viewPrdPlanTable() {
     const refresh = refreshPrdPlanDBDataAll();
     refresh.then(value => {
@@ -625,10 +653,11 @@ function viewPrdPlanTable() {
     });
 }
 
+// span 을 자식으로 갖지 않은 셀에 select 추가하기
 function makeSelectForRawCell(cell, ...options) {
     let value = cell.innerText;
     const span = document.createElement("span");
-    span.innerText = value;
+    span.innerHTML = value;
     cell.innerText = "";
     cell.appendChild(span);
     makeSelect(cell, options[0]);
@@ -680,6 +709,7 @@ function makeTableCellSelect(table, cellIndex, ...options) {
     }
 }
 
+// 등록, 수정, 목록 전환 버튼
 function initPageTable() {
     const viewGroup = document.getElementById("tables-view");
     const editGroup = document.getElementById("tables-edit");
@@ -770,6 +800,7 @@ function initPageTable() {
 export {
     initPageTable,
     initEmptyTable,
+    initEmptyPbomTable,
     initEditButtons,
     viewAllProductTable,
     viewPrdPlanTable,
