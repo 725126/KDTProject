@@ -10,42 +10,43 @@
 
 <th:block layout:fragment="incoming-planned">
     <div class="container py-5">
-        <h1 class="mb-4">입고 예정</h1>
 
-        <div class="card p-4 mb-4">
-            <div class="row g-3 align-items-end">
-                <div class="col-lg-4 col-md-6">
-                    <label class="form-label">입고예정일</label>
-                    <div class="d-flex gap-1">
-                        <input type="date" class="form-control" id="search-incoming-start">
-                        <span class="pt-2">~</span>
-                        <input type="date" class="form-control" id="search-incoming-end">
+        <h1 class="mb-4">입고 예정</h1>
+        <form action="/internal/incoming/planned" method="get">
+            <div class="card p-4 mb-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label">입고예정일</label>
+                        <div class="d-flex gap-1">
+                            <input type="date" class="form-control" id="search-incoming-start">
+                            <span class="pt-2">~</span>
+                            <input type="date" class="form-control" id="search-incoming-end">
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label">입고코드</label>
+                        <input type="text" class="form-control" id="search-incoming-code">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label for="search-partner" class="form-label">협력사</label>
+                        <input type="text" class="form-control" id="search-partner">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="search-material-code" class="form-label">자재코드</label>
+                        <input type="text" class="form-control" id="search-material-code">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="search-material-name" class="form-label">자재명</label>
+                        <input type="text" class="form-control" id="search-material-name">
+                    </div>
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                        <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-3">
-                    <label class="form-label">입고코드</label>
-                    <input type="text" class="form-control" id="search-incoming-code">
-                </div>
-
-                <div class="col-md-2">
-                    <label for="search-partner" class="form-label">협력사</label>
-                    <input type="text" class="form-control" id="search-partner">
-                </div>
-                <div class="col-md-2">
-                    <label for="search-material-code" class="form-label">자재코드</label>
-                    <input type="text" class="form-control" id="search-material-code">
-                </div>
-                <div class="col-md-2">
-                    <label for="search-material-name" class="form-label">자재명</label>
-                    <input type="text" class="form-control" id="search-material-name">
-                </div>
-                <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                    <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
-                </div>
             </div>
-        </div>
-
+        </form>
 
 
         <div class="card p-4">
@@ -58,18 +59,19 @@
                     <th>자재코드</th>
                     <th>자재명</th>
                     <th>입고예정수량</th>
+                    <th>창고</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>2025-04-15</td>
-                    <td>IN-20250415-001</td>
-                    <td>DG전동</td>
-                    <td>ES-W001-1</td>
-                    <td>10인치 튜브형 타이어</td>
-                    <td>100</td>
+                <tr th:each="incoming:${incomingList}" th:data-id="${incoming.incomingId}">
+                    <td th:text="${incoming.deliveryPartnerItemDate}"></td>
+                    <td th:text="${incoming.incomingCode}"></td>
+                    <td th:text="${incoming.pCompany}"></td>
+                    <td th:text="${incoming.matId}"></td>
+                    <td th:text="${incoming.matName}"></td>
+                    <td th:text="${incoming.deliveryPartnerItemQty}"></td>
+                    <td th:text="${incoming.cstorageId}"></td>
                 </tr>
-                <!-- 추가 데이터 삽입 가능 -->
                 </tbody>
             </table>
         </div>

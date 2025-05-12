@@ -1,0 +1,144 @@
+package org.zerock.b01.service.warehouse;
+
+import jakarta.transaction.Transactional;
+import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Service;
+import org.zerock.b01.domain.operation.Ordering;
+import org.zerock.b01.domain.warehouse.*;
+import org.zerock.b01.dto.PageRequestDTO;
+import org.zerock.b01.dto.PageResponseDTO;
+import org.zerock.b01.dto.warehouse.DeliveryPartnerDTO;
+import org.zerock.b01.repository.warehouse.DeliveryPartnerRepository;
+
+import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+@Service
+@RequiredArgsConstructor
+@Log4j2
+@Transactional
+public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
+
+  private final DeliveryPartnerRepository deliveryPartnerRepository;
+  private final DeliveryPartnerItemService deliveryPartnerItemService;
+  private final IncomingService incomingService;
+
+  @Override
+  public PageResponseDTO<DeliveryPartnerDTO> listWithDeliveryPartner(PageRequestDTO pageRequestDTO) {
+
+    // 검색 조건을 받아옵니다.
+    String drItemCode = pageRequestDTO.getDrItemCode();
+    String orderId = pageRequestDTO.getOrderId();
+    String matName = pageRequestDTO.getMatName();
+    LocalDate drItemDueDateStart = pageRequestDTO.getDrItemDueDateStart();
+    LocalDate drItemDueDateEnd = pageRequestDTO.getDrItemDueDateEnd();
+
+    // Pageable을 pageRequestDTO에서 받아옵니다.
+    Pageable pageable = pageRequestDTO.getPageable("deliveryPartnerId");
+
+    // 검색 조건과 페이지 정보를 이용하여 데이터를 조회합니다.
+    Page<DeliveryPartner> result = deliveryPartnerRepository
+            .searchDeliveryPartnerAll(drItemCode, orderId, matName,
+                    drItemDueDateStart, drItemDueDateEnd, pageable);
+
+
+    List<DeliveryPartnerDTO> dtoList = new ArrayList<>();
+
+
+
+    for (DeliveryPartner deliveryPartner : result.getContent()) {
+
+      DeliveryRequestItem deliveryRequestItem = deliveryPartner.getDeliveryRequestItem();
+      Ordering ordering = deliveryPartner.getDeliveryRequestItem().getDeliveryRequest().getOrdering();
+      Incoming incoming = deliveryPartner.getIncoming();
+
+      // DTO 생성
+      DeliveryPartnerDTO dto = DeliveryPartnerDTO.builder()
+              .deliveryPartnerId(deliveryPartner.getDeliveryPartnerId())
+              .deliveryPartnerQty(deliveryPartner.getDeliveryPartnerQty())
+              .deliveryPartnerStatus(deliveryPartner.getDeliveryPartnerStatus().name())
+              .drItemCode(deliveryRequestItem.getDrItemCode())
+              .orderId(ordering.getOrderId())
+              .matName(ordering.getContractMaterial().getMaterial().getMatName())
+              .drItemQty(deliveryRequestItem.getDrItemQty())
+              .drItemDueDate(deliveryRequestItem.getDrItemDueDate())
+              .incomingReturnQty(incoming != null ? incoming.getIncomingReturnQty() : 0)
+              .build();
+
+      dtoList.add(dto);
+    }
+
+    dtoList.sort((a, b) -> {
+      boolean aZero = a.getRemainingQty() == 0;
+      boolean bZero = b.getRemainingQty() == 0;
+
+      if (aZero == bZero) {
+        return 0; // 순서 유지
+      } else if (aZero) {
+        return 1; // a가 0이면 뒤로
+      } else {
+        return -1; // b가 0이면 뒤로
+      }
+    });
+
+    // PageResponseDTO로 변환하여 반환합니다.
+    return PageResponseDTO.<DeliveryPartnerDTO>withAll()
+            .pageRequestDTO(pageRequestDTO)
+            .dtoList(dtoList)
+            .total((int) result.getTotalElements())
+            .build();
+  }
+
+  // 부분출고
+  public void partialDelivery(DeliveryPartnerDTO dto) {
+    validateDeliveryQty(dto.getDeliveryPartnerQty());
+
+    DeliveryPartner deliveryPartner = deliveryPartnerRepository.findById(dto.getDeliveryPartnerId())
+            .orElseThrow(() -> new IllegalArgumentException("해당 항목 없음"));
+
+    // 출고 수량 누적
+    deliveryPartner.updateDeliveryPartnerQty(dto.getDeliveryPartnerQty());
+
+    deliveryPartnerRepository.save(deliveryPartner);
+
+    // 이력 저장 후 반환
+    DeliveryPartnerItem savedItem =
+            deliveryPartnerItemService.saveDeliveryPartnerItem(deliveryPartner, dto.getDeliveryPartnerQty());
+
+    // 입고 생성
+    incomingService.createIncomingForDeliveryPartnerItem(savedItem);
+
+
+  }
+
+  // 출고
+  public void fullDelivery(List<DeliveryPartnerDTO> dtoList) {
+    for (DeliveryPartnerDTO dto : dtoList) {
+
+      DeliveryPartner deliveryPartner = deliveryPartnerRepository.findById(dto.getDeliveryPartnerId())
+              .orElseThrow(() -> new IllegalArgumentException("해당 항목 없음"));
+
+      int totalQty = dto.getDeliveryPartnerQty(); // 전체출고량
+      deliveryPartner.updateDeliveryPartnerQty(totalQty);
+
+      deliveryPartnerRepository.save(deliveryPartner);
+
+      // 이력 저장 + 반환
+      DeliveryPartnerItem savedItem = deliveryPartnerItemService.saveDeliveryPartnerItem(deliveryPartner, totalQty);
+
+      // 입고 엔티티 생성
+      incomingService.createIncomingForDeliveryPartnerItem(savedItem);
+
+    }
+  }
+
+  private void validateDeliveryQty(int qty) {
+    if (qty < 0) {
+      throw new IllegalArgumentException("출고 수량은 음수일 수 없습니다.");
+    }
+  }
+}

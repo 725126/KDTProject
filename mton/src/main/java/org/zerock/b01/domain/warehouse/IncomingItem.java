@@ -2,8 +2,8 @@ package org.zerock.b01.domain.warehouse;
 
 import jakarta.persistence.*;
 import lombok.*;
-import org.zerock.b01.domain.operation.Material;
-import org.zerock.b01.domain.operation.Ordering;
+
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -15,31 +15,26 @@ public class IncomingItem {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int incomingItemId;
+  private Long incomingItemId;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "incoming_id",nullable = false)
   private Incoming incoming;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
-  private Material material;
-
-  @ManyToOne
-  @JoinColumn(nullable = false)
-  private Ordering ordering;
-
-  @ManyToOne
-  @JoinColumn(nullable = false)
-  private DeliveryRequest deliveryRequest;
+  @JoinColumn(name = "cstorage_item_id", nullable = false)
+  private CompanyStorageItem companyStorageItem;
 
   @Column(nullable = false)
-  private int incomingQty;
+  private LocalDate incomingItemDate;
 
   @Column(nullable = false)
-  private int incomingReturnQty;
+  private int incomingItemQty = 0;
+
+  @Column(nullable = false)
+  private int incomingItemReturnQty = 0;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
-  private IncomingStatus incomingStatus;
+  private IncomingItemStatus incomingItemStatus;
 }

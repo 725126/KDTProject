@@ -16,25 +16,25 @@ public class InventoryHistory {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int inventoryHistoryId;
+  private Long inventoryHistoryId;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "inventory_id", nullable = false)
   private Inventory inventory;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "cstorage_id", nullable = false)
   private CompanyStorage companyStorage;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "mat_id", nullable = false)
   private Material material;
 
   @Column(nullable = false)
   private int changeQty;
 
   @Column(nullable = false)
-  private int changePrice;
+  private Long changePrice;
 
   @Column(nullable = false)
   private LocalDateTime updateDate;

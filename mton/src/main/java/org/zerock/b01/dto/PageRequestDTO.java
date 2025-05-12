@@ -10,6 +10,8 @@ import org.springframework.data.domain.Sort;
 
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -29,6 +31,38 @@ public class PageRequestDTO {
 
     private String keyword;
 
+    private String orderId;
+
+    private String matName;
+
+    private LocalDate orderDateStart;
+
+    private LocalDate orderDateEnd;
+
+    private LocalDate orderEndStart;
+
+    private LocalDate orderEndEnd;
+
+    private String drItemCode;
+
+    private String incomingCode;
+
+    private String pCompany;
+
+    private String matId;
+
+    private LocalDate drItemDueDateStart;
+
+    private LocalDate drItemDueDateEnd;
+
+    private LocalDate creDateStart;
+
+    private LocalDate creDateEnd;
+
+    private LocalDate deliveryPartnerItemDateStart;
+
+    private LocalDate deliveryPartnerItemDateEnd;
+
     public String[] getTypes() {
         if (type == null || type.isEmpty()) {
             return null;
@@ -41,7 +75,7 @@ public class PageRequestDTO {
     // String[]보다 더 유연하게 사용가능
     // 직접 String[]을 생성할 필요 없이 여러 인자 전달 가능
     public Pageable getPageable(String... props) {
-        return PageRequest.of(this.page - 1, this.size, Sort.by(props).descending() );
+        return PageRequest.of(this.page - 1, this.size, Sort.by(props).ascending() );
 
     }
 

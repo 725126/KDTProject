@@ -14,7 +14,7 @@
         <h1 class="mb-4">입고 검수</h1>
 
         <div class="card p-4 mb-4">
-            <form>
+            <form action="/internal/incoming/inspection" method="get">
                 <div class="row g-3">
                     <!-- 입고예정일 -->
                     <div class="col-md-4 col-lg-4">
@@ -96,12 +96,14 @@
                     <th>협력사</th>
                     <th>자재코드</th>
                     <th>자재명</th>
+                    <th>납입지시수량</th>
                     <th>입고예정수량</th>
                     <th>입고수량</th>
                     <th>반품수량</th>
                     <th>잔여 입고 수량</th>
                     <th>입고일</th>
                     <th>입고마감일</th>
+                    <th>창고</th>
                     <th>진행상태</th>
                 </tr>
                 </thead>
@@ -114,26 +116,13 @@
                     <td>MAT-001</td>
                     <td>전기자전거 모터</td>
                     <td>100</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>100</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td class="text-center"><span class="badge bg-secondary">미입고</span></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" class="row-check"></td>
-                    <td>2025-04-10</td>
-                    <td>INC-24041001</td>
-                    <td>협력사A</td>
-                    <td>MAT-002</td>
-                    <td>전기자전거 컨트롤러</td>
                     <td>100</td>
                     <td>0</td>
                     <td>0</td>
                     <td>100</td>
                     <td>-</td>
                     <td>-</td>
+                    <td>수원</td>
                     <td class="text-center"><span class="badge bg-secondary">미입고</span></td>
                 </tr>
                 </tbody>

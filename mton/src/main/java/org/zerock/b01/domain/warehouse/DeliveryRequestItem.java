@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.b01.domain.BaseEntity;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -16,10 +16,10 @@ public class DeliveryRequestItem extends BaseEntity {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int drItemId;
+  private Long drItemId;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "dr_id", nullable = false)
   private DeliveryRequest deliveryRequest;
 
   @ManyToOne
@@ -27,16 +27,18 @@ public class DeliveryRequestItem extends BaseEntity {
   private CompanyStorage companyStorage;
 
   @Column(nullable = false)
+  private String drItemCode;
+
+  @Column(nullable = false)
   private int drItemQty;
 
   @Column(nullable = false)
-  private int drItemReceivedQty = 0;
+  private LocalDate drItemDueDate;
 
-  @Column(nullable = false)
-  private Date drItemDueDate;
-
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private DeliveryItemStatus drItemStatus;
+  public void updateDeliveryRequestItem(int drItemQty, LocalDate drItemDueDate, CompanyStorage companyStorage) {
+    this.drItemQty = drItemQty;
+    this.drItemDueDate = drItemDueDate;
+    this.companyStorage = companyStorage;
+  }
 
 }

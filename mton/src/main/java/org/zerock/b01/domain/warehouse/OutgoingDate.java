@@ -15,10 +15,10 @@ public class OutgoingDate {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int outgoingDateId;
+  private Long outgoingDateId;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "outgoing_item_id", nullable = false)
   private OutgoingItem outgoingItem;
 
   private LocalDateTime outgoingDate;

@@ -5,6 +5,9 @@ import lombok.*;
 import org.zerock.b01.domain.BaseEntity;
 import org.zerock.b01.domain.operation.Material;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Entity
 @Getter
 @Builder
@@ -16,10 +19,6 @@ public class CompanyStorage extends BaseEntity {
   @Id
   private String cstorageId;
 
-  @ManyToOne
-  @JoinColumn(nullable = false)
-  private Material material;
-
   @Column(length = 150)
   private String cstorageAddress;
 
@@ -29,6 +28,6 @@ public class CompanyStorage extends BaseEntity {
   @Column(length = 20)
   private String cstorageManager;
 
-  @Column(nullable = false)
-  private int cstorageQty;
+  @OneToMany(mappedBy = "companyStorage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private Set<CompanyStorageItem> storageDetails = new HashSet<>();
 }
