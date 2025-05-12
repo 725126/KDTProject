@@ -4,7 +4,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.context.annotation.Bean;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -307,11 +309,11 @@ public class UserServiceImpl implements UserService {
         // [2] 상태 변경: ACTIVE → INACTIVE (비활성화 처리)
         user.setuIsActive(UserStatus.INACTIVE);
 
-        // [3] 탈퇴 사유 로그 기록 (WITHDRAW 타입)
+        // [3] 탈퇴 사유 로그 기록 (DELETE 타입)
         userLogRepository.save(UserLog.builder()
                 .user(user)
-                .sActionType("WITHDRAW")
-                .sActionContent("탈퇴 사유: " + reason)
+                .sActionType("DELETE")
+                .sActionContent("[탈퇴] 탈퇴 사유: " + reason)
                 .build());
     }
 
@@ -345,7 +347,8 @@ public class UserServiceImpl implements UserService {
     @Transactional
     public void activateUser(String uEmail) {
         User user = userRepository.findByuEmail(uEmail)
-                .orElseThrow(() -> new IllegalArgumentException("해당 사용자가 없습니다."));
+                .orElseThrow(() -> new IllegalArgumentException("승인 대상 유저 없음."));
+
         user.setuIsActive(UserStatus.ACTIVE);
     }
 
@@ -453,6 +456,32 @@ public class UserServiceImpl implements UserService {
 
         return userRepository.searchUsers(userStatus, userRole,
                 StringUtils.hasText(keyword) ? keyword : null, pageable);
+    }
+
+//    @Override
+//    public List<UserLog> getAllLogsSortedByDateDesc() {
+//        List<UserLog> userLogs = userLogRepository.findAll(Sort.by(Sort.Direction.DESC, "creDate"));
+//
+//        return userLogs;
+//    }
+
+    @Override
+    public Page<UserLog> getPagedLogsSortedByDateDesc(Pageable pageable) {
+        return userLogRepository.findAll(PageRequest.of(
+                pageable.getPageNumber(),
+                pageable.getPageSize(),
+                Sort.by(Sort.Direction.DESC, "creDate")
+        ));
+    }
+
+    public void saveUserLog(User actor, String actionType, String content) {
+        UserLog log = UserLog.builder()
+                .user(actor)
+                .sActionType(actionType)
+                .sActionContent(content)
+                .build();
+
+        userLogRepository.save(log);
     }
 
 }

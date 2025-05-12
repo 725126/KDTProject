@@ -17,9 +17,9 @@ public class UserLog extends BaseEntity { // 회원 로그 (활동 기록용)
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userLogId; // 회원 로그 ID
 
-    private String sActionType; // 활동 타입
+    private String sActionType; // 활동 타입 (DELETE / CREATE / UPDATE)
 
-    private String sActionContent; // 활동 내용
+    private String sActionContent; // 활동 내용 ([상세 활동명] 활동 내용)
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

@@ -48,8 +48,9 @@
 
 .page-btn:hover,
 .nav-btn:hover {
-    border: 1px solid #BBBFCA;
-    background-color: #E8E8E8;
+    border: 1px solid #608BC1;
+    background-color: #608BC1;
+    color: #fff;
 }
 
 .page-btn.active {
@@ -97,7 +98,8 @@
 }
 
 .goto-page button:hover {
-    background-color: #9BA4B5;
+    background-color: #608BC1;
+    color: #fff;
 }
 
 .dots {

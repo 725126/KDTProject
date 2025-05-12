@@ -19,6 +19,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import org.zerock.b01.domain.user.User;
+import org.zerock.b01.domain.user.UserLog;
 import org.zerock.b01.domain.user.UserRole;
 import org.zerock.b01.dto.user.FindIdDTO;
 import org.zerock.b01.dto.user.UserCreateDTO;
@@ -27,6 +28,7 @@ import org.zerock.b01.dto.user.UserUpdateDTO;
 import org.zerock.b01.security.CustomUserDetails;
 import org.zerock.b01.service.user.UserService;
 
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
@@ -516,7 +518,17 @@ public class UserController {
 
     // 마이페이지 - 관리자 > 회원로그 기록
     @GetMapping("/admin/my/log-list")
-    public String adminMyPageLogListGet() {
+    public String adminMyPageLogListGet(@RequestParam(defaultValue = "0") int page,
+                                        @RequestParam(defaultValue = "6") int size,
+                                        Model model) {
+        Pageable pageable = PageRequest.of(page, size);
+        Page<UserLog> userLogs = userService.getPagedLogsSortedByDateDesc(pageable);
+
+//        List<UserLog> userLogs = userService.getAllLogsSortedByDateDesc();
+        model.addAttribute("userLogs", userLogs);
+        model.addAttribute("currentPage", userLogs.getNumber() + 1);
+        model.addAttribute("totalPages", userLogs.getTotalPages());
+
         return "page/user/my/admin/log-list";
     }
 
