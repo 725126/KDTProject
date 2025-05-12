@@ -127,6 +127,7 @@ public class ProcurementPlanServiceImpl implements ProcurementPlanService {
                     .material(materialRepository.findById(pplan.getMaterialId()).get())
                     .ppmatQty(pplan.getPpmatQty())
                     .pplanEnd(pplan.getPplanEnd())
+                    .pplanStat(pplan.getPplanStat())
                     .build()).collect(Collectors.toList());
 
             var pplanNames = list.stream().map(ProcurementPlanDTO::getPplanId).collect(Collectors.toList());

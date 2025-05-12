@@ -105,6 +105,7 @@ public class ProcurementController {
                 .materialId(hashmap.get(ProcurementPlanTableHead.MAT_ID.getLabel()))
                 .ppmatQty(Integer.parseInt(hashmap.get(ProcurementPlanTableHead.PPMAT_QTY.getLabel())))
                 .pplanEnd(LocalDate.parse(hashmap.get(ProcurementPlanTableHead.PPLAN_END.getLabel()).substring(0, 10)))
+                .pplanStat(hashmap.get(ProcurementPlanTableHead.PPLAN_STAT.getLabel()))
                 .build()
         ).collect(Collectors.toList());
 

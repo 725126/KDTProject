@@ -9,6 +9,8 @@ let prdDBData;
 let pbomDBData;
 let prdplanDBData;
 let prdplanDBEditData;
+let pplanDBData;
+let pplanDBEditData;
 
 // 수정 전 원래 값을 담는 변수와 삭제 전 삭제할 ID를 담는 변수
 let originalValues = {};
@@ -147,7 +149,7 @@ function initEditButtons(table) {
         e.preventDefault();
         e.stopPropagation();
 
-        const checkboxes = Array.from(table.querySelectorAll("input[type='checkbox']"));
+        const checkboxes = Array.from(table.querySelectorAll("tr:not(.table-info) input[type='checkbox']"));
         const unchecked = checkboxes.filter(box => !box.checked);
         const checked = checkboxes.filter(box => box.checked);
 
@@ -566,6 +568,14 @@ function reloadTable(table, request) {
         case "productionplanedit":
             targetDB = prdplanDBEditData;
             break;
+        case "pplan":
+        case "productionplan":
+            targetDB = prdDBData;
+            break;
+        case "pplanedit":
+        case "productionplanedit":
+            targetDB = pplanDBEditData;
+            break;
     }
 
     const sheet = XLSX.utils.json_to_sheet(targetDB);
@@ -625,10 +635,45 @@ async function refreshPrdPlanDBDataAll() {
                 const ePrd = {};
                 ePrd[keys[0]] = prd[keys[0]];
                 ePrd[keys[1]] = prd[keys[1]];
-                ePrd[keys[2]] = prd[keys[3]];
-                ePrd[keys[3]] = prd[keys[5]];
+                ePrd[keys[3]] = prd[keys[3]];
+                ePrd[keys[5]] = prd[keys[5]];
 
+                console.log(ePrd);
                 return ePrd;
+            });
+
+            return values;
+        },
+        (reason) => {
+            return reason;
+        }
+    );
+}
+
+async function refreshPPlanDBDataAll() {
+    const result = Promise.all([
+        refreshTableView("/internal/procurement/view/procure", "procure"),
+        refreshTableView("/internal/product/view/prdplan", "prdplan"),
+        refreshTableView("/internal/product/view/mat", "material")
+    ]);
+
+    return result.then(
+        (values) => {
+            pplanDBData = values[0];
+            prdDBData = values[1];
+            matDBData = values[2];
+            pplanDBEditData = Array.from(values[0]).map(pplan => {
+                const keys = Object.keys(pplan);
+                const ePPlan = {};
+                ePPlan[keys[0]] = pplan[keys[0]];
+                ePPlan[keys[1]] = pplan[keys[1]];
+                ePPlan[keys[2]] = pplan[keys[2]];
+                ePPlan[keys[4]] = pplan[keys[4]];
+                ePPlan[keys[6]] = pplan[keys[6]];
+                ePPlan[keys[7]] = pplan[keys[7]];
+
+                console.log(ePPlan);
+                return ePPlan;
             });
 
             return values;
@@ -701,6 +746,15 @@ function viewPrdPlanTable() {
         originalValues = {};
 
         initEmptyPrdPlanTable(prdplanInputTable);
+    });
+}
+
+function viewPPlanTable() {
+    const refresh = refreshPPlanDBDataAll();
+    refresh.then(value => {
+        const pplanViewTable = document.querySelector("#pplan-table-view");
+        const pplanEditTable = document.querySelector("#pplan-table-edit");
+        const pplanInputTable = document.querySelector("#pplan-table");
     });
 }
 
@@ -891,6 +945,7 @@ export {
     initEditButtons,
     viewAllProductTable,
     viewPrdPlanTable,
+    viewPPlanTable,
     addTableUtilBtn,
     addTableEditButtons,
     addPbomTableUtilBtn,
