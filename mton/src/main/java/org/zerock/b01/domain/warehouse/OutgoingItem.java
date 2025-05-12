@@ -15,19 +15,23 @@ public class OutgoingItem {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int outgoingItemId;
+  private Long outgoingItemId;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "outgoing_id", nullable = false)
   private Outgoing outgoing;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "mat_id", nullable = false)
   private Material material;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "prdplan_id", nullable = false)
   private ProductionPlan productionPlan;
+
+  @ManyToOne
+  @JoinColumn(name = "cstorage_id", nullable = false)
+  private CompanyStorage companyStorage;
 
   @Column(nullable = false)
   private int outgoingQty = 0;

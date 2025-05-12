@@ -15,14 +15,11 @@ public class Outgoing {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int outgoingId;
+  private Long outgoingId;
 
   @Column(nullable = false)
   private String outgoingCode;
 
   private LocalDateTime outgoingCompletedAt;
 
-  @ManyToOne
-  @JoinColumn(nullable = false)
-  private CompanyStorage companyStorage;
 }

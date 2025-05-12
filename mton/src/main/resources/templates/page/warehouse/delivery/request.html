@@ -10,50 +10,62 @@
 
 <th:block layout:fragment="delivery-request">
     <div class="container py-5">
-        <h2 class="mb-4">납입지시 요청</h2>
+        <form action="/internal/delivery/request" method="get">
+            <h2 class="mb-4">납입지시 요청</h2>
 
-        <div class="card p-4 mb-5">
-            <div class="row g-3 align-items-end">
-                <!-- 발주코드 -->
-                <div class="col-md-2">
-                    <label for="orderCode" class="form-label">발주코드</label>
-                    <input type="text" name="orderCode" id="orderCode" class="form-control">
-                </div>
-
-                <!-- 자재명 -->
-                <div class="col-md-2">
-                    <label for="materialName" class="form-label">자재명</label>
-                    <input type="text" name="materialName" id="materialName" class="form-control">
-                </div>
-
-                <!-- 발주일자 -->
-                <div class="col-md-4">
-                    <label class="form-label">발주일자</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="date" name="orderDateFrom" class="form-control">
-                        <span class="px-1">~</span>
-                        <input type="date" name="orderDateTo" class="form-control">
+            <div class="card p-4 mb-5">
+                <div class="row g-3 align-items-end">
+                    <!-- 발주코드 -->
+                    <div class="col-md-2">
+                        <label for="orderId" class="form-label">발주코드</label>
+                        <input type="text" name="orderId" id="orderId" class="form-control">
                     </div>
-                </div>
 
-                <!-- 납기일자 -->
-                <div class="col-md-4">
-                    <label class="form-label">납기일자</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="date" name="dueDateFrom" class="form-control">
-                        <span class="px-1">~</span>
-                        <input type="date" name="dueDateTo" class="form-control">
+                    <!-- 자재명 -->
+                    <div class="col-md-2">
+                        <label for="matName" class="form-label">자재명</label>
+                        <input type="text" name="matName" id="matName" class="form-control">
                     </div>
-                </div>
 
-                <!-- 버튼 -->
-                <div class="col-12 text-end mt-4">
-                    <button type="button" class="btn btn-primary me-2" onclick="search()"><i class="bi bi-search"></i> 검색</button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="reset()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
-                </div>
+                    <!-- 발주일자 -->
+                    <div class="col-md-4">
+                        <label class="form-label">발주일자</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" name="orderDateStart" class="form-control"
+                                   th:value="${pageRequestDTO.orderDateStart != null ?
+                                   #temporals.format(pageRequestDTO.orderDateStart, 'yyyy-MM-dd') : ''}">
+                            <span class="px-1">~</span>
+                            <input type="date" name="orderDateEnd" class="form-control"
+                                   th:value="${pageRequestDTO.orderDateEnd != null ?
+                                   #temporals.format(pageRequestDTO.orderDateEnd, 'yyyy-MM-dd') : ''}">
+                        </div>
+                    </div>
 
+                    <!-- 납기일자 -->
+                    <div class="col-md-4">
+                        <label class="form-label">납기일자</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" name="orderEndStart" class="form-control"
+                                   th:value="${pageRequestDTO.orderEndStart != null ?
+                                   #temporals.format(pageRequestDTO.orderEndStart, 'yyyy-MM-dd') : ''}">
+                            <span class="px-1">~</span>
+                            <input type="date" name="orderEndEnd" class="form-control"
+                                   th:value="${pageRequestDTO.orderEndEnd != null ?
+                                   #temporals.format(pageRequestDTO.orderEndEnd, 'yyyy-MM-dd') : ''}">
+                        </div>
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="col-12 text-end mt-4">
+                        <button type="submit" class="btn btn-primary me-2"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary clearBtn"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                    </div>
+
+                </div>
             </div>
-        </div>
+        </form>
+
+<!--        <input type="hidden" th:value="${dto.drId}" id="drId">-->
 
         <div class="card p-4">
             <table class="table table-hover table-bordered text-center">
@@ -70,30 +82,20 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>PO202504001</td>
-                    <td>모터</td>
-                    <td>2025-04-10</td>
-                    <td>2025-04-30</td>
-                    <td>100</td>
-                    <td>30</td>
-                    <td class="text-center"><span class="badge bg-warning text-dark">진행중</span></td>
+                <tr th:each="dto:${responseDTO.dtoList}">
+                    <td th:text="${dto.orderId}"></td>  <!-- orderId -->
+                    <td th:text="${dto.matName}"></td>  <!-- matName -->
+                    <td th:text="${dto.orderDate}"></td>  <!-- orderDate -->
+                    <td th:text="${dto.orderEnd}"></td>  <!-- orderEnd -->
+                    <td th:text="${dto.orderQty}"></td>  <!-- orderQty -->
+                    <td th:text="${dto.drTotalQty}"></td>  <!-- drTotalQty -->
                     <td class="text-center">
-                        <button class="btn btn-sm btn-outline-primary" onclick="goToInstruction('PO202504001')">납입지시
-                        </button>
+                        <span th:text="${dto.drStatus}" th:classappend="' badge ' + (${dto.drStatus} == '완료' ? 'bg-success' : 'bg-warning')"></span>
                     </td>
-                </tr>
-                <tr>
-                    <td>PO202504002</td>
-                    <td>컨트롤러</td>
-                    <td>2025-04-12</td>
-                    <td>2025-05-01</td>
-                    <td>50</td>
-                    <td>50</td>
-                    <td class="text-center"><span class="badge bg-success">완료</span></td>
                     <td class="text-center">
-                        <button class="btn btn-sm btn-outline-primary" onclick="goToInstruction('PO202504002')">납입지시
-                        </button>
+                        <button class="btn btn-sm btn-outline-primary"
+                                th:attr="data-order-id=${dto.orderId}"
+                                onclick="goToInstruction(this)">납입지시</button>
                     </td>
                 </tr>
                 </tbody>
@@ -102,17 +104,20 @@
     </div>
 
     <script>
-        //추가
-        function search() {
-            alert('검색 기능은 구현 예정입니다.');
-        }
 
-        function reset() {
-            document.querySelectorAll('input[type="text"], input[type="date"], select').forEach(input => input.value = '');
-        }
+        document.querySelector(".clearBtn").addEventListener("click", function (e) {
+            e.preventDefault()
+            e.stopPropagation()
 
-        function goToInstruction(orderCode) {
-            window.location.href = `/internal/delivery/instruction?orderCode=${orderCode}`;
+            self.location = '/internal/delivery/request'
+        }, false)
+
+        function goToInstruction(button) {
+            var orderId = button.getAttribute('data-order-id'); // data-order-id 값을 가져옵니다.
+
+            console.log(orderId)
+
+            window.location.href = '/internal/delivery/instruction?orderId=' + encodeURIComponent(orderId);
         }
     </script>
 </th:block>

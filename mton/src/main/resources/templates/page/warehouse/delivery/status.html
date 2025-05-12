@@ -10,66 +10,84 @@
 
 <th:block layout:fragment="delivery-status">
     <div class="container py-5">
-        <h2 class="mb-4">납입지시 조회</h2>
-        <div class="card p-4 mb-4">
-            <div class="row g-3 align-items-end">
+        <form action="/internal/delivery/status" method="get">
+            <h2 class="mb-4">납입지시 조회</h2>
+            <div class="card p-4 mb-4">
+                <div class="row g-3 align-items-end">
 
-                <!-- 납입지시코드 -->
-                <div class="col-md-4">
-                    <label for="deliveryCode" class="form-label">납입지시코드</label>
-                    <input type="text" name="deliveryCode" id="deliveryCode" class="form-control">
-                </div>
-
-                <!-- 발주코드 -->
-                <div class="col-md-4">
-                    <label for="orderCode" class="form-label">발주코드</label>
-                    <input type="text" name="orderCode" id="orderCode" class="form-control">
-                </div>
-
-                <!-- 자재명 -->
-                <div class="col-md-4">
-                    <label for="materialName" class="form-label">자재명</label>
-                    <input type="text" name="materialName" id="materialName" class="form-control">
-                </div>
-
-                <!-- 납기일자 -->
-                <div class="col-md-4">
-                    <label class="form-label">납기일자</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="date" name="dueDateFrom" class="form-control">
-                        <span class="px-1">~</span>
-                        <input type="date" name="dueDateTo" class="form-control">
+                    <!-- 납입지시코드 -->
+                    <div class="col-md-4">
+                        <label for="drItemCode" class="form-label">납입지시코드</label>
+                        <input type="text" name="drItemCode" id="drItemCode"
+                               th:value="${pageRequestDTO.drItemCode}" class="form-control">
                     </div>
-                </div>
 
-                <!-- 납입지시일자 -->
-                <div class="col-md-4">
-                    <label class="form-label">납입지시일자</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="date" name="deliveryDateFrom" class="form-control">
-                        <span class="px-1">~</span>
-                        <input type="date" name="deliveryDateTo" class="form-control">
+                    <!-- 발주코드 -->
+                    <div class="col-md-4">
+                        <label for="orderId" class="form-label">발주코드</label>
+                        <input type="text" name="orderId" id="orderId"
+                               th:value="${pageRequestDTO.orderId}" class="form-control">
                     </div>
-                </div>
 
-                <!-- 납입지시등록일 -->
-                <div class="col-md-4">
-                    <label class="form-label">납입지시 등록일</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="date" name="regDateFrom" class="form-control">
-                        <span class="px-1">~</span>
-                        <input type="date" name="regDateTo" class="form-control">
+                    <!-- 자재명 -->
+                    <div class="col-md-4">
+                        <label for="matName" class="form-label">자재명</label>
+                        <input type="text" name="matName" id="matName"
+                               th:value="${pageRequestDTO.matName}" class="form-control">
                     </div>
-                </div>
 
-                <!-- 버튼 영역 -->
-                <div class="col-12 text-end mt-4">
-                    <button type="button" class="btn btn-primary me-2" onclick="search()"><i class="bi bi-search"></i> 검색</button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="reset()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
-                </div>
+                    <!-- 납기일자 -->
+                    <div class="col-md-4">
+                        <label class="form-label">납기일자</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" name="orderEndStart" class="form-control"
+                                   th:value="${pageRequestDTO.orderEndStart != null ?
+                                   #temporals.format(pageRequestDTO.orderEndStart, 'yyyy-MM-dd') : ''}">
+                            <span class="px-1">~</span>
+                            <input type="date" name="orderEndEnd" class="form-control"
+                                   th:value="${pageRequestDTO.orderEndEnd != null ?
+                                   #temporals.format(pageRequestDTO.orderEndEnd, 'yyyy-MM-dd') : ''}">
+                        </div>
+                    </div>
 
+                    <!-- 납입지시일자 -->
+                    <div class="col-md-4">
+                        <label class="form-label">납입지시일자</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" name="drItemDueDateStart" class="form-control"
+                                   th:value="${pageRequestDTO.drItemDueDateStart != null ?
+                                   #temporals.format(pageRequestDTO.drItemDueDateStart, 'yyyy-MM-dd') : ''}">
+                            <span class="px-1">~</span>
+                            <input type="date" name="drItemDueDateEnd" class="form-control"
+                                   th:value="${pageRequestDTO.drItemDueDateEnd != null ?
+                                   #temporals.format(pageRequestDTO.drItemDueDateEnd, 'yyyy-MM-dd') : ''}">
+                        </div>
+                    </div>
+
+                    <!-- 납입지시등록일 -->
+                    <div class="col-md-4">
+                        <label class="form-label">납입지시 등록일</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" name="creDateStart" class="form-control"
+                                   th:value="${pageRequestDTO.creDateStart != null ?
+                                   #temporals.format(pageRequestDTO.creDateStart, 'yyyy-MM-dd') : ''}">
+                            <span class="px-1">~</span>
+                            <input type="date" name="creDateEnd" class="form-control"
+                                   th:value="${pageRequestDTO.creDateEnd != null ?
+                                   #temporals.format(pageRequestDTO.creDateEnd, 'yyyy-MM-dd') : ''}">
+                        </div>
+                    </div>
+
+                    <!-- 버튼 영역 -->
+                    <div class="col-12 text-end mt-4">
+                        <button type="submit" class="btn btn-primary me-2"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary clearBtn"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                    </div>
+
+                </div>
             </div>
-        </div>
+
+        </form>
 
         <div class="card p-4">
             <table class="table table-bordered table-hover text-center">
@@ -83,34 +101,34 @@
                     <th>납입지시일자</th>
                     <th>지시수량</th>
                     <th>납입지시등록일</th>
+                    <th>창고</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>DI202504001</td>
-                    <td>PO202504001</td>
-                    <td>모터</td>
-                    <td>2025-04-30</td>
-                    <td>100</td>
-                    <td>2025-04-25</td>
-                    <td>30</td>
-                    <td>2025-04-24</td>
-                </tr>
-                <tr>
-                    <td>DI202504002</td>
-                    <td>PO202504002</td>
-                    <td>컨트롤러</td>
-                    <td>2025-05-01</td>
-                    <td>50</td>
-                    <td>2025-04-28</td>
-                    <td>50</td>
-                    <td>2025-04-26</td>
+                <tr th:each="item : ${drItemList}">
+                    <td th:text="${item.drItemCode}"></td>
+                    <td th:text="${item.orderId}"></td>
+                    <td th:text="${item.matName}"></td>
+                    <td th:text="${item.orderEnd}"></td>
+                    <td th:text="${item.orderQty}"></td>
+                    <td th:text="${item.drItemDueDate}"></td>
+                    <td th:text="${item.drItemQty}"></td>
+                    <td th:text="${#temporals.format(item.creDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td th:text="${item.cstorageId}"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/internal/delivery/status'
+    }, false)
+</script>
 
 </body>
 </html>

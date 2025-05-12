@@ -3,14 +3,21 @@ package org.zerock.b01.controller.partner;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.zerock.b01.dto.PageRequestDTO;
+import org.zerock.b01.dto.PageResponseDTO;
+import org.zerock.b01.dto.warehouse.DeliveryPartnerDTO;
+import org.zerock.b01.service.warehouse.DeliveryPartnerService;
 
 @Controller
 @Log4j2
 @RequiredArgsConstructor
 @RequestMapping("/external")
 public class PartnerController {
+
+    private final DeliveryPartnerService deliveryPartnerService;
     // 계약 정보 열람
     @GetMapping("/contract/view")
     public String contractViewGet() {
@@ -41,9 +48,18 @@ public class PartnerController {
         return "/page/partner/trans";
     }
 
-    // 납품 지시 요청
+    // 협력사 납품 지시 요청
     @GetMapping("/delivery")
-    public String deliveryGet() {
+    public String listDeliveryRequestItems(PageRequestDTO pageRequestDTO, Model model) {
+
+        // 전체 납입지시 상세 항목 페이징 조회
+        PageResponseDTO<DeliveryPartnerDTO> drPartnerList =
+                deliveryPartnerService.listWithDeliveryPartner(pageRequestDTO);
+
+        model.addAttribute("drPartnerList", drPartnerList.getDtoList());
+        model.addAttribute("pageRequestDTO", pageRequestDTO);
+        model.addAttribute("totalCount", drPartnerList.getTotal());
+
         return "/page/partner/delivery";
     }
 }

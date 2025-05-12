@@ -4,6 +4,8 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Check;
 
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 
 @Entity
@@ -12,7 +14,7 @@ import java.util.Date;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class Order {
+public class Ordering {
     @Id
     private String orderId;
 
@@ -25,10 +27,10 @@ public class Order {
     private ProcurementPlan procurementPlan;
 
     @Column(nullable = false)
-    private Date orderDate;
+    private LocalDate orderDate;
 
     @Column(nullable = false)
-    private Date orderEnd;
+    private LocalDate orderEnd;
 
     @Column(nullable = false)
     private int orderQty;

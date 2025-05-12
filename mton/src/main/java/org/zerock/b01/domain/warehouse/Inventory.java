@@ -14,18 +14,18 @@ public class Inventory {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private int inventoryId;
+  private Long inventoryId;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "cstorage_id", nullable = false)
   private CompanyStorage companyStorage;
 
   @ManyToOne
-  @JoinColumn(nullable = false)
+  @JoinColumn(name = "mat_id", nullable = false)
   private Material material;
 
   @Column(nullable = false)
-  private int totalPrice;
+  private Long totalPrice;
 
   @Column(nullable = false)
   private int totalQty;

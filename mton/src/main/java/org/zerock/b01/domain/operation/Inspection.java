@@ -17,7 +17,7 @@ public class Inspection {
 
     @ManyToOne
     @JoinColumn(name = "order_id", nullable = false)
-    private Order order;
+    private Ordering ordering;
 
     @Column(nullable = false)
     private Date insStart;

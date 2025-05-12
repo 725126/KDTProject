@@ -10,51 +10,68 @@
 
 <th:block layout:fragment="delivery">
     <div class="container py-5">
-        <h2 class="mb-4">납품지시요청</h2>
+        <form action="/external/delivery" method="get">
+            <h2 class="mb-4">납품지시요청</h2>
 
-        <!-- 검색 영역 -->
-        <div class="card p-4 mb-4">
-            <div class="row g-3 align-items-end">
+            <!-- 검색 영역 -->
+            <div class="card p-4 mb-4">
+                <div class="row g-3 align-items-end">
 
-                <!-- 납품지시코드 -->
-                <div class="col-md-2">
-                    <label for="deliveryCode" class="form-label">납품지시코드</label>
-                    <input type="text" class="form-control" id="deliveryCode" placeholder="납품지시코드">
-                </div>
-
-                <!-- 발주코드 -->
-                <div class="col-md-2">
-                    <label for="orderCode" class="form-label">발주코드</label>
-                    <input type="text" class="form-control" id="orderCode" placeholder="발주코드">
-                </div>
-
-                <!-- 자재명 -->
-                <div class="col-md-2">
-                    <label for="materialName" class="form-label">자재명</label>
-                    <input type="text" class="form-control" id="materialName" placeholder="자재명">
-                </div>
-
-                <!-- 납품요청일 -->
-                <div class="col-md-6">
-                    <label class="form-label">납품요청일</label>
-                    <div class="d-flex align-items-center gap-2">
-                        <input type="date" class="form-control" id="requestDateFrom">
-                        <span class="px-1">~</span>
-                        <input type="date" class="form-control" id="requestDateTo">
+                    <!-- 납품지시코드 -->
+                    <div class="col-md-2">
+                        <label for="drItemCode" class="form-label">납품지시코드</label>
+                        <input type="text" class="form-control" id="drItemCode" name="drItemCode"
+                               th:value="${pageRequestDTO.drItemCode}" placeholder="납품지시코드">
                     </div>
-                </div>
 
-                <!-- 버튼 -->
-                <div class="col-12 text-end mt-4">
-                    <button class="btn btn-primary me-2" onclick="search()"><i class="bi bi-search"></i> 검색</button>
-                    <button class="btn btn-outline-secondary" onclick="resetSearch()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
-                </div>
+                    <!-- 발주코드 -->
+                    <div class="col-md-2">
+                        <label for="orderId" class="form-label">발주코드</label>
+                        <input type="text" class="form-control" id="orderId" name="orderId"
+                               th:value="${pageRequestDTO.orderId}" placeholder="발주코드">
+                    </div>
 
+                    <!-- 자재명 -->
+                    <div class="col-md-2">
+                        <label for="matName" class="form-label">자재명</label>
+                        <input type="text" class="form-control" id="matName" name="matName"
+                               th:value="${pageRequestDTO.matName}" placeholder="자재명">
+                    </div>
+
+                    <!-- 납품요청일 -->
+                    <div class="col-md-6">
+                        <label class="form-label">납품요청일</label>
+                        <div class="d-flex align-items-center gap-2">
+                            <input type="date" class="form-control" name="drItemDueDateStart"
+                                   th:value="${pageRequestDTO.drItemDueDateStart != null ?
+                                   #temporals.format(pageRequestDTO.drItemDueDateStart, 'yyyy-MM-dd') : ''}">
+                            <span class="px-1">~</span>
+                            <input type="date" class="form-control" name="drItemDueDateEnd"
+                                   th:value="${pageRequestDTO.drItemDueDateEnd != null ?
+                                   #temporals.format(pageRequestDTO.drItemDueDateEnd, 'yyyy-MM-dd') : ''}">
+                        </div>
+                    </div>
+
+                    <!-- 버튼 -->
+                    <div class="col-12 text-end mt-4">
+                        <button type="submit" class="btn btn-primary me-2"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary clearBtn"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                    </div>
+
+                </div>
             </div>
-        </div>
+        </form>
+
 
         <!-- 테이블 -->
         <div class="card p-4">
+            <div class="text-end mt-3">
+                <button type="button" class="btn btn-success me-2" id="partialDeliveryBtn">부분출고</button>
+                <button type="button" class="btn btn-danger" id="fullDeliveryBtn">출고</button>
+            </div>
+
+            <br>
+
             <table id="requestTable" class="table table-bordered table-hover text-center">
                 <thead class="table-light">
                 <tr>
@@ -71,23 +88,143 @@
                 </tr>
                 </thead>
                 <tbody id="requestBody">
-                <tr>
+                <tr th:each="partner : ${drPartnerList}" th:data-id="${partner.deliveryPartnerId}">
                     <td><input type="checkbox" class="rowCheck"></td>
-                    <td>D2025042401</td>
-                    <td>PO24041201</td>
-                    <td>배터리</td>
-                    <td>100</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td class="remaining">100</td>
-                    <td>2025-04-25</td>
-                    <td class="text-center"><span class="badge bg-warning text-dark">요청중</span></td>
+                    <td th:text="${partner.drItemCode}"></td>
+                    <td th:text="${partner.orderId}"></td>
+                    <td th:text="${partner.matName}"></td>
+                    <td th:text="${partner.drItemQty}"></td>
+                    <td th:text="${partner.deliveryPartnerQty}"></td>
+                    <td th:text="${partner.incomingReturnQty}"></td>
+                    <td th:text="${partner.drItemQty - partner.deliveryPartnerQty + partner.incomingReturnQty}"></td>
+                    <td th:text="${partner.drItemDueDate}"></td>
+                    <td class="text-center"><span class="badge bg-warning text-dark" th:text="${partner.deliveryPartnerStatus}"></span></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/external/delivery'
+    }, false)
+
+    // 체크박스 전체 선택
+    function toggleAll(source) {
+        document.querySelectorAll(".rowCheck").forEach(cb => cb.checked = source.checked);
+    }
+
+    // 부분출고 버튼
+    document.getElementById("partialDeliveryBtn").addEventListener("click", function () {
+        const checkedRows = document.querySelectorAll(".rowCheck:checked");
+
+        if (checkedRows.length !== 1) {
+            alert("부분출고는 하나만 선택할 수 있습니다.");
+            return;
+        }
+
+        const row = checkedRows[0].closest("tr");
+        const deliveryPartnerId = row.getAttribute("data-id");
+
+        // 남은 수량 읽어올 때 trim + 10진수 파싱
+        const remainingQtyText = row.children[7].innerText.trim();
+        const remainingQty = parseInt(remainingQtyText, 10);
+
+        const inputQty = prompt("출고할 수량을 입력하세요 (남은 수량: " + remainingQty + "):");
+        if (inputQty === null) {
+            return; // 취소 누르면 중단
+        }
+
+        // 입력값도 trim + 10진수 파싱
+        const qty = parseInt(inputQty.trim(), 10);
+
+        // 유효성 검사: 숫자, 양수, 남은 수량 초과 금지
+        if (isNaN(qty) || qty <= 0 || qty > remainingQty) {
+            alert(`유효한 수량이 아닙니다.\n남은 출고 가능 수량: ${remainingQty}개 이하로 입력하세요.`);
+            return;
+        }
+
+        // 그대로 fetch 호출
+        fetch('/api/delivery/partial', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                deliveryPartnerId: deliveryPartnerId,
+                deliveryPartnerQty: qty
+            })
+        }).then(res => {
+            if (res.ok) {
+                alert("부분출고가 완료되었습니다.");
+                location.reload();
+            } else {
+                alert("출고 처리 중 오류 발생.");
+            }
+        }).catch(err => {
+            console.error(err);
+            alert("서버 통신 중 오류가 발생했습니다.");
+        });
+    });
+
+    // 전체출고 버튼
+    document.getElementById("fullDeliveryBtn").addEventListener("click", function () {
+        const selected = Array.from(document.querySelectorAll(".rowCheck:checked"));
+
+        if (selected.length === 0) {
+            alert("출고할 항목을 선택하세요.");
+            return;
+        }
+
+        const dtoList = selected.map(cb => {
+            const row = cb.closest("tr");
+            const deliveryPartnerId = row.getAttribute("data-id");
+            const remainingQty = parseInt(row.children[7].innerText);
+
+            return {
+                deliveryPartnerId: deliveryPartnerId,
+                deliveryPartnerQty: remainingQty
+            };
+        });
+
+        fetch('/api/delivery/full', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify(dtoList)
+        }).then(res => {
+            if (res.ok) {
+                alert("출고가 완료되었습니다.");
+                location.reload();
+            } else {
+                alert("출고 처리 중 오류 발생.");
+            }
+        });
+    });
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelectorAll(".rowCheck").forEach(cb => {
+            const row = cb.closest("tr");
+            const remainingQtyText = row.children[7].innerText.trim();
+            const remainingQty = parseInt(remainingQtyText, 10);
+
+            if (remainingQty <= 0) {
+                // 체크박스 비활성화
+                cb.disabled = true;
+                // 체크박스만 반투명하게
+                cb.style.opacity = "0.4";
+                // 툴팁으로 안내
+                cb.title = "남은 수량이 없어 선택할 수 없습니다.";
+            }
+        });
+    });
+
+</script>
 
 </body>
 </html>

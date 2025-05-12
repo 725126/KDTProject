@@ -24,25 +24,38 @@
                     </tr>
                 </thead>
                 <tr>
-                    <td id="orderCode" class="value-box">OR-20250401</td>
-                    <td id="materialName" class="value-box">가이던스 FV 그립 핸들</td>
-                    <td id="dueDate" class="value-box">2025-05-20</td>
-                    <td id="orderQty" class="value-box">100</td>
+                    <td id="orderId" class="value-box">[[${dto.orderId}]]</td>
+                    <td id="matName" class="value-box">[[${dto.matName}]]</td>
+                    <td id="orderEnd" class="value-box">[[${dto.orderEnd}]]</td>
+                    <td id="orderQty" class="value-box">[[${dto.orderQty}]]</td>
                 </tr>
             </table>
+
+            <input type="hidden" id="drId" name="drId" th:value="${dto.drId}">
         </div>
 
         <!-- 납입지시 입력 및 버튼 영역 -->
         <div class="card p-4 mb-4">
             <div class="input-group d-flex gap-3 align-items-end flex-wrap">
                 <div class="col-md-2 form-item">
-                    <label for="deliveryDate" class="mb-2">납입지시일자</label>
-                    <input type="date" id="deliveryDate" class="form-control">
+                    <label for="drItemDueDate" class="mb-2">납입지시일자</label>
+                    <input type="date" id="drItemDueDate" class="form-control">
                 </div>
                 <div class="col-md-2 form-item">
-                    <label for="deliveryQty" class="mb-2">지시수량</label>
-                    <input type="number" id="deliveryQty" class="form-control" min="1">
+                    <label for="drItemQty" class="mb-2">지시수량</label>
+                    <input type="number" id="drItemQty" class="form-control" min="1">
                 </div>
+
+                <div class="col-md-3 form-item">
+                    <label for="cstorage" class="mb-2">창고</label>
+                    <select id="cstorage" class="form-control">
+                        <option value="">창고를 선택하세요</option>
+                        <th:block th:each="storage : ${companyStorageList}">
+                            <option th:value="${storage.cstorageId}" th:text="${storage.cstorageId}"></option>
+                        </th:block>
+                    </select>
+                </div>
+
                 <div class="col-12 text-end">
                     <button id="addButton" class="btn btn-primary rounded me-1" onclick="addInstruction()">
                         <i class="bi bi-plus-circle me-1"></i> 지시 추가
@@ -52,8 +65,12 @@
                         <i class="bi bi-pencil-square me-1"></i> 수정 완료
                     </button>
 
-                    <button class="btn btn-danger rounded me-1" onclick="deleteLastInstruction()">
+                    <button id="removeButton" class="btn btn-danger rounded me-1" onclick="deleteLastInstruction()">
                         <i class="bi bi-trash me-1"></i> 지시 삭제
+                    </button>
+
+                    <button id="cancelButton" class="btn btn-outline-secondary rounded me-1" style="display:none;" onclick="cancelEdit()">
+                        <i class="bi bi-x-circle me-1"></i> 수정 취소
                     </button>
 
                     <button class="btn btn-outline-dark rounded me-1" onclick="goBackToRequestPage()">
@@ -72,29 +89,405 @@
                     <th>납입지시일자</th>
                     <th>지시수량</th>
                     <th>납입지시등록일</th>
+                    <th>창고</th>
                     <th>수정</th>
                 </tr>
                 </thead>
                 <tbody id="instructionTable">
-                <tr>
-                    <td>DEL-20250418-01</td>
-                    <td>2025-05-10</td>
-                    <td>50</td>
-                    <td>2025-04-18</td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-primary">수정</button>
-                    </td>
-                </tr>
+                    <tr th:each="item : ${drItemList}">
+                        <td th:text="${item.drItemCode}"></td>
+                        <td th:text="${item.drItemDueDate}"></td>
+                        <td th:text="${item.drItemQty}"></td>
+                        <td th:text="${#temporals.format(item.creDate, 'yyyy-MM-dd HH:mm:ss')}"></td>
+                        <td th:text="${item.cstorageId}"></td>
+                        <td class="text-center">
+                            <button class="btn btn-sm btn-outline-primary" th:data-dr-item-id="${item.drItemId}"  onclick="editInstruction(this)">수정</button>
+                        </td>
+                    </tr>
+
                 </tbody>
             </table>
 
             <!-- 총 지시수량 표시 -->
             <div class="summary ms-auto">
-                총 지시수량: <span id="totalQty">50</span> / <span id="maxQty">100</span>
+                총 지시수량: <span id="drTotalQty">0</span> / <span>[[${dto.orderQty}]]</span>
             </div>
         </div>
     </div>
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+
+    // 오늘 날짜를 최소 날짜로 설정
+    const today = new Date().toISOString().split('T')[0];
+    document.getElementById('drItemDueDate').setAttribute('min', today);
+    // 납기일자를 받아오는 코드
+    const maxOrderEnd = document.getElementById('orderEnd').textContent.trim() || document.getElementById('orderEnd').innerText.trim();
+    // 납기일자보다 이후 날짜는 선택할 수 없도록 최대 날짜 설정
+    document.getElementById('drItemDueDate').setAttribute('max', maxOrderEnd);
+
+    let lastEnteredDate = today; // 최초 등록 날짜는 오늘로 설정
+    let editingRow = null;  // 수정 중인 행 저장
+    let lastDrItemDueDate = null;
+
+    // 페이지 로딩 후 총 지시수량을 계산하는 함수
+    function updateTotalQty() {
+        let totalQty = 0;
+        const rows = document.getElementById('instructionTable').rows;
+
+        // 각 행을 순회하여 drItemQty 합산
+        for (let i = 0; i < rows.length; i++) {
+            const drItemQty = parseInt(rows[i].cells[2].textContent);
+            if (!isNaN(drItemQty)) {
+                totalQty += drItemQty;
+            }
+        }
+
+        // 총 지시수량 업데이트
+        document.getElementById('drTotalQty').textContent = totalQty;
+    }
+
+    // 페이지 로드 시 총 지시수량 업데이트
+    document.addEventListener('DOMContentLoaded', updateTotalQty);
+
+    // 페이지 로드 후 첫 번째 drItemId로 최신 납입지시일자 조회
+    document.addEventListener('DOMContentLoaded', () => {
+        const drId = document.getElementById('drId').value;
+        if (drId) {
+            getLastDrItemDueDate(drId); // ← 여기서 이 함수 사용
+        }
+    });
+
+    function parseDateOnly(dateStr) {
+        // "yyyy-MM-dd" 문자열을 로컬 시간 기준으로 Date 객체 생성
+        const [year, month, day] = dateStr.split('-').map(Number);
+        return new Date(year, month - 1, day); // month는 0부터 시작
+    }
+
+    // 최신 납입지시일자 조회 함수
+    function getLastDrItemDueDate(drId) {
+        fetch(`/api/delivery-request/last-dr-item-due-date/${drId}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.status === 'success') {
+                    // 최신 납입지시일자 받아오기
+                    lastDrItemDueDate = data.lastDrItemDueDate;
+
+                    console.log('최신 납입지시일자:', lastDrItemDueDate);
+
+                    // 최신 날짜를 처리할 추가 로직을 여기에 추가할 수 있습니다.
+                    // 예를 들어, 드롭다운에 표시하거나 입력 값과 비교하는 로직 추가
+
+                } else {
+                    console.error('오류 발생:', data.message);
+                }
+            })
+            .catch(error => {
+                console.error('API 호출 중 오류 발생:', error);
+            });
+    }
+
+
+    // 지시 추가 버튼 클릭 시 호출되는 함수
+    function addInstruction() {
+        // 입력된 값 가져오기
+        const drItemDueDate = document.getElementById('drItemDueDate').value;
+        const drItemQty = document.getElementById('drItemQty').value;
+        const cstorageId = document.getElementById('cstorage').value;
+        const drId = document.getElementById('drId').value;
+        const creDate = new Date().toISOString();
+        const currentTotal = parseInt(document.getElementById('drTotalQty').textContent);
+        const maxOrderQty = parseInt(document.getElementById('orderQty').textContent || document.getElementById('orderQty').innerText);
+        const remainingQty = maxOrderQty - currentTotal;
+
+        let errorMessages = [];
+
+        // 입력 값 체크
+        if (!drItemDueDate || !drItemQty || !cstorageId) {
+            errorMessages.push('모든 필드를 입력해주세요.');
+        }
+
+        if (drItemQty < 0) {
+            errorMessages.push('수량은 음수일 수 없습니다.');
+        }
+
+        if (lastDrItemDueDate && parseDateOnly(drItemDueDate) < parseDateOnly(lastDrItemDueDate)) {
+            errorMessages.push(`입력된 납입지시일자(${drItemDueDate})가 이전 납입지시일자(${lastDrItemDueDate})보다 이전입니다. ${lastDrItemDueDate} 이후 날짜를 입력해주세요`);
+        }
+
+        if (currentTotal + parseInt(drItemQty) > maxOrderQty) {
+            errorMessages.push(`총 지시수량이 발주량을 초과할 수 없습니다.\n현재 남은 수량은 ${remainingQty}입니다.`);
+        }
+
+        // 오류가 하나라도 있으면 모두 보여주기
+        if (errorMessages.length > 0) {
+            alert(errorMessages.join('\n\n'));
+            return;
+        }
+
+        // 서버로 AJAX 요청 보내기
+        fetch('/api/delivery-request/', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                drId: drId,
+                drItemDueDate: drItemDueDate,
+                drItemQty: drItemQty,
+                cstorageId: cstorageId,
+                creDate: creDate,
+            })
+        })
+            .then(response => response.json())
+            .then(data => {
+                console.log(data);
+
+                const drItemId = data.drItemId;
+                const drItemCode = data.drItemCode;
+                const creDate = data.creDate;
+
+
+                addRowToTable(drItemId, drItemCode, drItemDueDate, drItemQty, creDate, cstorageId);
+
+                // 입력 필드 초기화
+                document.getElementById('drItemDueDate').value = '';
+                document.getElementById('drItemQty').value = '';
+                document.getElementById('cstorage').value = '';
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+    }
+
+    // 테이블에 새로운 행 추가
+    function addRowToTable(drItemId, drItemCode, drItemDueDate, drItemQty, creDate, cstorageId) {
+        const table = document.getElementById('instructionTable');
+
+        // 새 행 생성
+        const newRow = document.createElement('tr');
+
+        // 새 행에 데이터 추가
+        newRow.innerHTML = `
+            <td>${drItemCode}</td>
+            <td>${drItemDueDate}</td>
+            <td>${drItemQty}</td>
+            <td>${creDate}</td>
+            <td>${cstorageId}</td>
+            <td class="text-center">
+                <button class="btn btn-sm btn-outline-primary"
+                data-dr-item-id="${drItemId}"
+                onclick="editInstruction(this)">수정</button>
+            </td>
+        `;
+
+        // 테이블에 새 행 추가
+        table.appendChild(newRow);
+
+        // 총 지시수량 갱신
+        updateTotalQty();
+
+        if (drItemDueDate > lastEnteredDate) {
+            lastEnteredDate = drItemDueDate;
+        }
+    }
+
+    // 수정 취소 버튼 클릭 시 호출되는 함수
+    function cancelEdit() {
+        // 입력 값 초기화
+        document.getElementById('drItemDueDate').value = '';
+        document.getElementById('drItemQty').value = '';
+        document.getElementById('cstorage').value = '';
+
+        // 버튼 상태 초기화
+        document.getElementById('updateButton').style.display = 'none'; // 수정 완료 버튼 숨기기
+        document.getElementById('addButton').style.display = 'inline-block'; // 지시 추가 버튼 보이기
+
+        // 수정 취소 버튼 숨기기
+        document.getElementById('cancelButton').style.display = 'none';
+        document.getElementById('removeButton').style.display = 'inline-block';
+
+        // 수정 중인 행 초기화
+        editingRow = null;
+    }
+
+    // 수정 버튼 클릭 시 호출되는 함수
+    function editInstruction(button) {
+        const row = button.closest('tr');
+        const drItemDueDate = row.cells[1].textContent;
+        const drItemQty = row.cells[2].textContent;
+        const cstorageId = row.cells[4].textContent;
+
+        // 수정할 데이터를 텍스트 필드에 채우기
+        document.getElementById('drItemDueDate').value = drItemDueDate;
+        document.getElementById('drItemQty').value = drItemQty;
+        document.getElementById('cstorage').value = cstorageId;
+
+        // 수정 버튼을 수정 완료 버튼으로 변경
+        document.getElementById('updateButton').style.display = 'inline-block';
+        document.getElementById('addButton').style.display = 'none';
+
+        // 수정 취소 버튼을 보이게 설정
+        document.getElementById('cancelButton').style.display = 'inline-block';
+        document.getElementById('removeButton').style.display = 'none';
+
+        // 수정할 행을 저장
+        editingRow = row;
+    }
+
+    // 수정 완료 버튼 클릭 시 호출되는 함수
+    function updateInstruction() {
+
+        if (!confirm('정말로 이 내용을 수정하시겠습니까?')) {
+            return;
+        }
+
+        const drItemId = editingRow.querySelector('button').dataset.drItemId;
+        const drItemDueDate = document.getElementById('drItemDueDate').value;
+        const drItemQty = document.getElementById('drItemQty').value;
+        const cstorageId = document.getElementById('cstorage').value;
+
+        // 기존 행의 수량을 가져오기
+        const oldQty = parseInt(editingRow.cells[2].textContent); // 기존 수량
+        const currentTotal = parseInt(document.getElementById('drTotalQty').textContent);
+        const maxOrderQty = parseInt(document.getElementById('orderQty').textContent || document.getElementById('orderQty').innerText);
+        const remainingQty = maxOrderQty - (currentTotal - oldQty); // 수정 전 총 지시수량에서 기존 수량을 빼고 새 수량을 더함
+
+        if (drItemQty < 0) {
+            alert('수량은 음수일 수 없습니다.');
+            return;
+        }
+
+        // 새 수량이 남은 수량을 초과하는지 체크
+        if (drItemQty > remainingQty) {
+            alert(`총 지시수량이 발주량을 초과할 수 없습니다.\n현재 남은 수량은 ${remainingQty}입니다.`);
+            return;
+        }
+
+        // 수정할 행의 인덱스 구하기
+        const rowIndex = editingRow.rowIndex -1; // tbody 기준이라면 -1 필요할 수 있음
+        const table = document.getElementById('instructionTable');
+        const prevRow = table.rows[rowIndex - 1];
+        const nextRow = table.rows[rowIndex + 1];
+
+        const newDate = parseDateOnly(drItemDueDate);
+
+        // 첫 번째 행 수정 시
+        if (prevRow === undefined) {
+            console.log('첫 번째 행이므로 날짜 비교하지 않음');
+        } else {
+            const prevDate = parseDateOnly(prevRow.cells[1].textContent);
+            if (newDate <= prevDate) {
+                alert(`수정된 날짜는 이전 지시일자(${prevRow.cells[1].textContent})보다 커야 합니다.`);
+                return;
+            }
+        }
+
+        // 마지막 행 수정 시
+        if (nextRow === undefined) {
+            console.log('마지막 행이므로 날짜 비교하지 않음');
+        } else {
+            const nextDate = parseDateOnly(nextRow.cells[1].textContent);
+            if (newDate >= nextDate) {
+                alert(`수정된 날짜는 다음 지시일자(${nextRow.cells[1].textContent})보다 작아야 합니다.`);
+                return;
+            }
+        }
+
+
+        // 서버로 수정 요청 보내기
+        fetch(`/api/delivery-request/${drItemId}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({
+                drItemDueDate: drItemDueDate,
+                drItemQty: drItemQty,
+                cstorageId: cstorageId,
+            }),
+        })
+            .then(response => {
+                if (!response.ok) {
+                    // 서버에서 수정 실패 시
+                    return response.json().then(data => {
+                        const msg = data.message || '수정에 실패했습니다. 이미 출고된 수량보다 작게 수정할 수 없습니다.';
+                        alert(msg);
+                        // throw 대신 명시적인 리턴 (catch에서 처리 막기)
+                        return Promise.reject('handled');
+                    });
+                }
+                return response.json();
+            })
+            .then(data => {
+                // 수정이 성공한 경우 테이블 업데이트
+                if (data.drItemId) {
+                    editingRow.cells[1].textContent = drItemDueDate;
+                    editingRow.cells[2].textContent = drItemQty;
+                    editingRow.cells[4].textContent = cstorageId;
+
+                    updateTotalQty();
+
+                    // 버튼 상태 초기화
+                    document.getElementById('updateButton').style.display = 'none';
+                    document.getElementById('addButton').style.display = 'inline-block';
+
+                    // 입력값 초기화
+                    document.getElementById('drItemDueDate').value = '';
+                    document.getElementById('drItemQty').value = '';
+                    document.getElementById('cstorage').value = '';
+
+                    editingRow = null;
+
+                    alert('수정이 완료되었습니다.');
+                }
+            })
+            .catch(error => {
+                if (error === 'handled') return; // 이미 처리된 에러는 무시
+                console.error('Error:', error);
+                alert('서버 오류가 발생했습니다. 다시 시도해주세요.');
+            });
+    }
+
+    // 마지막 행 삭제 함수
+    function deleteLastInstruction() {
+        const table = document.getElementById('instructionTable');
+        if (table.rows.length > 0) {
+            const lastRow = table.rows[table.rows.length - 1];
+            const drItemId = lastRow.querySelector('button').dataset.drItemId;
+            console.log(drItemId);
+
+            // 사용자 확인
+            const confirmDelete = confirm("마지막 지시 항목을 삭제하시겠습니까?");
+            if (!confirmDelete) {
+                return; // 취소 시 아무 동작도 하지 않음
+            }
+
+            // 서버에서 삭제 요청
+            fetch(`/api/delivery-request/${drItemId}`, {
+                method: 'DELETE'
+            })
+                .then(response => {
+                    if (response.ok) {
+                        // 서버에서 삭제 성공, 테이블에서 해당 행 삭제
+                        lastRow.remove();
+
+                        // 총 지시수량 갱신
+                        updateTotalQty();
+                    } else {
+                        alert('이미 출고 된 항목은 삭제할 수 없습니다. ');
+                    }
+                })
+                .catch(error => {
+                    console.error('삭제 오류:', error);
+                });
+        }
+    }
+
+    // 요청페이지로 돌아가기
+    function goBackToRequestPage() {
+        window.location.href = '/internal/delivery/request';  // 요청페이지로 리디렉션
+    }
+</script>
 
 </body>
 </html>
