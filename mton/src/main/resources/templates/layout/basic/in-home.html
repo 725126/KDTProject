@@ -42,7 +42,12 @@
                 <span class="my-tog ms-2">▼</span>
             </button>
             <ul class="dropdown-menu border">
-                <li><a class="dropdown-item" href="/internal/my/account-edit">내 정보</a></li>
+                <li>
+                    <a class="dropdown-item" href="/internal/my/account-edit"
+                       onclick="sessionStorage.setItem('prevUrl', window.location.href)">
+                        내 정보
+                    </a>
+                </li>
                 <!-- import 필요 -->
                 <th:block th:with="ADMIN=${T(org.zerock.b01.domain.user.UserRole).ADMIN}">
 
@@ -124,8 +129,7 @@
 <div class="sidebar" id="sidebar">
     <div class="d-flex sidebar-header align-items-center">
         <h5 class="me-auto">
-            <i class="bi bi-arrow-down"></i>
-            <span class="manu-span">MANU</span> <i class="bi bi-clipboard"></i>
+            <span class="manu-span ms-2">MANU</span> <i class="bi bi-clipboard"></i>
         </h5>
 
         <button class="toggle-btn sidebar-toggler ">

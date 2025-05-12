@@ -27,12 +27,13 @@ public class GlobalControllerAdvice {
     public UserRole currentUserRole(@AuthenticationPrincipal CustomUserDetails userDetails) {
         log.info("Current user role: {}", userDetails);
 
-        if (userDetails != null) {
+        if (userDetails != null && userDetails.getUserRole() != null) {
             log.info("Current user role: {}", userDetails.getUserRole());
-            return userDetails.getUserRole(); // "ADMIN", "PARTNER" 등
+            return userDetails.getUserRole();
         }
         return null;
     }
+
 
     // 이름
     @ModelAttribute("currentUserName")

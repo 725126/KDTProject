@@ -36,11 +36,6 @@ import java.util.Optional;
 public class UserController {
     private final UserService userService;
 
-    // 관리자 마이페이지 > 회원정보 수정
-    // 헤더에 아이콘 메뉴 추가
-    // 관리자 탈퇴 기능 마무리 (사이드바 탈퇴 없애고 ... 비활성화 이런 거 넣어서 탈퇴 시키기)
-    // 관리페이지로 돌아가기 메뉴 추가
-
     // 회원 관리 - 인트로(로그인)
     @GetMapping("/intro")
     public String introGet(@AuthenticationPrincipal CustomUserDetails userDetails) {
@@ -339,7 +334,7 @@ public class UserController {
     public String myPageAccountDeleteGetIn(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
         UserResponseDTO userResponseDTO = userService.getUserInfoById(customUserDetails.getUserId());
-        model.addAttribute("uEmail", userResponseDTO.getUEmail());
+        model.addAttribute("userResponseDTO", userResponseDTO);
 
         return "page/user/my/account-delete";
     }
@@ -359,7 +354,7 @@ public class UserController {
     public String myPageAccountDeleteGetEx(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
         UserResponseDTO userResponseDTO = userService.getUserInfoById(customUserDetails.getUserId());
-        model.addAttribute("uEmail", userResponseDTO.getUEmail());
+        model.addAttribute("userResponseDTO", userResponseDTO);
 
         return "page/user/my/account-delete";
     }
@@ -376,35 +371,43 @@ public class UserController {
 
     // [공통] 마이페이지 > 회원탈퇴
     @PostMapping("/withdraw")
-    public String withdraw(@AuthenticationPrincipal CustomUserDetails userDetails,
+    public String withdraw(@RequestParam Long userId,
                            @RequestParam String reason,
                            @RequestParam(required = false) String customReason,
-                           HttpServletRequest request) {
+                           @AuthenticationPrincipal CustomUserDetails currentUser,
+                           HttpServletRequest request,
+                           RedirectAttributes redirectAttributes) {
 
         String finalReason = reason.equals("other") ? customReason : reason;
 
-        userService.deactivateUser(userDetails.getUserId(), finalReason);
+        userService.deactivateUser(userId, finalReason);
 
-        // 로그아웃 처리
-        HttpSession session = request.getSession(false);
-        if (session != null) {
-            session.invalidate();
+        // 탈퇴 성공 flag 추가
+        redirectAttributes.addFlashAttribute("withdrawSuccess", true);
+
+        // 현재 로그인한 사용자가 스스로 탈퇴한 경우 → 로그아웃
+        if (currentUser.getUserId().equals(userId)) {
+            HttpSession session = request.getSession(false);
+            if (session != null) {
+                session.invalidate();
+            }
+            SecurityContextHolder.clearContext();
+            return "redirect:/login?logout";
         }
-        SecurityContextHolder.clearContext();
 
-        return "redirect:/login?logout";
+        // 관리자가 타인 계정 탈퇴시 → 로그아웃 없이 관리자 마이페이지로 이동
+        return "redirect:/admin/my/user/" + userId;
     }
 
     // [공통] 마이페이지 > 내 정보 > 비밀번호 변경
     @PostMapping("/my/change-password")
-    public String changePassword(@AuthenticationPrincipal CustomUserDetails userDetails,
-                                 @RequestParam String currentPassword,
+    public String changePassword(@RequestParam String currentPassword,
                                  @RequestParam String newPassword,
                                  @RequestParam Long userId,
                                  RedirectAttributes redirectAttributes) {
 
         // 1. 사용자 정보 조회
-        User user = userService.getUserByEmail(userDetails.getUsername());
+        User user = userService.getUserById(userId);
 
         // 2. 현재 비밀번호 검증
         if (!userService.checkPasswordMatch(currentPassword, user.getUPassword())) {
@@ -412,7 +415,7 @@ public class UserController {
             redirectAttributes.addFlashAttribute("activeTab", "passwordTab");
 
             // [협력업체] 회원인 경우
-            if (userDetails.getUserRole().equals(UserRole.PARTNER)) {
+            if (user.getUserRole().equals(UserRole.PARTNER)) {
                 return "redirect:/external/my/account-edit";
             }
 
@@ -426,7 +429,7 @@ public class UserController {
         redirectAttributes.addFlashAttribute("activeTab", "passwordTab");
 
         // [협력업체] 회원인 경우
-        if (userDetails.getUserRole().equals(UserRole.PARTNER)) {
+        if (user.getUserRole().equals(UserRole.PARTNER)) {
             return "redirect:/external/my/account-edit";
         }
 
@@ -444,6 +447,7 @@ public class UserController {
             userService.updateUserInfo(dto.getUserId(), dto);
             redirectAttributes.addFlashAttribute("successEdit", "회원정보가 성공적으로 수정되었습니다.");
         } catch (Exception e) {
+            log.error(e.getMessage(), e);
             redirectAttributes.addFlashAttribute("errorEdit", "회원정보 수정 중 오류가 발생했습니다.");
         }
 
@@ -547,16 +551,20 @@ public class UserController {
         return "page/user/my/admin/user-list";
     }
 
+    // 관리자가 회원의 회원정보 수정
     @GetMapping("/admin/my/user/{id}")
     public String viewUser(@PathVariable("id") Long userId, Model model) {
         UserResponseDTO userDto = userService.getUserInfoById(userId);
         model.addAttribute("userResponseDTO", userDto);
-        model.addAttribute("isAdminEdit", true);
+
         return "page/user/my/account-edit";
     }
 
     @GetMapping("/admin/my/user-deleted/{id}")
     public String deleteUser(@PathVariable("id") Long userId, Model model) {
+        UserResponseDTO userDto = userService.getUserInfoById(userId);
+        model.addAttribute("userResponseDTO", userDto);
+
         return "page/user/my/account-delete";
     }
 

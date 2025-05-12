@@ -22,7 +22,7 @@
       <div class="bg-white p-3 border-rounded border">
 
         <!-- 기존에는 currentUserRole 기준으로 아이콘/텍스트 렌더링 -->
-        <th:block th:if="${isAdminEdit}">
+        <th:block th:if="${currentUserRole.name() == 'ADMIN' && currentPath.startsWith('/admin/my/user')}">
           <!-- 관리자 모드: 수정 대상 회원 정보 기준 -->
           <div class="d-flex align-items-center mb-4 ps-3 pt-2">
         <span class="profile-icon rounded-circle p-2 me-3"
@@ -30,7 +30,15 @@
             <i class="bi" th:classappend="${userResponseDTO.userRole.iconClass}"></i>
         </span>
             <div>
-              <h5 class="mb-1 fw-semibold fs-5" th:text="${userResponseDTO.uName}">회원명</h5>
+              <h5 class="mb-1 fw-semibold fs-5">
+                <span th:text="${userResponseDTO.uName}">회원명</span>
+                <small th:switch="${userResponseDTO.uIsActive.name()}">
+                  <span th:case="'ACTIVE'"> · 활성화</span>
+                  <span th:case="'INACTIVE'"> · 비활성화</span>
+                  <span th:case="'PENDING'"> · 가입 승인 대기</span>
+                  <span th:case="*">-</span> <!-- 혹시 모를 기타 값 대비 -->
+                </small>
+              </h5>
               <th:block th:switch="${userResponseDTO.userRole.name()}">
                 <small class="text-muted" th:case="'PRODUCTION'">DG 전동(내부) · 생산부서</small>
                 <small class="text-muted" th:case="'PURCHASING'">DG 전동(내부) · 구매부서</small>
@@ -42,7 +50,7 @@
           </div>
         </th:block>
 
-        <th:block th:unless="${isAdminEdit}">
+        <th:block th:unless="${currentUserRole.name() == 'ADMIN' && currentPath.startsWith('/admin/my/user')}">
           <!-- 일반 사용자 자기 정보 수정용 -->
           <div class="d-flex align-items-center mb-4 ps-3 pt-2">
         <span class="profile-icon rounded-circle p-2 me-3"
@@ -79,7 +87,7 @@
         <ul class="nav flex-column">
           <li class="nav-item mb-2">
             <!-- 관리자일 때 -->
-            <a th:if="${isAdminEdit}"
+            <a th:if="${currentUserRole.name() == 'ADMIN'}"
                th:href="@{|/admin/my/user/${userResponseDTO.userId}|}"
                class="nav-link my-nav-link rounded" id="editLink"
                th:classappend="${currentPath.startsWith('/admin/my/user')} ? ' active' : ''">
@@ -87,7 +95,7 @@
             </a>
 
             <!-- 협력업체일 때 -->
-            <a th:if="${isAdminEdit == false && currentUserRole.name() == 'PARTNER'}"
+            <a th:if="${currentUserRole.name() == 'PARTNER'}"
                th:href="@{/external/my/account-edit}"
                class="nav-link my-nav-link rounded" id="editLink"
                th:classappend="${currentPath.startsWith('/external/my/account-edit')} ? ' active' : ''">
@@ -95,7 +103,7 @@
             </a>
 
             <!-- 내부직원일 때 -->
-            <a th:if="${isAdminEdit == false && currentUserRole.name() != 'PARTNER'}"
+            <a th:if="${currentUserRole.name() != 'PARTNER' && currentUserRole.name() != 'ADMIN'}"
                th:href="@{/internal/my/account-edit}"
                class="nav-link my-nav-link rounded" id="editLink"
                th:classappend="${currentPath.startsWith('/internal/my/account-edit')} ? ' active' : ''">
@@ -104,28 +112,36 @@
 
           </li>
           <li>
-            <!-- 관리자용 탈퇴 링크 -->
-            <a th:if="${isAdminEdit}"
+            <!-- 탈퇴 링크 -->
+            <a th:if="${currentUserRole.name() == 'ADMIN' &&  currentUserRole.name() != userResponseDTO.userRole.name()
+                        && userResponseDTO.getUIsActive().name() == 'ACTIVE'}"
                th:href="@{|/admin/my/user-deleted/${userResponseDTO.userId}|}"
-               class="nav-link my-nav-link text-danger" id="deleteLink"
+               class="nav-link my-nav-link" id="deleteLink"
                th:classappend="${currentPath.startsWith('/admin/my/user-deleted')} ? ' active' : ''">
               <i class="bi bi-x-circle me-2"></i>탈퇴
             </a>
 
             <!-- 협력업체용 탈퇴 링크 -->
-            <a th:if="${isAdminEdit == false && currentUserRole.name() == 'PARTNER'}"
+            <a th:if="${currentUserRole.name() == 'PARTNER'}"
                th:href="@{/external/my/account-delete}"
-               class="nav-link my-nav-link text-danger" id="deleteLink"
+               class="nav-link my-nav-link" id="deleteLink"
                th:classappend="${currentPath.startsWith('/external/my/account-delete')} ? ' active' : ''">
               <i class="bi bi-x-circle me-2"></i>탈퇴
             </a>
 
             <!-- 내부직원용 탈퇴 링크 -->
-            <a th:if="${isAdminEdit == false && currentUserRole.name() != 'PARTNER'}"
+            <a th:if="${currentUserRole.name() != 'PARTNER' && currentUserRole.name() != 'ADMIN'}"
                th:href="@{/internal/my/account-delete}"
-               class="nav-link my-nav-link text-danger" id="deleteLink"
+               class="nav-link my-nav-link" id="deleteLink"
                th:classappend="${currentPath.startsWith('/internal/my/account-delete')} ? ' active' : ''">
               <i class="bi bi-x-circle me-2"></i>탈퇴
+            </a>
+
+          </li>
+          <li><hr class="m-2"></li>
+          <li>
+            <a class="nav-link my-nav-link" onclick="goBack(); return false;" id="backLink">
+              <i class="bi bi-arrow-left me-2"></i>뒤로가기
             </a>
           </li>
         </ul>

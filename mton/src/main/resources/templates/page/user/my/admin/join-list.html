@@ -80,7 +80,11 @@
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end border">
-                        <li><a class="dropdown-item" th:href="@{'/admin/my/user/' + ${user.userId}}">회원정보 보기</a></li>
+                        <li>
+                            <a class="dropdown-item" th:href="@{'/admin/my/user/' + ${user.userId}}"
+                               onclick="sessionStorage.setItem('prevUrl', window.location.href)">
+                                회원정보 보기</a>
+                        </li>
                     </ul>
                 </div>
 
@@ -96,7 +100,10 @@
                     </div>
                 </div>
 
-                <div class="mt-3 d-flex justify-content-end">
+                <div class="mt-3 d-flex justify-content-between">
+                    <div class="d-flex align-items-end text-secondary">
+                        <small>가입 신청일: <span th:text="${#temporals.format(user.creDate, 'yyyy-MM-dd a hh:mm')}"></span></small>
+                    </div>
                     <button class="btn btn-outline-primary btn-sm approve-btn">승인</button>
                 </div>
             </div>

@@ -213,6 +213,12 @@ public class UserServiceImpl implements UserService {
                 .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
     }
 
+    @Override
+    public User getUserById(Long userId) {
+        return userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));
+    }
+
     /**
      * [공통] 현재 비밀번호 일치 여부 확인
      * - 사용자 입력값(현재 비밀번호)과 저장된 암호화된 비밀번호 비교
@@ -441,7 +447,7 @@ public class UserServiceImpl implements UserService {
                 log.warn("잘못된 계정 상태: {}", status);
             }
         } else {
-            // [4] 👈 status 파라미터 없으면 기본 ACTIVE만 조회
+            // [4] status 파라미터 없으면 기본 ACTIVE만 조회
             userStatus = UserStatus.ACTIVE;
         }
 

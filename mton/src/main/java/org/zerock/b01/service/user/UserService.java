@@ -22,6 +22,8 @@ public interface UserService {
 
     User getUserByEmail(String email);
 
+    User getUserById(Long userId);
+
     boolean isExistedUEmail(String email);
 
     void sendResetPasswordEmail(String email);
