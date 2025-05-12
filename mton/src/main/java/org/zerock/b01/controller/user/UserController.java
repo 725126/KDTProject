@@ -284,8 +284,12 @@ public class UserController {
     @ResponseBody
     public Map<String, Boolean> sendResetPasswordLink(@RequestBody Map<String, String> payload) {
         String email = payload.get("email");
-        userService.sendResetPasswordEmail(email);
-        return Map.of("success", true);
+        if(userService.isExistedUEmail(email)) {
+            userService.sendResetPasswordEmail(email);
+            return Map.of("success", true);
+        } else {
+            return Map.of("success", false);
+        }
     }
 
     // 회원 관리 - 아이디 찾기 Get

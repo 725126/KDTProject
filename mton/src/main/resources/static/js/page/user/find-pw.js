@@ -58,7 +58,7 @@ function sendResetEmail(triggerSource = 'form') {
                     ? "✅ 비밀번호 재설정 링크가 메일로 발송되었습니다."
                     : "✅ 메일이 재발송되었습니다.";
                 resetMessage.style.color = "green";
-            } else {
+            } else if (!data.success) {
                 resetMessage.textContent = "❌ 가입된 이메일이 아닙니다.";
                 resetMessage.style.color = "red";
             }
