@@ -112,7 +112,7 @@ async function uploadJsonPost(dest, jdata) {
 // 실제 보이는 테이블 데이터를 업로드.
 // Response 받아서 뭔가 더 할 예정이라면 그냥 이 함수를 복사해서 수정하면 된다.
 function tableUpload(dest, table) {
-    const sheet = XLSX.utils.table_to_sheet(table);
+    const sheet = XLSX.utils.table_to_sheet(table, {UTC: true});
     const jsheet = XLSX.utils.sheet_to_json(sheet);
 
     const result = uploadJsonPost(dest, jsheet);

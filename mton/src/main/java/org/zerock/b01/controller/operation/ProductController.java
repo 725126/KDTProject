@@ -88,12 +88,14 @@ public class ProductController {
 
             return ProductionPlanDTO.builder()
                     .prdplanId(id)
-                    .prodId(hashmap.get(ProductionPlanTableHead.PRDPLAN_ID.getLabel()))
+                    .prodId(hashmap.get(ProductionPlanTableHead.PROD_ID.getLabel()))
                     .prdplanDate(LocalDate.now())
-                    .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel())))
+                    .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel()).substring(0, 10)))
                     .prdplanQty(Integer.parseInt(hashmap.get(ProductionPlanTableHead.PRDPLAN_QTY.getLabel())))
                     .build();
         }).collect(Collectors.toList());
+
+        log.info(productionPlanDTOList.toString());
 
         return productionPlanService.registerAll(productionPlanDTOList);
     }
@@ -282,7 +284,7 @@ public class ProductController {
                 .prdplanId(hashmap.get(ProductionPlanTableHead.PRDPLAN_ID.getLabel()))
                 .prodId(hashmap.get(ProductionPlanTableHead.PROD_ID.getLabel()))
                 .prdplanQty(Integer.parseInt(hashmap.get(ProductionPlanTableHead.PRDPLAN_QTY.getLabel())))
-                .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel())))
+                .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel()).substring(0, 10)))
                 .build()).collect(Collectors.toList());
 
         return productionPlanService.updateAll(productionPlanDTOList);

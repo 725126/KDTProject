@@ -67,6 +67,7 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
                 return new StatusTuple(false, twinMessage.toString());
             }
 
+            log.info(prdPlans);
             productionPlanRepository.saveAll(prdPlans);
             return new StatusTuple(true, "모든 Prdplan이 등록되었습니다.");
         } catch (Exception e) {

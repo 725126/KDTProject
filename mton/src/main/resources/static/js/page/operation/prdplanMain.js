@@ -80,7 +80,15 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
         e.stopPropagation();
 
         const currentTable = document.querySelector("div[style='display: block;'] table");
-        excelParser.tableToFile(currentTable, currentTable.id + ".xlsx");
+
+        // 그대로 다운로드하면 나중에 집어넣을때 문제가 생기므로 이렇게 함
+        const editedTable = currentTable.cloneNode(true);
+        for (const row of editedTable.rows) {
+            row.deleteCell(6);
+            row.deleteCell(4);
+            row.deleteCell(2);
+        }
+        excelParser.tableToFile(editedTable, currentTable.id + ".xlsx");
     });
 
     editRefreshBtn.addEventListener("click", function (e) {
@@ -112,4 +120,8 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
     tutorialMessage.bindTutorialMessage(viewDownloadBtn, tmessage.viewDownloadBtnTutorial)
     tutorialMessage.bindTutorialMessage(editRefreshBtn, tmessage.editRefreshBtnTutorial);
     tutorialMessage.bindTutorialMessage(editUploadBtn, tmessage.editUploadBtnTutorial);
+})();
+
+(function () {
+    tableFilter.applyTableSorting(prdplanViewTable);
 })();

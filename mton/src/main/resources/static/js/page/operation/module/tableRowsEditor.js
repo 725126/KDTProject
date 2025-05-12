@@ -697,6 +697,7 @@ function viewPrdPlanTable() {
         addTableEditButtons(prdplanEditTable);
 
         makeTableCellDBSelect(prdplanEditTable, 1, prdDBData, dbElementNames.prodId);
+        makeTableCellDatePicker(prdplanEditTable, 3);
         originalValues = {};
 
         initEmptyPrdPlanTable(prdplanInputTable);
@@ -749,10 +750,30 @@ function makeTableCellDBSelect(table, cellIndex, dbData, dbElement) {
     }
 }
 
+function makeTableCellDatePicker(table, cellIndex) {
+    const rows = table.rows;
+
+    for (let i = 1; i < rows.length; i++) {
+        const cell = rows[i].cells[cellIndex];
+        makeDatePickerRawCell(cell);
+    }
+}
+
+function makeDatePickerRawCell(cell) {
+    let value = cell.innerText;
+    const span = document.createElement("span");
+    span.innerHTML = value;
+    cell.innerText = "";
+    cell.appendChild(span);
+    makeDatePicker(cell);
+}
+
 function makeDatePicker(cell) {
     const date = document.createElement("input");
+    const today = new Date().toISOString();
     date.type = "date";
     date.classList.add("indirect-time");
+    date.setAttribute("min", today.substring(0, today.indexOf("T")));
 
     date.addEventListener("change", function (e) {
         let span = cell.querySelector("span");
