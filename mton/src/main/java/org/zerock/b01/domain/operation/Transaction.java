@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.b01.domain.user.Partner;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -21,5 +21,5 @@ public class Transaction {
     private Partner partner;
 
     @Column(nullable = false)
-    private Date tranDate;
+    private LocalDate tranDate;
 }

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.b01.domain.user.Partner;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -21,10 +21,10 @@ public class Contract {
     private Partner partner;
 
     @Column(nullable = false)
-    private Date conDate;
+    private LocalDate conDate;
 
     @Column(nullable = false)
-    private Date conEnd;
+    private LocalDate conEnd;
 
     @Column(length = 800, nullable = false)
     private String conContent;

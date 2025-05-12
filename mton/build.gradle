@@ -52,6 +52,15 @@ dependencies {
     // 이메일 인증
     implementation 'org.springframework.boot:spring-boot-starter-mail'
 
+    // POI
+    // https://mvnrepository.com/artifact/org.apache.poi/poi
+    implementation("org.apache.poi:poi:5.4.1")
+    // https://mvnrepository.com/artifact/org.apache.poi/poi-ooxml
+    implementation("org.apache.poi:poi-ooxml:5.4.1")
+
+    // TIKA
+    // https://mvnrepository.com/artifact/org.apache.tika/tika-core
+    implementation("org.apache.tika:tika-core:3.1.0")
 }
 
 tasks.named('test') {

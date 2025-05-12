@@ -1,0 +1,879 @@
+import * as tutorialMessage from "./tutorialMessage.js";
+import * as tmessage from "./tmessage.js";
+import * as excelParser from "./excelParser.js";
+import * as dbElementNames from "./dbElementNames.js";
+
+// DB 에서 가져온 각 테이블 데이터들
+let matDBData;
+let prdDBData;
+let pbomDBData;
+let prdplanDBData;
+let prdplanDBEditData;
+
+// 수정 전 원래 값을 담는 변수와 삭제 전 삭제할 ID를 담는 변수
+let originalValues = {};
+
+// 테이블 열 개수 파악하고 새 행과 열을 삽입.
+// 일반적으로 등록 테이블에서만 사용한다.
+function insertRowCells(table, index, ...optionFn) {
+    // 원하는 index 위치에 행 삽입
+    const newRow = table.insertRow(index);
+    newRow.style.position = 'relative';
+
+    const cellCount = table.rows[0].cells.length;
+    // 셀이야 항상 끝까지 채워야하니 index 쓸 필요 없음
+    for (let i = 0; i < cellCount; i++) {
+        const newCell = newRow.insertCell(-1);
+        const newSpan = document.createElement("span");
+        newSpan.setAttribute("contenteditable", "true");
+        newCell.appendChild(newSpan);
+    }
+
+    tutorialMessage.bindTutorialMessage(newRow.cells[0], tmessage.idCellTutorial);
+    newRow.cells[0].style.cursor = "help";
+
+    addUtilButtons(table, newRow, optionFn.flat());
+    return newRow;
+}
+
+// 행에 추가 버튼과 삭제 버튼을 넣음
+function addUtilButtons(table, row, ...optionFn) {
+    // 행 추가 버튼
+    const addButton = document.createElement("button");
+    addButton.style.padding = "0";
+    addButton.style.display = "flex";
+    addButton.style.justifyContent = "center";
+    addButton.style.alignItems = "center";
+    addButton.style.borderStyle = "none";
+    addButton.style.position = "absolute";
+    addButton.style.top = "8px";
+    addButton.style.right = "32px";
+    addButton.style.width = "24px";
+    addButton.style.height = "24px";
+    addButton.style.fontSize = "24px";
+    addButton.innerHTML = "&crarr;";
+    addButton.classList.add("opacity-btn");
+
+    // 행 삭제 버튼
+    const dltButton = addButton.cloneNode(true);
+    dltButton.style.right = "6px";
+    dltButton.innerHTML = "&times;";
+    dltButton.setAttribute("red-button", "true");
+
+    addButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentRow = row.rowIndex;
+        insertRowCells(table, currentRow + 1, optionFn.flat());
+    });
+
+    dltButton.addEventListener("dblclick", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentRow = row.rowIndex;
+        if (currentRow === 0) {
+            insertRowCells(table, 1, optionFn.flat());
+            while (table.rows.length > 2) {
+                table.deleteRow(-1);
+            }
+        } else if (table.rows.length === 2) {
+            insertRowCells(table, 1, optionFn.flat());
+            table.deleteRow(2);
+        } else {
+            table.deleteRow(currentRow);
+        }
+
+        tutorialMessage.forceHideMessage();
+    });
+
+    tutorialMessage.bindTutorialMessage(addButton, tmessage.matRowAddTutorial);
+    tutorialMessage.bindTutorialMessage(dltButton, tmessage.matRowRemoveTutorial);
+
+    row.appendChild(addButton);
+    row.appendChild(dltButton);
+
+    for (const option of optionFn.flat()) {
+        const cell = option(row);
+        cell.setAttribute("contenteditable", "true");
+    }
+
+    return row;
+}
+
+// 테이블에 행 추가와 삭제 버튼을 추가
+function addTableUtilBtn(table) {
+    const rows = table.rows;
+
+    for (let i = 1; i < rows.length; i++) {
+        addUtilButtons(table, rows[i]);
+    }
+}
+
+function addPbomTableUtilBtn(table) {
+    initEmptyPbomTable(table, true);
+}
+
+function addPrdPlanTableUtilBtn(table) {
+    initEmptyPrdPlanTable(table, true);
+}
+
+// 수정테이블의 헤더에 조작버튼 추가
+function initEditButtons(table) {
+    const allDeleteButton = document.createElement("button");
+    allDeleteButton.style.padding = "0";
+    allDeleteButton.style.display = "flex";
+    allDeleteButton.style.justifyContent = "center";
+    allDeleteButton.style.alignItems = "center";
+    allDeleteButton.style.borderStyle = "none";
+    allDeleteButton.style.position = "absolute";
+    allDeleteButton.style.top = "8px";
+    allDeleteButton.style.right = "6px";
+    allDeleteButton.style.width = "24px";
+    allDeleteButton.style.height = "24px";
+    allDeleteButton.style.fontSize = "24px";
+    allDeleteButton.innerHTML = "&times;";
+    allDeleteButton.classList.add("opacity-btn");
+    allDeleteButton.style.cursor = "pointer";
+    allDeleteButton.setAttribute("red-button", "true");
+
+    const allRevertButton = allDeleteButton.cloneNode(true);
+    allRevertButton.innerHTML = "&circlearrowright;"
+    allRevertButton.style.right = "32px";
+    allRevertButton.setAttribute("red-button", "false");
+
+    allDeleteButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const checkboxes = Array.from(table.querySelectorAll("input[type='checkbox']"));
+        const unchecked = checkboxes.filter(box => !box.checked);
+        const checked = checkboxes.filter(box => box.checked);
+
+        if (checkboxes.length === unchecked.length) {
+            for (const box of checkboxes) {
+                box.checked = true;
+                box.dispatchEvent(new Event('change'));
+            }
+        } else if (checkboxes.length === checked.length) {
+            for (const box of checkboxes) {
+                box.checked = false;
+                box.dispatchEvent(new Event('change'));
+            }
+        } else {
+            for (const box of unchecked) {
+                box.checked = true;
+                box.dispatchEvent(new Event('change'));
+            }
+        }
+    });
+
+    allRevertButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const reverts = document.querySelectorAll("button[revert='enabled']");
+        if (reverts !== null && reverts.length > 0) {
+            for (const btn of reverts) {
+                btn.dispatchEvent(new Event('click'));
+            }
+        }
+    });
+
+    const firstRow = table.rows[0];
+    firstRow.appendChild(allDeleteButton);
+    firstRow.appendChild(allRevertButton);
+
+    tutorialMessage.bindTutorialMessage(allDeleteButton, tmessage.editAllDeleteTutorial);
+    tutorialMessage.bindTutorialMessage(allRevertButton, tmessage.editAllRevertTutorial);
+}
+
+// 행에 수정 관련 버튼을 넣음
+function addEditButtons(table, row, ...protectedCols) {
+    // 삭제 체크박스 라벨
+    // 스타일링은 이녀석에게 할 것
+    const deleteLabel = document.createElement("label");
+    deleteLabel.style.padding = "0";
+    deleteLabel.style.display = "flex";
+    deleteLabel.style.justifyContent = "center";
+    deleteLabel.style.alignItems = "center";
+    deleteLabel.style.borderStyle = "none";
+    deleteLabel.style.position = "absolute";
+    deleteLabel.style.top = "8px";
+    deleteLabel.style.right = "6px";
+    deleteLabel.style.width = "24px";
+    deleteLabel.style.height = "24px";
+    deleteLabel.style.fontSize = "24px";
+    deleteLabel.innerHTML = "&times;";
+    deleteLabel.classList.add("opacity-btn");
+    deleteLabel.style.cursor = "pointer";
+    deleteLabel.setAttribute("red-button", "true");
+
+    // 삭제 체크박스
+    const deleteCheck = document.createElement("input");
+    deleteCheck.style.position = "absolute";
+    deleteCheck.type = "checkbox";
+    deleteCheck.style.opacity = "0";
+    deleteCheck.style.pointerEvents = "none";
+    // 라벨에 넣어줌
+    deleteLabel.appendChild(deleteCheck);
+
+    // 수정버튼
+    const editButton = document.createElement("button");
+    editButton.style.padding = "0";
+    editButton.style.display = "flex";
+    editButton.style.justifyContent = "center";
+    editButton.style.alignItems = "center";
+    editButton.style.borderStyle = "none";
+    editButton.style.position = "absolute";
+    editButton.style.top = "8px";
+    editButton.style.right = "32px";
+    editButton.style.width = "24px";
+    editButton.style.height = "24px";
+    editButton.style.fontSize = "24px";
+    editButton.innerHTML = "&bernou;";
+    editButton.classList.add("opacity-btn");
+
+    // 되돌리기 버튼
+    const revertButton = editButton.cloneNode(true);
+    revertButton.innerHTML = "&circlearrowright;"
+    revertButton.style.display = "none";
+    revertButton.setAttribute("revert", "disabled");
+
+    // 삭제버튼 이벤트. 실제 삭제 로직은 업로드 버튼 눌렀을 때 이루어짐
+    deleteCheck.addEventListener("change", function (e) {
+        const isChecked = deleteCheck.checked;
+
+        // 켜고 끔에 따라 수정 버튼도 같이 숨기고 보여야함
+        // 행 색상도 바꿔줌
+        if (isChecked) {
+            row.classList.add("table-danger");
+            editButton.style.display = "none";
+        } else {
+            row.classList.remove("table-danger");
+            editButton.style.display = "flex";
+        }
+    });
+
+    // 수정버튼 이벤트. 셀을 수정 가능할 수 있게 함
+    editButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // 원래의 값을 저장
+        const cells = row.cells;
+        const id = cells[0].innerText;
+        originalValues[id] = Array.from(cells).slice(1).map(cell => cell.innerText);
+
+        // 첫 번째 열을 제외한 행의 전체 셀 내부를 수정 가능하도록 변경
+        // 첫 번째 열은 암묵적으로 DB ID 로 간주됨.
+        for (let i = 1; i < cells.length; i++) {
+            cells[i].setAttribute("contenteditable", "true");
+        }
+
+        // 보호하도록 선택한 열은 수정 불가능하게 변경
+        if (protectedCols !== null && protectedCols.length > 0) {
+            for (const i of protectedCols) {
+                cells[i].setAttribute("contenteditable", "false");
+            }
+        }
+
+        // 행 색상 바꾸기
+        row.classList.add("table-info");
+
+        // 수정버튼과 삭제버튼을 숨김처리, 이후 되돌리기 버튼 보이기
+        editButton.style.display = "none";
+        deleteLabel.style.display = "none";
+        revertButton.style.display = "flex";
+        revertButton.setAttribute("revert", "enabled");
+    });
+
+    // 되돌리기 버튼 동작
+    revertButton.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const cells = row.cells;
+        const id = cells[0].innerText;
+
+        // 원래 값이 있었다면 그걸로 다 바꿔줌
+        if (originalValues.hasOwnProperty(id)) {
+            for (let i = 1; i < cells.length; i++) {
+                const origin = originalValues[id];
+                const span = cells[i].querySelector("span");
+
+                if (span !== null) {
+                    span.innerText = origin[i - 1];
+                } else {
+                    cells[i].innerText = origin[i - 1];
+                }
+
+                const select = cells[i].querySelector("select");
+                if (select !== null) {
+                    select.value = "";
+                }
+
+                cells[i].setAttribute("contenteditable", "false");
+            }
+        }
+
+        // 행 색상 원래대로 돌리기
+        row.classList.remove("table-info");
+
+        // 버튼들 다시 보이게 하고 자기 자신은 숨기
+        editButton.style.display = "flex";
+        deleteLabel.style.display = "flex";
+        revertButton.style.display = "none";
+        revertButton.setAttribute("revert", "disabled");
+    });
+
+    row.appendChild(deleteLabel);
+    row.appendChild(editButton);
+    row.appendChild(revertButton);
+
+    tutorialMessage.bindTutorialMessage(deleteLabel, tmessage.editDeleteBtnTutorial);
+    tutorialMessage.bindTutorialMessage(editButton, tmessage.editModifyBtnTutorial);
+    tutorialMessage.bindTutorialMessage(revertButton, tmessage.editRevertBtnTutorial);
+}
+
+// 수정 테이블에 관련 버튼을 넣음
+function addTableEditButtons(table) {
+    const rows = table.rows;
+
+    for (let i = 1; i < rows.length; i++) {
+        addEditButtons(table, rows[i]);
+    }
+}
+
+// 테이블용 json Fetch 함수
+async function jsonFetcher(dest, jData) {
+    return await fetch(dest, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+        },
+        body: JSON.stringify(jData)
+    }).then((res) => {
+        return res.json();
+    }).then(data => {
+        return data;
+    }).catch(error => {
+        console.log(error);
+    });
+}
+
+// 수정 테이블의 사항을 데이터베이스에 반영한다.
+function uploadEditedTable(table, request) {
+    let jsonData;
+    let jsonFinalData;
+    let deleteDest;
+    let updateDest;
+
+    const deleteList = Array.from(table.querySelectorAll("input[type='checkbox']:checked"))
+        .map(item => item.parentElement.parentElement.cells[0].innerText);
+
+    console.log(deleteList);
+
+    if (deleteList === null || deleteList.length === 0) {
+        console.log("삭제사항은 없습니다.");
+    }
+
+    switch (request) {
+        case "mat":
+        case "material":
+            deleteDest = "/internal/product/delete/mat";
+            updateDest = "/internal/product/update/mat";
+            break;
+        case "prd":
+        case "product":
+            deleteDest = "/internal/product/delete/prd";
+            updateDest = "/internal/product/update/prd";
+            break;
+        case "pbom":
+            deleteDest = "/internal/product/delete/pbom";
+            updateDest = "/internal/product/update/pbom";
+            break;
+        case "prdplan":
+        case "productionplan":
+            deleteDest = "/internal/product/delete/prdplan";
+            updateDest = "/internal/product/update/prdplan";
+            break;
+        default:
+            jsonData = null;
+    }
+
+    jsonData = jsonFetcher(deleteDest, deleteList);
+    return jsonData.then(res => {
+        const unModifyList = Array.from(table.querySelectorAll("button[revert='disabled']")).map(item => item.parentElement);
+        for (const unMod of unModifyList) {
+            unMod.remove();
+        }
+
+        for (const row of table.rows) {
+            for (const cell of row.cells) {
+                cell.removeAttribute("data-v");
+            }
+        }
+
+        jsonFinalData = excelParser.tableUpload(updateDest, table);
+        return jsonFinalData.then(ress => {
+            console.log(ress.message);
+            return res;
+        }).catch(error => {
+            console.log(error);
+        });
+    }).then(data => {
+        console.log(data.message);
+        return data;
+    }).catch(error => {
+        console.log(error);
+    });
+}
+
+// 등록 테이블에 초기 버튼을 단다.
+function initEmptyTable(table) {
+    for (const row of table.rows) {
+        addUtilButtons(table, row);
+        tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.idCellTutorial);
+        table.rows[1].cells[0].style.cursor = "help";
+    }
+}
+
+function initEmptyPbomTable(table, isFile = false) {
+    const matOptions = matDBData.map(data => data[dbElementNames.pbomMatId]);
+    const prdOptions = prdDBData.map(data => data[dbElementNames.pbomProdId]);
+
+    const makeMatSelect = (row) => {
+        makeSelectForRawCell(row.cells[1], matOptions);
+        return row.cells[1];
+    }
+    const makePrdSelect = (row) => {
+        makeSelectForRawCell(row.cells[2], prdOptions);
+        return row.cells[2];
+    }
+
+    for (const row of table.rows) {
+        if (isFile && row.rowIndex === 0) {
+            continue;
+        }
+        addUtilButtons(table, row, makeMatSelect, makePrdSelect);
+        tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.idCellTutorial);
+        table.rows[1].cells[0].style.cursor = "help";
+    }
+}
+
+function initEmptyPrdPlanTable(table, isFile = false) {
+    const prdOptions = prdDBData.map(data => data[dbElementNames.prodId]);
+
+    const makePrdSelect = (row) => {
+        makeSelectForRawCell(row.cells[1], prdOptions);
+        return row.cells[1];
+    }
+
+    const makeDate = (row) => {
+        makeDatePicker(row.cells[3]);
+        return row.cells[3];
+    }
+
+    for (const row of table.rows) {
+        if (isFile && row.rowIndex === 0) {
+            continue;
+        }
+
+        if (row.rowIndex !== 0) {
+            addUtilButtons(table, row, makePrdSelect, makeDate);
+        } else {
+            addUtilButtons(table, row, makePrdSelect);
+        }
+        tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.idCellTutorial);
+        table.rows[1].cells[0].style.cursor = "help";
+    }
+}
+
+// 목록 테이블용 fetch 함수
+async function refreshTableView(dest, request = "") {
+    return await fetch(dest, {
+        method: "POST",
+        headers: {
+            "Content-Type": "text/plain",
+        },
+        body: request
+    }).then(response => {
+        return response.json();
+    }).then(data => {
+        return data;
+    }).catch(error => {
+        console.error(error);
+    });
+}
+
+// 목록 테이블을 갱신한다.
+function viewTable(table, request) {
+    let jsonData;
+
+    switch (request) {
+        case "mat":
+        case "material":
+            jsonData = refreshTableView("/internal/product/view/mat", "material");
+            break;
+        case "prd":
+        case "product":
+            jsonData = refreshTableView("/internal/product/view/prd", "product");
+            break;
+        case "pbom":
+            jsonData = refreshTableView("/internal/product/view/pbom", "pbom");
+            break;
+        default:
+            jsonData = null;
+    }
+
+    if (jsonData === null) { return Promise.reject(new Error("jsonData is null")); }
+
+    return jsonData.then((result) => {
+        const sheet = XLSX.utils.json_to_sheet(result);
+        const htmlSheet = XLSX.utils.sheet_to_html(sheet);
+        const startIndex = htmlSheet.indexOf("<tr", htmlSheet.indexOf("<tr") + 1);
+        const endIndex = htmlSheet.lastIndexOf("</tr>") + "</tr>".length;
+        const htmlRow = htmlSheet.substring(startIndex, endIndex);
+
+        const tbody = table.querySelector("tbody");
+        tbody.innerHTML = htmlRow;
+    });
+}
+
+// DB 받아온 내용으로 테이블을 갱신한다.
+function reloadTable(table, request) {
+    let targetDB;
+
+    switch (request) {
+        case "mat":
+        case "material":
+            targetDB = matDBData;
+            break;
+        case "prd":
+        case "product":
+            targetDB = prdDBData;
+            break;
+        case "pbom":
+            targetDB = pbomDBData;
+            break;
+        case "prdplan":
+        case "productionplan":
+            targetDB = prdplanDBData;
+            break;
+        case "prdplanedit":
+        case "productionplanedit":
+            targetDB = prdplanDBEditData;
+            break;
+    }
+
+    const sheet = XLSX.utils.json_to_sheet(targetDB);
+    const htmlSheet = XLSX.utils.sheet_to_html(sheet);
+    const startIndex = htmlSheet.indexOf("<tr", htmlSheet.indexOf("<tr") + 1);
+    const endIndex = htmlSheet.lastIndexOf("</tr>") + "</tr>".length;
+    const htmlRow = htmlSheet.substring(startIndex, endIndex);
+
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = htmlRow;
+}
+
+// 수정 테이블을 갱신한다.
+function viewEditTable(table, request) {
+    const result = viewTable(table, request);
+    result.then((result) => {
+        addTableEditButtons(table);
+        originalValues = {};
+    });
+}
+
+// Product 페이지에 필요한 DB 갱신한다.
+async function refreshProductDBDataAll() {
+    const result = Promise.all([
+        refreshTableView("/internal/product/view/mat", "material"),
+        refreshTableView("/internal/product/view/prd", "product"),
+        refreshTableView("/internal/product/view/pbom", "pbom"),
+    ]);
+
+    return result.then(
+        (values) => {
+            matDBData = values[0];
+            prdDBData = values[1];
+            pbomDBData = values[2];
+
+            return values;
+        },
+        (reason) => {
+            return reason;
+        },
+    );
+}
+
+// 생산계획 페이지에 필요한 DB 갱신
+async function refreshPrdPlanDBDataAll() {
+    const result = Promise.all([
+        refreshTableView("/internal/product/view/prdplan", "prdplan"),
+        refreshTableView("/internal/product/view/prd", "product"),
+        ]);
+
+    return result.then(
+        (values) => {
+            prdplanDBData = values[0];
+            prdDBData = values[1];
+            prdplanDBEditData = Array.from(values[0]).map(prd => {
+                const keys = Object.keys(prd);
+                const ePrd = {};
+                ePrd[keys[0]] = prd[keys[0]];
+                ePrd[keys[1]] = prd[keys[1]];
+                ePrd[keys[2]] = prd[keys[3]];
+                ePrd[keys[3]] = prd[keys[5]];
+
+                return ePrd;
+            });
+
+            console.log(values[0]);
+            return values;
+        },
+        (reason) => {
+            return reason;
+        }
+    );
+}
+
+// Product 페이지의 모든 수정 및 목록 테이블 갱신
+function viewAllProductTable() {
+    const refresh = refreshProductDBDataAll();
+    refresh.then(value => {
+        const matViewTable = document.querySelector("#mat-table-view");
+        const prdViewTable = document.querySelector("#prd-table-view");
+        const pbomViewTable = document.querySelector("#pbom-table-view");
+
+        const matEditTable = document.querySelector("#mat-table-edit");
+        const prdEditTable = document.querySelector("#prd-table-edit");
+        const pbomEditTable = document.querySelector("#pbom-table-edit");
+
+        const pbomInputTable = document.querySelector("#pbom-table");
+
+        if (value[0].length > 0) {
+            reloadTable(matViewTable, "material");
+            reloadTable(matEditTable, "material");
+        }
+
+        if (value[1].length > 0) {
+            reloadTable(prdViewTable, "product");
+            reloadTable(prdEditTable, "product");
+        }
+
+        if (value[2].length > 0) {
+            reloadTable(pbomViewTable, "pbom");
+            reloadTable(pbomEditTable, "pbom");
+        }
+
+        addTableEditButtons(matEditTable);
+        addTableEditButtons(prdEditTable);
+        addTableEditButtons(pbomEditTable);
+
+        makeTableCellDBSelect(pbomEditTable, 1, matDBData, dbElementNames.pbomMatId);
+        makeTableCellDBSelect(pbomEditTable, 2, prdDBData, dbElementNames.pbomProdId);
+
+        originalValues = {};
+
+        initEmptyPbomTable(pbomInputTable);
+    });
+}
+
+// 생산계획 테이블 목록 갱신
+function viewPrdPlanTable() {
+    const refresh = refreshPrdPlanDBDataAll();
+    refresh.then(value => {
+        const prdplanViewTable = document.querySelector("#prdplan-table-view");
+        const prdplanEditTable = document.querySelector("#prdplan-table-edit");
+        const prdplanInputTable = document.querySelector("#prdplan-table");
+
+        if (value[0].length > 0) {
+            reloadTable(prdplanViewTable, "prdplan");
+            reloadTable(prdplanEditTable, "prdplanedit");
+        }
+
+        addTableEditButtons(prdplanEditTable);
+
+        makeTableCellDBSelect(prdplanEditTable, 1, prdDBData, dbElementNames.prodId);
+        originalValues = {};
+
+        initEmptyPrdPlanTable(prdplanInputTable);
+    });
+}
+
+// span 을 자식으로 갖지 않은 셀에 select 추가하기
+function makeSelectForRawCell(cell, ...options) {
+    let value = cell.innerText;
+    const span = document.createElement("span");
+    span.innerHTML = value;
+    cell.innerText = "";
+    cell.appendChild(span);
+    makeSelect(cell, options[0]);
+}
+
+// 셀 안에 Select Element 넣기
+function makeSelect(cell, ...options) {
+    const select = document.createElement("select");
+    select.classList.add("indirect-select");
+
+    for (const option of options[0]) {
+        const opt = document.createElement("option");
+        opt.value = option;
+        opt.label = option;
+        select.appendChild(opt);
+    }
+
+    select.addEventListener("change", function (e) {
+        let span = cell.querySelector("span");
+        if (span === null) {
+            span = document.createElement("span");
+            cell.appendChild(span);
+        }
+
+        span.innerText = select.value;
+    });
+    select.value = "";
+    cell.appendChild(select);
+}
+
+// DB 데이터를 참조하여 셀을 Select 로 만든다.
+function makeTableCellDBSelect(table, cellIndex, dbData, dbElement) {
+    const rows = table.rows;
+    const options = dbData.map(data => data[dbElement]);
+
+    for (let i = 1; i < rows.length; i++) {
+        const cell = rows[i].cells[cellIndex];
+        makeSelectForRawCell(cell, options);
+    }
+}
+
+function makeDatePicker(cell) {
+    const date = document.createElement("input");
+    date.type = "date";
+    date.classList.add("indirect-time");
+
+    date.addEventListener("change", function (e) {
+        let span = cell.querySelector("span");
+        if (span === null) {
+            span = document.createElement("span");
+            cell.appendChild(span);
+        }
+
+        span.innerText = date.value;
+    });
+    cell.appendChild(date);
+}
+
+// 임의의 option 을 사용하여 셀을 select 로 만든다.
+function makeTableCellSelect(table, cellIndex, ...options) {
+    const rows = table.rows;
+
+    for (let i = 1; i < rows.length; i++) {
+        const cell = rows[i].cells[cellIndex];
+        makeSelectForRawCell(cell, options);
+    }
+}
+
+// 등록, 수정, 목록 전환 버튼
+function initPageTable() {
+    const viewGroup = document.getElementById("tables-view");
+    const editGroup = document.getElementById("tables-edit");
+    const inputGroup = document.getElementById("tables-input");
+
+    const inputManageBtn = document.getElementById("input-manage-btn");
+    const editManageBtn = document.getElementById("edit-manage-btn");
+    const viewManageBtn = document.getElementById("view-manage-btn");
+
+    const manageMod = document.getElementById("manage-mod");
+    const insertLabel = manageMod.querySelector("#mod-insert");
+    const editLabel = manageMod.querySelector("#mod-edit");
+    const viewLabel = manageMod.querySelector("#mod-view");
+
+    // 등록, 수정, 목록 라디오 간 전환 시각효과
+    manageMod.addEventListener("click", function (event) {
+        const labels = manageMod.querySelectorAll("label");
+
+        for (const label of labels) {
+            if (label.control.checked) {
+                label.classList.add("pe-none");
+                label.classList.remove("btn-outline-secondary");
+                label.classList.add("btn-primary");
+            } else {
+                label.classList.remove("pe-none");
+                label.classList.add("btn-outline-secondary");
+                label.classList.remove("btn-primary");
+            }
+        }
+    });
+
+    // 등록, 수정, 목록 버튼 클릭시 테이블과 우측 패널 전환 이벤트
+    insertLabel.addEventListener("change", function (event) {
+        inputGroup.style.display = "block";
+        editGroup.style.display = "none";
+        viewGroup.style.display = "none";
+
+        inputManageBtn.style.display = "flex";
+        editManageBtn.style.display = "none";
+        viewManageBtn.style.display = "none";
+
+        const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
+        if (initial !== null) {
+            initial.dispatchEvent(new Event('change'));
+        }
+    });
+
+    editLabel.addEventListener("change", function (event) {
+        inputGroup.style.display = "none";
+        editGroup.style.display = "block";
+        viewGroup.style.display = "none";
+
+        inputManageBtn.style.display = "none";
+        editManageBtn.style.display = "flex";
+        viewManageBtn.style.display = "none";
+
+        const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
+        if (initial !== null) {
+            initial.dispatchEvent(new Event('change'));
+        }
+    });
+
+    viewLabel.addEventListener("change", function (event) {
+        inputGroup.style.display = "none";
+        editGroup.style.display = "none";
+        viewGroup.style.display = "block";
+
+        inputManageBtn.style.display = "none";
+        editManageBtn.style.display = "none";
+        viewManageBtn.style.display = "flex";
+
+        const initial = document.querySelector("input[type='radio'][name='v-filter']:checked");
+        if (initial !== null) {
+            initial.dispatchEvent(new Event('change'));
+        }
+    });
+
+    // 툴팁 메시지 바인딩
+    tutorialMessage.bindTutorialMessage(insertLabel, tmessage.manageInsertTutorial);
+    tutorialMessage.bindTutorialMessage(editLabel, tmessage.manageEditTutorial);
+    tutorialMessage.bindTutorialMessage(viewLabel, tmessage.manageViewTutorial);
+
+    // 화면 초기화용 이벤트 발생
+    const initial = document.querySelector("input[type='radio'][name='i-filter']:checked");
+    initial.dispatchEvent(new Event('change'));
+}
+
+export {
+    initPageTable,
+    initEmptyTable,
+    initEditButtons,
+    viewAllProductTable,
+    viewPrdPlanTable,
+    addTableUtilBtn,
+    addTableEditButtons,
+    addPbomTableUtilBtn,
+    addPrdPlanTableUtilBtn,
+    uploadEditedTable,
+};

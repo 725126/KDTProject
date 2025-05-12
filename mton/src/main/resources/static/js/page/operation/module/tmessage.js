@@ -1,0 +1,17 @@
+export const manageInsertTutorial = "새 항목을 엑셀 파일 또는 개별적으로 등록합니다.";
+export const manageEditTutorial = "등록된 항목을 개별적으로 수정합니다.";
+export const manageViewTutorial = "현재 등록된 목록을 봅니다.";
+export const idCellTutorial = "코드를 비워두면 현재 등록된 항목 개수에 맞춰 자동으로 생성합니다. 오류를 방지하기 위해 이 열은 모두 비워놓거나 채워놓아야 합니다.";
+export const matRowAddTutorial = "아래에 새 행을 추가합니다.";
+export const matRowRemoveTutorial = "빠르게 두 번 클릭하여 해당 행을 지웁니다.\n헤더에서 하면 모든 행을 지웁니다.";
+export const insertFileBtnTutorial = "파일을 선택하고 해당 내용을 표에 삽입합니다.";
+export const insertUploadBtnTutorial = "표에 입력한 내용을 데이터베이스에 반영합니다.";
+export const viewRefreshBtnTutorial = "최신 데이터베이스를 반영해 표를 새로고침합니다.";
+export const viewDownloadBtnTutorial = ".xlsx 확장자를 가진 스프레드시트 파일로 표를 다운로드합니다.";
+export const editDeleteBtnTutorial = "한 번 눌러 데이터베이스에서 삭제할 행을 지정합니다. 행이 붉게 표시된 상태에서 한 번 더 누르면 해제됩니다.";
+export const editModifyBtnTutorial = "행의 내용을 수정합니다.";
+export const editRevertBtnTutorial = "수정한 내용을 원래대로 되돌립니다.";
+export const editAllRevertTutorial = "모든 수정한 행의 내용을 원래대로 되돌립니다.";
+export const editAllDeleteTutorial = "모든 행을 삭제하거나 삭제 취소합니다.";
+export const editRefreshBtnTutorial = "최신 데이터베이스를 반영해 표를 새로고침합니다. 모든 수정사항과 삭제사항은 파기됩니다.";
+export const editUploadBtnTutorial = "수정사항과 삭제사항을 데이터베이스에 반영합니다.";

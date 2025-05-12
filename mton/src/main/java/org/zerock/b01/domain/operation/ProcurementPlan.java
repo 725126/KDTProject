@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.Check;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -28,10 +28,10 @@ public class ProcurementPlan {
     private int ppmatQty;
 
     @Column(nullable = false)
-    private Date pplanDate;
+    private LocalDate pplanDate;
 
     @Column(nullable = false)
-    private Date pplanEnd;
+    private LocalDate pplanEnd;
 
     @Column(name = "pplan_stat", nullable = false)
     @Check(constraints = "pplan_stat IN ('진행중', '완료')")

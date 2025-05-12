@@ -3,7 +3,7 @@ package org.zerock.b01.domain.operation;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.util.Date;
+import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -23,8 +23,8 @@ public class ProductionPlan {
     private int prdplanQty;
 
     @Column(nullable = false)
-    private Date prdplanDate;
+    private LocalDate prdplanDate;
 
     @Column(nullable = false)
-    private Date prdplanEnd;
+    private LocalDate prdplanEnd;
 }

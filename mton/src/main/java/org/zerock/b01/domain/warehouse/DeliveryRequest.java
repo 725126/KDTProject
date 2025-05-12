@@ -4,8 +4,6 @@ import jakarta.persistence.*;
 import lombok.*;
 import org.zerock.b01.domain.operation.Ordering;
 
-import java.util.List;
-
 @Entity
 @Getter
 @Builder
