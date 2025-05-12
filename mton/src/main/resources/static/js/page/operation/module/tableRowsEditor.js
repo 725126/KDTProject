@@ -631,7 +631,6 @@ async function refreshPrdPlanDBDataAll() {
                 return ePrd;
             });
 
-            console.log(values[0]);
             return values;
         },
         (reason) => {

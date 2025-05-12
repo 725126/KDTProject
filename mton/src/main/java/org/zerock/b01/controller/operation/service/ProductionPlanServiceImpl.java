@@ -98,11 +98,34 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
 
     @Override
     public StatusTuple deleteAll(ArrayList<String> arrayList) {
-        return null;
+        try {
+            productionPlanRepository.deleteAllById(arrayList);
+            return new StatusTuple(true, "PRDPLAN 삭제에 성공했습니다.");
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
     }
 
     @Override
     public StatusTuple updateAll(List<ProductionPlanDTO> list) {
-        return null;
+        try {
+            var prdpland = list.stream().map(prdplan -> ProductionPlan.builder()
+                    .prdplanId(prdplan.getPrdplanId())
+                    .product(productRepository.findById(prdplan.getProdId()).get())
+                    .prdplanQty(prdplan.getPrdplanQty())
+                    .prdplanEnd(prdplan.getPrdplanEnd())
+                    .build()).collect(Collectors.toList());
+
+            var prdplanNames = list.stream().map(ProductionPlanDTO::getPrdplanId).collect(Collectors.toList());
+
+            if (prdpland.size() != productionPlanRepository.findAllById(prdplanNames).size()) {
+                return new StatusTuple(false, "PRDPLAN 수정사항 개수가 일치하지 않습니다.");
+            }
+
+            productionPlanRepository.saveAll(prdpland);
+            return new StatusTuple(true, "모든 PRDPLAN 수정사항을 반영하였습니다.");
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
     }
 }
