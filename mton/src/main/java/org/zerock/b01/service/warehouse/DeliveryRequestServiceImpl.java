@@ -12,7 +12,6 @@ import org.zerock.b01.domain.warehouse.DeliveryStatus;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.warehouse.DeliveryRequestDTO;
-import org.zerock.b01.repository.OrderingRepository;
 import org.zerock.b01.repository.warehouse.CompanyStorageRepository;
 import org.zerock.b01.repository.warehouse.DeliveryRequestItemRepository;
 import org.zerock.b01.repository.warehouse.DeliveryRequestRepository;
