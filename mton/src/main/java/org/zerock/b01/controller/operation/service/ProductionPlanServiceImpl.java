@@ -101,7 +101,7 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
     public StatusTuple deleteAll(ArrayList<String> arrayList) {
         try {
             productionPlanRepository.deleteAllById(arrayList);
-            return new StatusTuple(true, "PRDPLAN 삭제에 성공했습니다.");
+            return new StatusTuple(true, "PRDPLAN 수정 성공했습니다.");
         } catch (Exception e) {
             return new StatusTuple(false, e.getMessage());
         }
