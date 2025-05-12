@@ -95,7 +95,6 @@ function addUtilButtons(table, row, ...optionFn) {
     row.appendChild(dltButton);
 
     for (const option of optionFn.flat()) {
-        console.log(typeof(option));
         const cell = option(row);
         cell.setAttribute("contenteditable", "true");
     }
@@ -110,6 +109,14 @@ function addTableUtilBtn(table) {
     for (let i = 1; i < rows.length; i++) {
         addUtilButtons(table, rows[i]);
     }
+}
+
+function addPbomTableUtilBtn(table) {
+    initEmptyPbomTable(table, true);
+}
+
+function addPrdPlanTableUtilBtn(table) {
+    initEmptyPrdPlanTable(table, true);
 }
 
 // 수정테이블의 헤더에 조작버튼 추가
@@ -366,6 +373,8 @@ function uploadEditedTable(table, request) {
     const deleteList = Array.from(table.querySelectorAll("input[type='checkbox']:checked"))
         .map(item => item.parentElement.parentElement.cells[0].innerText);
 
+    console.log(deleteList);
+
     if (deleteList === null || deleteList.length === 0) {
         console.log("삭제사항은 없습니다.");
     }
@@ -384,6 +393,11 @@ function uploadEditedTable(table, request) {
         case "pbom":
             deleteDest = "/internal/product/delete/pbom";
             updateDest = "/internal/product/update/pbom";
+            break;
+        case "prdplan":
+        case "productionplan":
+            deleteDest = "/internal/product/delete/prdplan";
+            updateDest = "/internal/product/update/prdplan";
             break;
         default:
             jsonData = null;
@@ -426,7 +440,7 @@ function initEmptyTable(table) {
     }
 }
 
-function initEmptyPbomTable(table) {
+function initEmptyPbomTable(table, isFile = false) {
     const matOptions = matDBData.map(data => data[dbElementNames.pbomMatId]);
     const prdOptions = prdDBData.map(data => data[dbElementNames.pbomProdId]);
 
@@ -440,7 +454,38 @@ function initEmptyPbomTable(table) {
     }
 
     for (const row of table.rows) {
+        if (isFile && row.rowIndex === 0) {
+            continue;
+        }
         addUtilButtons(table, row, makeMatSelect, makePrdSelect);
+        tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.idCellTutorial);
+        table.rows[1].cells[0].style.cursor = "help";
+    }
+}
+
+function initEmptyPrdPlanTable(table, isFile = false) {
+    const prdOptions = prdDBData.map(data => data[dbElementNames.prodId]);
+
+    const makePrdSelect = (row) => {
+        makeSelectForRawCell(row.cells[1], prdOptions);
+        return row.cells[1];
+    }
+
+    const makeDate = (row) => {
+        makeDatePicker(row.cells[3]);
+        return row.cells[3];
+    }
+
+    for (const row of table.rows) {
+        if (isFile && row.rowIndex === 0) {
+            continue;
+        }
+
+        if (row.rowIndex !== 0) {
+            addUtilButtons(table, row, makePrdSelect, makeDate);
+        } else {
+            addUtilButtons(table, row, makePrdSelect);
+        }
         tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.idCellTutorial);
         table.rows[1].cells[0].style.cursor = "help";
     }
@@ -607,6 +652,8 @@ function viewAllProductTable() {
         const prdEditTable = document.querySelector("#prd-table-edit");
         const pbomEditTable = document.querySelector("#pbom-table-edit");
 
+        const pbomInputTable = document.querySelector("#pbom-table");
+
         if (value[0].length > 0) {
             reloadTable(matViewTable, "material");
             reloadTable(matEditTable, "material");
@@ -631,7 +678,7 @@ function viewAllProductTable() {
 
         originalValues = {};
 
-        initEmptyPbomTable(document.getElementById("pbom-table"));
+        initEmptyPbomTable(pbomInputTable);
     });
 }
 
@@ -641,6 +688,7 @@ function viewPrdPlanTable() {
     refresh.then(value => {
         const prdplanViewTable = document.querySelector("#prdplan-table-view");
         const prdplanEditTable = document.querySelector("#prdplan-table-edit");
+        const prdplanInputTable = document.querySelector("#prdplan-table");
 
         if (value[0].length > 0) {
             reloadTable(prdplanViewTable, "prdplan");
@@ -650,6 +698,9 @@ function viewPrdPlanTable() {
         addTableEditButtons(prdplanEditTable);
 
         makeTableCellDBSelect(prdplanEditTable, 1, prdDBData, dbElementNames.prodId);
+        originalValues = {};
+
+        initEmptyPrdPlanTable(prdplanInputTable);
     });
 }
 
@@ -697,6 +748,23 @@ function makeTableCellDBSelect(table, cellIndex, dbData, dbElement) {
         const cell = rows[i].cells[cellIndex];
         makeSelectForRawCell(cell, options);
     }
+}
+
+function makeDatePicker(cell) {
+    const date = document.createElement("input");
+    date.type = "date";
+    date.classList.add("indirect-time");
+
+    date.addEventListener("change", function (e) {
+        let span = cell.querySelector("span");
+        if (span === null) {
+            span = document.createElement("span");
+            cell.appendChild(span);
+        }
+
+        span.innerText = date.value;
+    });
+    cell.appendChild(date);
 }
 
 // 임의의 option 을 사용하여 셀을 select 로 만든다.
@@ -800,11 +868,12 @@ function initPageTable() {
 export {
     initPageTable,
     initEmptyTable,
-    initEmptyPbomTable,
     initEditButtons,
     viewAllProductTable,
     viewPrdPlanTable,
     addTableUtilBtn,
     addTableEditButtons,
+    addPbomTableUtilBtn,
+    addPrdPlanTableUtilBtn,
     uploadEditedTable,
 };

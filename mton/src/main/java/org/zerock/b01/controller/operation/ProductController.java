@@ -270,6 +270,25 @@ public class ProductController {
     }
 
     @ResponseBody
+    @PostMapping("/update/prdplan")
+    public StatusTuple updatePrdPlan(@RequestBody ArrayList<HashMap<String, String>> list) {
+        log.info(list.toString());
+
+        if (list.isEmpty()) {
+            return new StatusTuple(false, "PRDPLAN 수정사항은 없습니다.");
+        }
+
+        List<ProductionPlanDTO> productionPlanDTOList = list.stream().map(hashmap -> ProductionPlanDTO.builder()
+                .prdplanId(hashmap.get(ProductionPlanTableHead.PRDPLAN_ID.getLabel()))
+                .prodId(hashmap.get(ProductionPlanTableHead.PROD_ID.getLabel()))
+                .prdplanQty(Integer.parseInt(hashmap.get(ProductionPlanTableHead.PRDPLAN_QTY.getLabel())))
+                .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel())))
+                .build()).collect(Collectors.toList());
+
+        return productionPlanService.updateAll(productionPlanDTOList);
+    }
+
+    @ResponseBody
     @PostMapping("/view/mat")
     public List<MaterialDTO> viewMatTable(@RequestBody String str) {
         log.info("View Material: " + str);
@@ -316,5 +335,12 @@ public class ProductController {
     public StatusTuple deletePbomTable(@RequestBody ArrayList<String> arrayList) {
         log.info("deleting ID: " + arrayList.toString());
         return pbomService.deleteAll(arrayList);
+    }
+
+    @ResponseBody
+    @PostMapping("/delete/prdplan")
+    public StatusTuple deletePrdPlanTable(@RequestBody ArrayList<String> arrayList) {
+        log.info("deleting ID: " + arrayList.toString());
+        return productionPlanService.deleteAll(arrayList);
     }
 }

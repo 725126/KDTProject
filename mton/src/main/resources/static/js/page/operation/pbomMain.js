@@ -132,7 +132,11 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
         const result = excelParser.sheetToTable(insertFileBtn.files[0], currentTable, true, -2);
 
         result.then(value => {
-            tableRowsEditor.addTableUtilBtn(currentTable);
+            if (currentTable.id === "pbom-table") {
+                tableRowsEditor.addPbomTableUtilBtn(currentTable);
+            } else {
+                tableRowsEditor.addTableUtilBtn(currentTable);
+            }
         });
     });
 

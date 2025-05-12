@@ -26,9 +26,6 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
         row.deleteCell(2);
     }
 
-    tableRowsEditor.initEmptyTable(prdplanInputTable);
-    tableRowsEditor.addTableUtilBtn(prdplanInputTable);
-
     for (const row of prdplanEditTable.rows) {
         row.deleteCell(6);
         row.deleteCell(4);
@@ -37,4 +34,82 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
 
     tableRowsEditor.viewPrdPlanTable();
     tableRowsEditor.initEditButtons(prdplanEditTable);
+})();
+
+(function () {
+    const insertFileBtn = document.getElementById("insert-file");
+    const insertFileLabel = document.getElementById("insert-file-label");
+    const insertUploadBtn = document.getElementById("insert-upload");
+    const editRefreshBtn = document.getElementById("edit-refresh");
+    const editUploadBtn = document.getElementById("edit-upload");
+    const viewRefreshBtn = document.getElementById("view-refresh");
+    const viewDownloadBtn = document.getElementById("view-download");
+
+    insertFileBtn.addEventListener("change", function (e) {
+        const currentTable = document.querySelector("div[style='display: block;'] table");
+        const result = excelParser.sheetToTable(insertFileBtn.files[0], currentTable, true, -2);
+
+        result.then(value => {
+            tableRowsEditor.addPrdPlanTableUtilBtn(currentTable);
+        });
+    });
+
+    insertUploadBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentTable = document.querySelector("div[style='display: block;'] table");
+        const dest = "/internal/product/register/prdplan";
+        const result = excelParser.tableUpload(dest, currentTable);
+        result.then(res => {
+            alert(res.message);
+            viewRefreshBtn.dispatchEvent(new Event("click"));
+            editRefreshBtn.dispatchEvent(new Event("click"));
+        });
+    });
+
+    viewRefreshBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        tableRowsEditor.viewPrdPlanTable();
+    });
+
+    viewDownloadBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentTable = document.querySelector("div[style='display: block;'] table");
+        excelParser.tableToFile(currentTable, currentTable.id + ".xlsx");
+    });
+
+    editRefreshBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        tableRowsEditor.viewPrdPlanTable();
+    });
+
+    editUploadBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const currentTable = document.querySelector("div[style='display: block;'] table");
+        const deleteResult = tableRowsEditor.uploadEditedTable(currentTable, "prdplan");
+
+        if (deleteResult === null) { console.log("테이블 참조가 잘못되었습니다."); return; }
+
+        deleteResult.then(res => {
+            alert(res.message);
+            editRefreshBtn.dispatchEvent(new Event("click"));
+            viewRefreshBtn.dispatchEvent(new Event("click"));
+        });
+    });
+
+    tutorialMessage.bindTutorialMessage(insertFileLabel, tmessage.insertFileBtnTutorial);
+    tutorialMessage.bindTutorialMessage(insertUploadBtn, tmessage.insertUploadBtnTutorial);
+    tutorialMessage.bindTutorialMessage(viewRefreshBtn, tmessage.viewRefreshBtnTutorial);
+    tutorialMessage.bindTutorialMessage(viewDownloadBtn, tmessage.viewDownloadBtnTutorial)
+    tutorialMessage.bindTutorialMessage(editRefreshBtn, tmessage.editRefreshBtnTutorial);
+    tutorialMessage.bindTutorialMessage(editUploadBtn, tmessage.editUploadBtnTutorial);
 })();

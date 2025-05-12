@@ -86,6 +86,7 @@ tr:hover .opacity-btn {
 }
 
 .indirect-time, .indirect-time::-webkit-calendar-picker-indicator {
+    border: none;
     background: transparent;
     color: transparent;
     cursor: pointer;
