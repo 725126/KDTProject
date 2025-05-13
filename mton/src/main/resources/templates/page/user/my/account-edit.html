@@ -211,44 +211,92 @@
     </div>
 
     <!-- 주소 입력 모달 -->
+    <!-- 주소 입력 모달 -->
     <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">
         <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title" id="addressModalLabel">주소 입력</h5>
+            <div class="modal-content border-0 shadow-lg rounded-4">
+                <div class="modal-header bg-light border-bottom-0">
+                    <h5 class="modal-title fw-bold" id="addressModalLabel">
+                        <i class="bi bi-geo-alt-fill me-2 text-primary"></i>주소 입력
+                    </h5>
                     <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
                 </div>
-                <div class="modal-body">
+
+                <div class="modal-body px-5 py-4">
                     <!-- ID 유지! -->
-                    <div class="mt-4 mb-3 col-md-8">
-                        <label for="postcode" class="form-label">우편번호</label>
+                    <div class="mb-4">
+                        <label for="postcode" class="form-label fw-semibold">우편번호</label>
                         <div class="input-group">
                             <input type="text" id="postcode" class="form-control" placeholder="우편번호" readonly>
-                            <button type="button" class="btn btn-outline-secondary" onclick="addressDaumPostcode()">주소 찾기</button>
+                            <button type="button" class="btn btn-outline-dark px-4" onclick="addressDaumPostcode()">
+                                <i class="bi bi-search me-1"></i>주소 찾기
+                            </button>
                         </div>
                     </div>
-                    <div class="mb-3">
-                        <label for="address" class="form-label">주소</label>
+
+                    <div class="mb-4">
+                        <label for="address" class="form-label fw-semibold">주소</label>
                         <input type="text" id="address" class="form-control" placeholder="주소" readonly>
                     </div>
-                    <div class="mb-3 row g-3">
+
+                    <div class="row g-4">
                         <div class="col-md-6">
-                            <label for="detailAddress" class="form-label">상세주소</label>
+                            <label for="detailAddress" class="form-label fw-semibold">상세주소</label>
                             <input type="text" id="detailAddress" class="form-control" placeholder="상세주소 입력">
                         </div>
                         <div class="col-md-6">
-                            <label for="extraAddress" class="form-label">참고항목</label>
+                            <label for="extraAddress" class="form-label fw-semibold">참고항목</label>
                             <input type="text" id="extraAddress" class="form-control" placeholder="참고항목 입력">
                         </div>
                     </div>
                 </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-primary" onclick="applyFullAddress()">확인</button>
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+
+                <div class="modal-footer border-top-0 bg-light px-5 py-3">
+                    <button type="button" class="btn btn-primary px-4" onclick="applyFullAddress()">확인</button>
+                    <button type="button" class="btn btn-outline-secondary px-4" data-bs-dismiss="modal">취소</button>
                 </div>
             </div>
         </div>
     </div>
+
+    <!--    <div class="modal fade" id="addressModal" tabindex="-1" aria-labelledby="addressModalLabel" aria-hidden="true">-->
+<!--        <div class="modal-dialog modal-lg">-->
+<!--            <div class="modal-content">-->
+<!--                <div class="modal-header">-->
+<!--                    <h5 class="modal-title" id="addressModalLabel">주소 입력</h5>-->
+<!--                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>-->
+<!--                </div>-->
+<!--                <div class="modal-body">-->
+<!--                    &lt;!&ndash; ID 유지! &ndash;&gt;-->
+<!--                    <div class="mt-4 mb-3 col-md-8">-->
+<!--                        <label for="postcode" class="form-label">우편번호</label>-->
+<!--                        <div class="input-group">-->
+<!--                            <input type="text" id="postcode" class="form-control" placeholder="우편번호" readonly>-->
+<!--                            <button type="button" class="btn btn-outline-secondary" onclick="addressDaumPostcode()">주소 찾기</button>-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                    <div class="mb-3">-->
+<!--                        <label for="address" class="form-label">주소</label>-->
+<!--                        <input type="text" id="address" class="form-control" placeholder="주소" readonly>-->
+<!--                    </div>-->
+<!--                    <div class="mb-3 row g-3">-->
+<!--                        <div class="col-md-6">-->
+<!--                            <label for="detailAddress" class="form-label">상세주소</label>-->
+<!--                            <input type="text" id="detailAddress" class="form-control" placeholder="상세주소 입력">-->
+<!--                        </div>-->
+<!--                        <div class="col-md-6">-->
+<!--                            <label for="extraAddress" class="form-label">참고항목</label>-->
+<!--                            <input type="text" id="extraAddress" class="form-control" placeholder="참고항목 입력">-->
+<!--                        </div>-->
+<!--                    </div>-->
+<!--                </div>-->
+<!--                <div class="modal-footer">-->
+<!--                    <button type="button" class="btn btn-primary" onclick="applyFullAddress()">확인</button>-->
+<!--                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>-->
+<!--                </div>-->
+<!--            </div>-->
+<!--        </div>-->
+<!--    </div>-->
 
     <!-- 관리자 > 회원 탈퇴 성공 시 -->
     <!-- 중앙 Toast 컨테이너 -->
