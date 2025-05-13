@@ -373,7 +373,7 @@ async function jsonFetcher(dest, jData) {
 }
 
 // 수정 테이블의 사항을 데이터베이스에 반영한다.
-function uploadEditedTable(table, request) {
+function uploadEditedTable(table, request, del, upd) {
     let jsonData;
     let jsonFinalData;
     let deleteDest;
@@ -388,6 +388,7 @@ function uploadEditedTable(table, request) {
         console.log("삭제사항은 없습니다.");
     }
 
+    // 왠만하면 여기에 경우의 수를 추가하지 말 것. 써보니까 엄청 힘듦.
     switch (request) {
         case "mat":
         case "material":
@@ -414,7 +415,8 @@ function uploadEditedTable(table, request) {
             updateDest = "/internal/procurement/update/pplan";
             break;
         default:
-            jsonData = null;
+            deleteDest = del;
+            updateDest = upd;
     }
 
     jsonData = jsonFetcher(deleteDest, deleteList);
