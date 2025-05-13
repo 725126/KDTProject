@@ -243,7 +243,7 @@ public class ProductController {
         log.info(list.toString());
 
         if (list.isEmpty()) {
-            return new StatusTuple(false, "상품 수정사항은 업습니다.");
+            return new StatusTuple(false, "상품 수정사항은 없습니다.");
         }
 
         List<ProductDTO> productDTOList = list.stream().map(hashmap -> ProductDTO.builder()

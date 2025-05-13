@@ -409,8 +409,8 @@ function uploadEditedTable(table, request) {
             break;
         case "pplan":
         case "procurementplan":
-            deleteDest = "/internal/product/delete/pplan";
-            updateDest = "/internal/product/update/pplan";
+            deleteDest = "/internal/procurement/delete/pplan";
+            updateDest = "/internal/procurement/update/pplan";
             break;
         default:
             jsonData = null;
