@@ -20,66 +20,73 @@
                     <div class="col-md-4 col-lg-4">
                         <label class="form-label">입고예정일</label>
                         <div class="d-flex gap-1">
-                            <input type="date" class="form-control" id="search-expected-start">
+                            <input type="date" class="form-control" name="deliveryPartnerItemDateStart"
+                                   th:value="${pageRequestDTO.deliveryPartnerItemDateStart != null ?
+                                   #temporals.format(pageRequestDTO.deliveryPartnerItemDateStart, 'yyyy-MM-dd') : ''}">
                             <span class="pt-2">~</span>
-                            <input type="date" class="form-control" id="search-expected-end">
+                            <input type="date" class="form-control" name="deliveryPartnerItemDateEnd"
+                                   th:value="${pageRequestDTO.deliveryPartnerItemDateEnd != null ?
+                                   #temporals.format(pageRequestDTO.deliveryPartnerItemDateEnd, 'yyyy-MM-dd') : ''}">
                         </div>
                     </div>
 
                     <!-- 입고코드 -->
                     <div class="col-md-2">
-                        <label class="form-label">입고코드</label>
-                        <input type="text" class="form-control" id="search-code">
+                        <label class="form-label" for="incomingCode">입고코드</label>
+                        <input type="text" class="form-control" id="incomingCode" name="incomingCode"
+                               th:value="${pageRequestDTO.incomingCode}">
                     </div>
 
                     <!-- 협력사 -->
                     <div class="col-md-2">
-                        <label class="form-label">협력사</label>
-                        <input type="text" class="form-control" id="search-supplier">
+                        <label class="form-label" for="pCompany">협력사</label>
+                        <input type="text" class="form-control" id="pCompany" name="pCompany"
+                               th:value="${pageRequestDTO.pCompany}">
                     </div>
 
                     <!-- 자재코드 -->
                     <div class="col-md-2">
-                        <label class="form-label">자재코드</label>
-                        <input type="text" class="form-control" id="search-material-code">
+                        <label class="form-label" for="matId">자재코드</label>
+                        <input type="text" class="form-control" id="matId" name="matId"
+                               th:value="${pageRequestDTO.matId}">
                     </div>
 
                     <!-- 자재명 -->
                     <div class="col-md-2">
-                        <label class="form-label">자재명</label>
-                        <input type="text" class="form-control" id="search-material-name">
+                        <label class="form-label" for="matName">자재명</label>
+                        <input type="text" class="form-control" id="matName" name="matName"
+                               th:value="${pageRequestDTO.matName}">
                     </div>
 
                     <!-- 입고일 -->
                     <div class="col-md-4 col-lg-4">
                         <label class="form-label">입고일</label>
                         <div class="d-flex gap-1">
-                            <input type="date" class="form-control" id="search-incoming-start">
+                            <input type="date" class="form-control" name="incomingFirstDateStart"
+                                   th:value="${pageRequestDTO.incomingFirstDateStart != null ?
+                                   #temporals.format(pageRequestDTO.incomingFirstDateStart, 'yyyy-MM-dd') : ''}">
                             <span class="pt-2">~</span>
-                            <input type="date" class="form-control" id="search-incoming-end">
+                            <input type="date" class="form-control" name="incomingFirstDateEnd"
+                                   th:value="${pageRequestDTO.incomingFirstDateEnd != null ?
+                                   #temporals.format(pageRequestDTO.incomingFirstDateEnd, 'yyyy-MM-dd') : ''}">
                         </div>
                     </div>
 
-                    <!-- 입고마감일 -->
-                    <div class="col-md-4 col-lg-4">
-                        <label class="form-label">입고마감일</label>
-                        <div class="d-flex gap-1">
-                            <input type="date" class="form-control" id="search-complete-start">
-                            <span class="pt-2">~</span>
-                            <input type="date" class="form-control" id="search-complete-end">
-                        </div>
-                    </div>
-
-                    <!-- 진행상태 -->
                     <div class="col-md-2">
-                        <label class="form-label">진행상태</label>
-                        <input type="text" class="form-control" id="search-status">
+                        <label class="form-label" for="incomingStatus">진행상태</label>
+                        <select class="form-select" id="incomingStatus" name="incomingStatus">
+                            <option value="" th:selected="${pageRequestDTO.incomingStatus == null}">전체</option>
+                            <option value="미입고" th:selected="${pageRequestDTO.incomingStatus == '미입고'}">미입고</option>
+                            <option value="부분입고" th:selected="${pageRequestDTO.incomingStatus == '부분입고'}">부분입고</option>
+                            <option value="입고마감대기중" th:selected="${pageRequestDTO.incomingStatus == '입고마감대기중'}">입고마감대기중</option>
+                            <option value="입고마감" th:selected="${pageRequestDTO.incomingStatus == '입고마감'}">입고마감</option>
+                        </select>
                     </div>
 
                     <!-- 버튼 -->
                     <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" class="btn btn-primary" onclick="searchTable()"><i class="bi bi-search"></i> 검색</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="resetSearch()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                        <button type="submit" class="btn btn-primary" ><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary clearBtn" ><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                     </div>
                 </div>
             </form>
@@ -108,22 +115,23 @@
                 </tr>
                 </thead>
                 <tbody id="inspection-body">
-                <tr>
+                <tr th:each="incomingItem:${incomingItemList}" th:data-id="${incomingItem.incomingItemId}">
                     <td><input type="checkbox" class="row-check"></td>
-                    <td>2025-04-10</td>
-                    <td>INC-24041001</td>
-                    <td>협력사A</td>
-                    <td>MAT-001</td>
-                    <td>전기자전거 모터</td>
-                    <td>100</td>
-                    <td>100</td>
-                    <td>0</td>
-                    <td>0</td>
-                    <td>100</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td>수원</td>
-                    <td class="text-center"><span class="badge bg-secondary">미입고</span></td>
+                    <td th:text="${incomingItem.deliveryPartnerItemDate}"></td>
+                    <td th:text="${incomingItem.incomingCode}"></td>
+                    <td th:text="${incomingItem.pCompany}"></td>
+                    <td th:text="${incomingItem.matId}"></td>
+                    <td th:text="${incomingItem.matName}"></td>
+                    <td th:text="${incomingItem.drItemQty}"></td>
+                    <td th:text="${incomingItem.deliveryPartnerItemQty}"></td>
+                    <td th:text="${incomingItem.incomingTotalQty}"></td>
+                    <td th:text="${incomingItem.incomingReturnTotalQty}"></td>
+                    <td th:text="${incomingItem.drItemQty - incomingItem.incomingTotalQty
+                                                    + incomingItem.incomingReturnTotalQty}"></td>
+                    <td th:text="${incomingItem.incomingFirstDate}"></td>
+                    <td th:text="${incomingItem.incomingCompletedAt}"></td>
+                    <td></td>
+                    <td class="text-center"><span class="badge bg-secondary" th:text="${incomingItem.incomingStatus}"></span></td>
                 </tr>
                 </tbody>
             </table>
@@ -153,6 +161,13 @@
     </div>
 
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
 
+        self.location = '/internal/incoming/inspection'
+    }, false)
+</script>
 </body>
 </html>

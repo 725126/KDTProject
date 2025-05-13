@@ -19,26 +19,14 @@ public class Incoming {
   private Long incomingId;
 
   @ManyToOne
+  @JoinColumn(name = "incoming_total_id", nullable = false)
+  private IncomingTotal incomingTotal;
+
+  @ManyToOne
   @JoinColumn(name = "delivery_partner_item_id", nullable = false)
   private DeliveryPartnerItem deliveryPartnerItem;
 
   @Column(nullable = false)
   private String incomingCode;
-
-  @Column(nullable = true)
-  private LocalDateTime incomingCompletedAt;
-
-  @Column(nullable = false)
-  private int incomingQty = 0;
-
-  @Column(nullable = false)
-  private int incomingReturnQty = 0;
-
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private IncomingStatus incomingStatus;
-
-  @Column(nullable = true)
-  private LocalDateTime incomingDate;
 
 }

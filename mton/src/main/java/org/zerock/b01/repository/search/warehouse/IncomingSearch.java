@@ -14,4 +14,10 @@ public interface IncomingSearch {
                                 String matId, String matName,
                                 Pageable pageable);
 
+  Page<Incoming> searchIncomingInspection(LocalDate deliveryPartnerItemDateStart,
+                                          LocalDate deliveryPartnerItemDateEnd, String incomingCode,
+                                          String pCompany, String matId, String matName,
+                                          LocalDate incomingFirstDateStart, LocalDate incomingFirstDateEnd,
+                                          String incomingStatus, Pageable pageable);
+
 }

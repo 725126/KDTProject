@@ -28,7 +28,6 @@ import java.util.stream.Collectors;
 public class DeliveryRequestServiceImpl implements DeliveryRequestService {
 
   private final DeliveryRequestRepository deliveryRequestRepository;
-  private final OrderingRepository orderingRepository;
   private final CompanyStorageRepository companyStorageRepository;
   private final DeliveryRequestItemRepository deliveryRequestItemRepository;
 

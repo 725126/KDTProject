@@ -34,7 +34,4 @@ public class IncomingItem {
   @Column(nullable = false)
   private int incomingItemReturnQty = 0;
 
-  @Enumerated(EnumType.STRING)
-  @Column(nullable = false)
-  private IncomingItemStatus incomingItemStatus;
 }

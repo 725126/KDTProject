@@ -157,6 +157,26 @@
         }
     });
 
+    // 날짜 제한 갱신
+    function updateLastDrItemDueDate() {
+        const table = document.getElementById('instructionTable');
+        let latestDueDate = null;
+
+        // 모든 행에서 가장 최신 날짜를 찾음
+        Array.from(table.rows).forEach(row => {
+            const dueDateCell = row.querySelector('.drItemDueDate');
+            if (dueDateCell) {
+                const dueDate = parseDateOnly(dueDateCell.textContent);
+                if (!latestDueDate || dueDate > latestDueDate) {
+                    latestDueDate = dueDate;
+                }
+            }
+        });
+
+        lastDrItemDueDate = latestDueDate ? latestDueDate : null;
+        console.log('Updated Last Due Date:', lastDrItemDueDate);
+    }
+
     function parseDateOnly(dateStr) {
         // "yyyy-MM-dd" 문자열을 로컬 시간 기준으로 Date 객체 생성
         const [year, month, day] = dateStr.split('-').map(Number);
@@ -249,10 +269,14 @@
 
                 addRowToTable(drItemId, drItemCode, drItemDueDate, drItemQty, creDate, cstorageId);
 
+
                 // 입력 필드 초기화
                 document.getElementById('drItemDueDate').value = '';
                 document.getElementById('drItemQty').value = '';
                 document.getElementById('cstorage').value = '';
+
+                getLastDrItemDueDate(drId);
+
             })
             .catch(error => {
                 console.error('Error:', error);
@@ -431,6 +455,10 @@
                     document.getElementById('updateButton').style.display = 'none';
                     document.getElementById('addButton').style.display = 'inline-block';
 
+                    // 수정 취소 버튼을 보이게 설정
+                    document.getElementById('cancelButton').style.display = 'none';
+                    document.getElementById('removeButton').style.display = 'inline-block';
+
                     // 입력값 초기화
                     document.getElementById('drItemDueDate').value = '';
                     document.getElementById('drItemQty').value = '';
@@ -439,6 +467,9 @@
                     editingRow = null;
 
                     alert('수정이 완료되었습니다.');
+
+                    // 날짜 제한 갱신
+                    updateLastDrItemDueDate();
                 }
             })
             .catch(error => {
@@ -451,6 +482,8 @@
     // 마지막 행 삭제 함수
     function deleteLastInstruction() {
         const table = document.getElementById('instructionTable');
+        const drId = document.getElementById('drId').value;
+
         if (table.rows.length > 0) {
             const lastRow = table.rows[table.rows.length - 1];
             const drItemId = lastRow.querySelector('button').dataset.drItemId;
@@ -472,7 +505,10 @@
                         lastRow.remove();
 
                         // 총 지시수량 갱신
-                        updateTotalQty();
+                        updateTotalQty()
+
+                        getLastDrItemDueDate(drId);
+
                     } else {
                         alert('이미 출고 된 항목은 삭제할 수 없습니다. ');
                     }
