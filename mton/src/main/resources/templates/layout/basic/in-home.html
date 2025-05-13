@@ -49,15 +49,15 @@
                     </a>
                 </li>
                 <!-- import 필요 -->
-                <th:block th:with="ADMIN=${T(org.zerock.b01.domain.user.UserRole).ADMIN}">
+                <th:block>
 
                     <!-- ADMIN이 아니면 탈퇴 링크 -->
-                    <li th:if="${currentUserRole != ADMIN}">
+                    <li th:if="${currentUserRole != null && currentUserRole.name() != 'ADMIN'}">
                         <a class="dropdown-item" href="/internal/my/account-delete">회원 탈퇴</a>
                     </li>
 
                     <!-- ADMIN이면 관리자 페이지 링크 -->
-                    <li th:if="${currentUserRole == ADMIN}">
+                    <li th:if="${currentUserRole != null && currentUserRole.name() == 'ADMIN'}">
                         <a class="dropdown-item" href="/admin/my/user-list">관리페이지</a>
                     </li>
 
