@@ -12,9 +12,9 @@ import java.time.LocalDateTime;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class IncomingInspectionDTO {
+public class IncomingItemDTO {
 
-  private Long incomingId;
+  private Long incomingItemId;
 
   private LocalDate deliveryPartnerItemDate;
 
@@ -30,23 +30,17 @@ public class IncomingInspectionDTO {
 
   private int deliveryPartnerItemQty;
 
-  private int incomingQty;
+  private int incomingEffectiveQty;
 
-  private int incomingReturnQty;
+  private int incomingTotalQty;
 
-  private LocalDateTime incomingDate;
+  private int incomingReturnTotalQty;
+
+  private LocalDateTime incomingFirstDate;
 
   private LocalDateTime incomingCompletedAt;
 
   private String incomingStatus;
 
   private String cstorageId;
-
-
-
-
-
-  private LocalDateTime creDate;
-
-
 }

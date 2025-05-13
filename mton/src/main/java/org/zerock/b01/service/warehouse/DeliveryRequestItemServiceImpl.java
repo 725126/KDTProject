@@ -13,10 +13,8 @@ import org.zerock.b01.domain.warehouse.*;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.warehouse.DeliveryRequestItemDTO;
-import org.zerock.b01.repository.warehouse.CompanyStorageRepository;
-import org.zerock.b01.repository.warehouse.DeliveryPartnerRepository;
-import org.zerock.b01.repository.warehouse.DeliveryRequestItemRepository;
-import org.zerock.b01.repository.warehouse.DeliveryRequestRepository;
+import org.zerock.b01.repository.search.warehouse.IncomingSearch;
+import org.zerock.b01.repository.warehouse.*;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -35,6 +33,7 @@ public class DeliveryRequestItemServiceImpl implements DeliveryRequestItemServic
   private final DeliveryRequestService deliveryRequestService;
   private final CompanyStorageRepository companyStorageRepository;
   private final DeliveryPartnerRepository deliveryPartnerRepository;
+  private final IncomingTotalRepository incomingTotalRepository;
 
 
   @Override
@@ -94,9 +93,22 @@ public class DeliveryRequestItemServiceImpl implements DeliveryRequestItemServic
 
     deliveryRequestService.updateDeliveryRequestStatus(deliveryRequest.getDrId());
 
+    // IncomingTotal 생성
+    IncomingTotal incomingTotal = IncomingTotal.builder()
+            .deliveryRequestItem(saved) // 필수
+            .incomingEffectiveQty(0)
+            .incomingTotalQty(0)
+            .incomingReturnTotalQty(0)
+            .incomingStatus(IncomingStatus.미입고) // 또는 적절한 enum 값
+            .build();
+
+// 저장
+    IncomingTotal savedIncomingTotal = incomingTotalRepository.save(incomingTotal);
+
     // DeliveryPartner 생성
     DeliveryPartner deliveryPartner = DeliveryPartner.builder()
             .deliveryRequestItem(saved)
+            .incomingTotal(savedIncomingTotal)
             .deliveryPartnerQty(0)
             .deliveryPartnerStatus(DeliveryPartnerStatus.진행중)
             .build();
@@ -151,8 +163,8 @@ public class DeliveryRequestItemServiceImpl implements DeliveryRequestItemServic
     if (dpOptional.isPresent()) {
       DeliveryPartner deliveryPartner = dpOptional.get();
       int alreadyDeliveredQty = deliveryPartner.getDeliveryPartnerQty();
-      int returnQty = (deliveryPartner.getIncoming() != null)
-              ? deliveryPartner.getIncoming().getIncomingReturnQty() : 0;
+      int returnQty = (deliveryPartner.getIncomingTotal() != null)
+              ? deliveryPartner.getIncomingTotal().getIncomingReturnTotalQty() : 0;
       int newQty = deliveryRequestItemDTO.getDrItemQty();
 
       if (newQty < 0) {
@@ -209,13 +221,13 @@ public class DeliveryRequestItemServiceImpl implements DeliveryRequestItemServic
       // 연관된 DeliveryPartner가 있으면 삭제
       if (deliveryPartnerOptional.isPresent()) {
         DeliveryPartner deliveryPartner = deliveryPartnerOptional.get();
-        Incoming incoming = deliveryPartner.getIncoming();
+        IncomingTotal incomingTotal = deliveryPartner.getIncomingTotal();
 
         int drItemQty = deliveryRequestItem.getDrItemQty();
         int deliveryPartnerQty = deliveryPartner.getDeliveryPartnerQty();
-        int incomingReturnQty = incoming != null ? incoming.getIncomingReturnQty() : 0;
+        int incomingReturnTotalQty = incomingTotal != null ? incomingTotal.getIncomingReturnTotalQty() : 0;
 
-        int remainingQty = drItemQty - deliveryPartnerQty + incomingReturnQty;
+        int remainingQty = drItemQty - deliveryPartnerQty + incomingReturnTotalQty;
 
         // 남은 수량이 전체 수량과 동일해야 삭제 허용
         if (remainingQty != drItemQty) {

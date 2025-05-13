@@ -51,6 +51,8 @@ public class PageRequestDTO {
 
     private String matId;
 
+    private String incomingStatus;
+
     private LocalDate drItemDueDateStart;
 
     private LocalDate drItemDueDateEnd;
@@ -62,6 +64,10 @@ public class PageRequestDTO {
     private LocalDate deliveryPartnerItemDateStart;
 
     private LocalDate deliveryPartnerItemDateEnd;
+
+    private LocalDate incomingFirstDateStart;
+
+    private LocalDate incomingFirstDateEnd;
 
     public String[] getTypes() {
         if (type == null || type.isEmpty()) {

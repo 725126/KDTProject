@@ -20,31 +20,39 @@
                     <div class="col-lg-4 col-md-6">
                         <label class="form-label">입고예정일</label>
                         <div class="d-flex gap-1">
-                            <input type="date" class="form-control" id="search-incoming-start">
+                            <input type="date" class="form-control" id="deliveryPartnerItemDateStart" name="deliveryPartnerItemDateStart"
+                                   th:value="${pageRequestDTO.deliveryPartnerItemDateStart != null ?
+                                   #temporals.format(pageRequestDTO.deliveryPartnerItemDateStart, 'yyyy-MM-dd') : ''}">
                             <span class="pt-2">~</span>
-                            <input type="date" class="form-control" id="search-incoming-end">
+                            <input type="date" class="form-control" name="deliveryPartnerItemDateEnd"
+                                   th:value="${pageRequestDTO.deliveryPartnerItemDateEnd != null ?
+                                   #temporals.format(pageRequestDTO.deliveryPartnerItemDateEnd, 'yyyy-MM-dd') : ''}">
                         </div>
                     </div>
                     <div class="col-lg-2 col-md-3">
-                        <label class="form-label">입고코드</label>
-                        <input type="text" class="form-control" id="search-incoming-code">
+                        <label for="incomingCode" class="form-label">입고코드</label>
+                        <input type="text" class="form-control" id="incomingCode" name="incomingCode"
+                               th:value="${pageRequestDTO.incomingCode}">
                     </div>
 
                     <div class="col-md-2">
-                        <label for="search-partner" class="form-label">협력사</label>
-                        <input type="text" class="form-control" id="search-partner">
+                        <label for="pCompany" class="form-label">협력사</label>
+                        <input type="text" class="form-control" id="pCompany" name="pCompany"
+                               th:value="${pageRequestDTO.pCompany}">
                     </div>
                     <div class="col-md-2">
-                        <label for="search-material-code" class="form-label">자재코드</label>
-                        <input type="text" class="form-control" id="search-material-code">
+                        <label for="matId" class="form-label">자재코드</label>
+                        <input type="text" class="form-control" id="matId" name="matId"
+                               th:value="${pageRequestDTO.matId}">
                     </div>
                     <div class="col-md-2">
-                        <label for="search-material-name" class="form-label">자재명</label>
-                        <input type="text" class="form-control" id="search-material-name">
+                        <label for="matName" class="form-label">자재명</label>
+                        <input type="text" class="form-control" id="matName" name="matName"
+                               th:value="${pageRequestDTO.matName}">
                     </div>
                     <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                        <button type="submit" class="btn btn-primary" ><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary clearBtn" ><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                     </div>
                 </div>
             </div>
@@ -79,6 +87,13 @@
         </div>
     </div>
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
 
+        self.location = '/internal/incoming/planned'
+    }, false)
+</script>
 </body>
 </html>

@@ -54,7 +54,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
 
       DeliveryRequestItem deliveryRequestItem = deliveryPartner.getDeliveryRequestItem();
       Ordering ordering = deliveryPartner.getDeliveryRequestItem().getDeliveryRequest().getOrdering();
-      Incoming incoming = deliveryPartner.getIncoming();
+      IncomingTotal incomingTotal = deliveryPartner.getIncomingTotal();
 
       // DTO 생성
       DeliveryPartnerDTO dto = DeliveryPartnerDTO.builder()
@@ -66,7 +66,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
               .matName(ordering.getContractMaterial().getMaterial().getMatName())
               .drItemQty(deliveryRequestItem.getDrItemQty())
               .drItemDueDate(deliveryRequestItem.getDrItemDueDate())
-              .incomingReturnQty(incoming != null ? incoming.getIncomingReturnQty() : 0)
+              .incomingReturnQty(incomingTotal != null ? incomingTotal.getIncomingReturnTotalQty() : 0)
               .build();
 
       dtoList.add(dto);

@@ -11,6 +11,8 @@ import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.warehouse.DeliveryRequestItemDTO;
 import org.zerock.b01.dto.warehouse.IncomingDTO;
+import org.zerock.b01.dto.warehouse.IncomingItemDTO;
+import org.zerock.b01.service.warehouse.IncomingItemService;
 import org.zerock.b01.service.warehouse.IncomingService;
 
 @Controller("incomingWarehouseController")
@@ -20,10 +22,11 @@ import org.zerock.b01.service.warehouse.IncomingService;
 public class IncomingController { // 입고
 
     private final IncomingService incomingService;
+    private final IncomingItemService incomingItemService;
 
     //입고 예정 페이지
     @GetMapping("/planned")
-    public String listDeliveryRequestItems(PageRequestDTO pageRequestDTO, Model model) {
+    public String listIncoming(PageRequestDTO pageRequestDTO, Model model) {
 
         // 전체 납입지시 상세 항목 페이징 조회
         PageResponseDTO<IncomingDTO> incomingList =
@@ -36,11 +39,20 @@ public class IncomingController { // 입고
         return "/page/warehouse/incoming/planned";
     }
 
-    // 입고 검수
-    @GetMapping("/inspection")
-    public String inspectionGet() {
-        return "/page/warehouse/incoming/inspection";
-    }
+//    // 입고 검수
+//    @GetMapping("/inspection")
+//    public String listIncomingItems(PageRequestDTO pageRequestDTO, Model model) {
+//
+//        // 전체 납입지시 상세 항목 페이징 조회
+//        PageResponseDTO<IncomingItemDTO> incomingItemList =
+//                incomingItemService.listWithIncomingItem(pageRequestDTO);
+//
+//        model.addAttribute("incomingItemList", incomingItemList.getDtoList());
+//        model.addAttribute("pageRequestDTO", pageRequestDTO);
+//        model.addAttribute("totalCount", incomingItemList.getTotal());
+//
+//        return "/page/warehouse/incoming/inspection";
+//    }
 
     // 입고 이력
     @GetMapping("/history")

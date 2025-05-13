@@ -9,7 +9,7 @@ import org.zerock.b01.domain.BaseEntity;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@ToString(exclude = "incomingItem")
+@ToString
 public class DeliveryPartner extends BaseEntity {
 
   @Id
@@ -20,9 +20,9 @@ public class DeliveryPartner extends BaseEntity {
   @JoinColumn(name = "dr_item_id", nullable = false)
   private DeliveryRequestItem deliveryRequestItem;
 
-  @ManyToOne
-  @JoinColumn(name = "incoming_id", nullable = false)
-  private Incoming incoming;
+  @ManyToOne(cascade = CascadeType.REMOVE)
+  @JoinColumn(name = "incoming_total_id", nullable = false)
+  private IncomingTotal incomingTotal;
 
   @Column(nullable = false)
   private int deliveryPartnerQty = 0;
@@ -36,11 +36,11 @@ public class DeliveryPartner extends BaseEntity {
     // 발주된 총 수량
     int drItemQty = deliveryRequestItem.getDrItemQty();
     // 반품 수량 (incomingItem이 없으면 0)
-    int incomingReturnQty = (incoming != null)
-            ? incoming.getIncomingReturnQty()
+    int incomingReturnTotalQty = (incomingTotal != null)
+            ? incomingTotal.getIncomingReturnTotalQty()
             : 0;
     // 남은 수량 = 발주수량 - 이미 입고된 수량 + 반품 수량
-    int remainingQty = drItemQty - this.deliveryPartnerQty + incomingReturnQty;
+    int remainingQty = drItemQty - this.deliveryPartnerQty + incomingReturnTotalQty;
 
     if (qtyToAdd > remainingQty) {
       throw new IllegalArgumentException(
