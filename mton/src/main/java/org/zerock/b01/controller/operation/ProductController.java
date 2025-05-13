@@ -80,10 +80,11 @@ public class ProductController {
                 log.info(count);
 
                 if (count != null) {
-                    int coundId = Integer.parseInt(count.substring(count.indexOf("PRDPLAN") + 7)) + atomicInteger.getAndIncrement();
-                    id = "PRDPLAN" + String.format("%3d", coundId).replace(" ", "0");
+                    int countId = Integer.parseInt(count.substring(count.indexOf("PRDPLAN") + 7)) + atomicInteger.getAndIncrement();
+                    id = "PRDPLAN" + String.format("%3d", countId).replace(" ", "0");
                 } else {
-                    id = "PRDPLAN001";
+                    int countId = atomicInteger.getAndIncrement();
+                    id = "PRDPLAN" + String.format("%3d", countId).replace(" ", "0");
                 }
             }
 
@@ -123,7 +124,8 @@ public class ProductController {
                     int countId = Integer.parseInt(count.substring(count.indexOf("EW") + 2)) + atomicInteger.getAndIncrement();
                     id = "EW" + String.format("%3d", countId).replace(" ", "0");
                 } else {
-                    id = "EW001";
+                    int countId = atomicInteger.getAndIncrement();
+                    id = "EW" + String.format("%3d", countId).replace(" ", "0");
                 }
             }
 
@@ -161,7 +163,8 @@ public class ProductController {
                     int countId = Integer.parseInt(count.substring(count.indexOf("P") + 1)) + atomicInteger.getAndIncrement();
                     id = "P" + String.format("%3d", countId).replace(" ", "0");
                 } else {
-                    id = "P001";
+                    int countId = atomicInteger.getAndIncrement();
+                    id = "P" + String.format("%3d", countId).replace(" ", "0");
                 }
             }
 
@@ -197,7 +200,8 @@ public class ProductController {
                     int countId = Integer.parseInt(count.substring(count.indexOf("PBOM") + 4)) + atomicInteger.getAndIncrement();
                     id = "PBOM" + String.format("%3d", countId).replace(" ", "0");
                 } else {
-                    id = "PBOM001";
+                    int countId = atomicInteger.getAndIncrement();
+                    id = "PBOM" + String.format("%3d", countId).replace(" ", "0");
                 }
             }
 

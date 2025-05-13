@@ -73,7 +73,8 @@ public class ProcurementController {
                     int countId = Integer.parseInt(count.substring(count.indexOf("PPLAN") + 5)) + atomicInteger.getAndIncrement();
                     id = "PPLAN" + String.format("%03d", countId).replace(" ", "0");
                 } else {
-                    id = "PPLAN001";
+                    int countId = atomicInteger.getAndIncrement();
+                    id = "PPLAN" + String.format("%03d", countId).replace(" ", "0");
                 }
             }
 
