@@ -32,7 +32,7 @@
             <select class="form-select custom-select" id="departmentSelect" name="role">
                 <option value="" disabled th:selected="${selectedRole == null}">회원 종류</option>
                 <option value="" th:selected="${selectedStatus == null}">전체</option>
-                <option value="PARTNER" th:selected="${selectedRole == 'ADMIN'}">관리자</option>
+                <option value="ADMIN" th:selected="${selectedRole == 'ADMIN'}">관리자</option>
                 <option value="PARTNER" th:selected="${selectedRole == 'PARTNER'}">협력 업체</option>
                 <option value="PURCHASING" th:selected="${selectedRole == 'PURCHASING'}">구매 부서</option>
                 <option value="PRODUCTION" th:selected="${selectedRole == 'PRODUCTION'}">생산 부서</option>

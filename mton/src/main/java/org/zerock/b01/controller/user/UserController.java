@@ -553,6 +553,9 @@ public class UserController {
             default -> pageable = PageRequest.of(page, size);
         }
 
+
+        log.info("회원역할: " + role);
+
         Page<User> userPage = userService.findUsersByFilters(keyword, role, status, pageable);
 
         model.addAttribute("userList", userPage.getContent());
