@@ -114,8 +114,8 @@ public class ProcurementController {
 
     @ResponseBody
     @PostMapping("/view/pplan")
-    public List<ProcurementPlanDTO> viewPplan(@RequestBody ArrayList<HashMap<String, String>> list) {
-        log.info(list.toString());
+    public List<ProcurementPlanDTO> viewPplan(@RequestBody String str) {
+        log.info("View PPlan: " + str);
         return procurementPlanService.viewAll();
     }
 

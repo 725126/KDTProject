@@ -77,10 +77,11 @@ public class ProductController {
 
             if (id == null || id.isEmpty()) {
                 String count = productionPlanRepository.findLastOrderIdByPrefix("PRDPLAN");
+                log.info(count);
 
                 if (count != null) {
                     int coundId = Integer.parseInt(count.substring(count.indexOf("PRDPLAN") + 7)) + atomicInteger.getAndIncrement();
-                    id = "PRDPLAN" + String.format("%03d", coundId).replace(" ", "0");
+                    id = "PRDPLAN" + String.format("%3d", coundId).replace(" ", "0");
                 } else {
                     id = "PRDPLAN001";
                 }

@@ -98,7 +98,9 @@ function addUtilButtons(table, row, ...optionFn) {
 
     for (const option of optionFn.flat()) {
         const cell = option(row);
-        cell.setAttribute("contenteditable", "true");
+        if (cell.tagName !== "TH") {
+            cell.setAttribute("contenteditable", "true");
+        }
     }
 
     return row;
@@ -119,6 +121,10 @@ function addPbomTableUtilBtn(table) {
 
 function addPrdPlanTableUtilBtn(table) {
     initEmptyPrdPlanTable(table, true);
+}
+
+function addPPlanTableUtilBtn(table) {
+    initEmptyPPlanTable(table, true);
 }
 
 // 수정테이블의 헤더에 조작버튼 추가
@@ -401,6 +407,11 @@ function uploadEditedTable(table, request) {
             deleteDest = "/internal/product/delete/prdplan";
             updateDest = "/internal/product/update/prdplan";
             break;
+        case "pplan":
+        case "procurementplan":
+            deleteDest = "/internal/product/delete/pplan";
+            updateDest = "/internal/product/update/pplan";
+            break;
         default:
             jsonData = null;
     }
@@ -482,14 +493,41 @@ function initEmptyPrdPlanTable(table, isFile = false) {
         if (isFile && row.rowIndex === 0) {
             continue;
         }
-
-        if (row.rowIndex !== 0) {
-            addUtilButtons(table, row, makePrdSelect, makeDate);
-        } else {
-            addUtilButtons(table, row, makePrdSelect);
-        }
+        addUtilButtons(table, row, makePrdSelect, makeDate);
         tutorialMessage.bindTutorialMessage(table.rows[1].cells[0], tmessage.idCellTutorial);
         table.rows[1].cells[0].style.cursor = "help";
+    }
+}
+
+function initEmptyPPlanTable(table, isFile = false) {
+    const prdplanOptions = prdplanDBData.map(data => data[dbElementNames.prdplanId]);
+    const matOptions = matDBData.map(data => data[dbElementNames.matId]);
+
+    const makePrdplanSelect = (row) => {
+        makeSelectForRawCell(row.cells[1], prdplanOptions);
+        return row.cells[1];
+    }
+
+    const makeMatSelect = (row) => {
+        makeSelectForRawCell(row.cells[2], matOptions);
+        return row.cells[2];
+    }
+
+    const makeDate = (row) => {
+        makeDatePicker(row.cells[4]);
+        return row.cells[4];
+    }
+
+    for (const row of table.rows) {
+        if (isFile && row.rowIndex === 0) {
+            continue;
+        }
+
+        if (row.rowIndex !== 0) {
+            addUtilButtons(table, row, makePrdplanSelect, makeMatSelect, makeDate);
+        } else {
+            addUtilButtons(table, row);
+        }
     }
 }
 
@@ -570,7 +608,7 @@ function reloadTable(table, request) {
             break;
         case "pplan":
         case "productionplan":
-            targetDB = prdDBData;
+            targetDB = pplanDBData;
             break;
         case "pplanedit":
         case "productionplanedit":
@@ -652,7 +690,7 @@ async function refreshPrdPlanDBDataAll() {
 
 async function refreshPPlanDBDataAll() {
     const result = Promise.all([
-        refreshTableView("/internal/procurement/view/procure", "procure"),
+        refreshTableView("/internal/procurement/view/pplan", "procure"),
         refreshTableView("/internal/product/view/prdplan", "prdplan"),
         refreshTableView("/internal/product/view/mat", "material")
     ]);
@@ -660,7 +698,7 @@ async function refreshPPlanDBDataAll() {
     return result.then(
         (values) => {
             pplanDBData = values[0];
-            prdDBData = values[1];
+            prdplanDBData = values[1];
             matDBData = values[2];
             pplanDBEditData = Array.from(values[0]).map(pplan => {
                 const keys = Object.keys(pplan);
@@ -684,6 +722,18 @@ async function refreshPPlanDBDataAll() {
     );
 }
 
+function makeUniCellMessage(table, message) {
+    const tr = document.createElement("tr");
+    tr.insertCell(-1);
+
+    tr.cells[0].colSpan = table.rows[0].cells.length;
+    tr.cells[0].innerText = message;
+
+    table.tBodies[0].innerHTML = "";
+
+    table.tBodies[0].appendChild(tr);
+}
+
 // Product 페이지의 모든 수정 및 목록 테이블 갱신
 function viewAllProductTable() {
     const refresh = refreshProductDBDataAll();
@@ -701,24 +751,35 @@ function viewAllProductTable() {
         if (value[0].length > 0) {
             reloadTable(matViewTable, "material");
             reloadTable(matEditTable, "material");
+
+            addTableEditButtons(matEditTable);
+        } else {
+            makeUniCellMessage(matViewTable, "등록된 내용이 없습니다.");
+            makeUniCellMessage(matEditTable, "수정할 내용이 없습니다.");
         }
 
         if (value[1].length > 0) {
             reloadTable(prdViewTable, "product");
             reloadTable(prdEditTable, "product");
+
+            addTableEditButtons(prdEditTable);
+        } else {
+            makeUniCellMessage(prdViewTable, "등록된 내용이 없습니다.");
+            makeUniCellMessage(prdEditTable, "수정할 내용이 없습니다.");
         }
 
         if (value[2].length > 0) {
             reloadTable(pbomViewTable, "pbom");
             reloadTable(pbomEditTable, "pbom");
+
+            addTableEditButtons(pbomEditTable);
+
+            makeTableCellDBSelect(pbomEditTable, 1, matDBData, dbElementNames.pbomMatId);
+            makeTableCellDBSelect(pbomEditTable, 2, prdDBData, dbElementNames.pbomProdId);
+        } else {
+            makeUniCellMessage(pbomViewTable, "등록된 내용이 없습니다.");
+            makeUniCellMessage(pbomEditTable, "수정할 내용이 없습니다.");
         }
-
-        addTableEditButtons(matEditTable);
-        addTableEditButtons(prdEditTable);
-        addTableEditButtons(pbomEditTable);
-
-        makeTableCellDBSelect(pbomEditTable, 1, matDBData, dbElementNames.pbomMatId);
-        makeTableCellDBSelect(pbomEditTable, 2, prdDBData, dbElementNames.pbomProdId);
 
         originalValues = {};
 
@@ -737,12 +798,15 @@ function viewPrdPlanTable() {
         if (value[0].length > 0) {
             reloadTable(prdplanViewTable, "prdplan");
             reloadTable(prdplanEditTable, "prdplanedit");
+
+            addTableEditButtons(prdplanEditTable);
+
+            makeTableCellDBSelect(prdplanEditTable, 1, prdDBData, dbElementNames.prodId);
+            makeTableCellDatePicker(prdplanEditTable, 3);
+        } else {
+            makeUniCellMessage(prdplanViewTable, "등록된 내용이 없습니다.");
+            makeUniCellMessage(prdplanEditTable, "수정할 내용이 없습니다.");
         }
-
-        addTableEditButtons(prdplanEditTable);
-
-        makeTableCellDBSelect(prdplanEditTable, 1, prdDBData, dbElementNames.prodId);
-        makeTableCellDatePicker(prdplanEditTable, 3);
         originalValues = {};
 
         initEmptyPrdPlanTable(prdplanInputTable);
@@ -755,6 +819,23 @@ function viewPPlanTable() {
         const pplanViewTable = document.querySelector("#pplan-table-view");
         const pplanEditTable = document.querySelector("#pplan-table-edit");
         const pplanInputTable = document.querySelector("#pplan-table");
+
+        if (value[0].length > 0) {
+            reloadTable(pplanViewTable, "pplan");
+            reloadTable(pplanEditTable, "pplanedit");
+
+            addTableEditButtons(pplanEditTable);
+
+            makeTableCellDBSelect(pplanEditTable, 1, prdplanDBData, dbElementNames.prdplanId);
+            makeTableCellDBSelect(pplanEditTable, 2, matDBData, dbElementNames.matId);
+        } else {
+            makeUniCellMessage(pplanViewTable, "등록된 내용이 없습니다.");
+            makeUniCellMessage(pplanEditTable, "수정할 내용이 없습니다.");
+        }
+
+        originalValues = {};
+
+        initEmptyPPlanTable(pplanInputTable);
     });
 }
 
@@ -950,5 +1031,6 @@ export {
     addTableEditButtons,
     addPbomTableUtilBtn,
     addPrdPlanTableUtilBtn,
+    addPPlanTableUtilBtn,
     uploadEditedTable,
 };
