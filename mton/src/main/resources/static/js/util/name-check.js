@@ -2,6 +2,8 @@ let isNameChecked = false;
 let isCompanyChecked = false;
 
 function validateTextField(inputElement, resultElement, type) {
+    console.log("validateTextField: " + inputElement);
+
     const value = inputElement.value.trim();
 
     if (value.length === 0) {
@@ -44,6 +46,7 @@ function updateCheckStatus(type, status) {
 const nameInput = document.getElementById('uName');
 const nameCheckResult = document.getElementById('nameCheckResult');
 
+
 nameInput.addEventListener('input', function() {
     validateTextField(nameInput, nameCheckResult, 'name');
 });
@@ -65,21 +68,26 @@ if (companyInput != null) {
 }
 
 function submitFormValidateName(event) {
-    const isNameValid = validateTextField(nameInput, nameCheckResult, 'name');
-    const isCompanyValid = validateTextField(companyInput, companyCheckResult, 'company');
+    console.log("submitFormValidateName: " + nameInput);
 
+    const isNameValid = validateTextField(nameInput, nameCheckResult, 'name');
     // 담당자 이름
+
     if (!isNameValid) {
         event.preventDefault();
         nameInput.focus();
         return false;
     }
 
-    // 회사명 (optional)
-    if (companyInput != null && !isCompanyValid) {
-        event.preventDefault();
-        companyInput.focus();
-        return false;
+    if (companyInput != null) {
+        const isCompanyValid = validateTextField(companyInput, companyCheckResult, 'company');
+
+        // 회사명 (optional)
+        if (!isCompanyValid) {
+            event.preventDefault();
+            companyInput.focus();
+            return false;
+        }
     }
 
     return true;

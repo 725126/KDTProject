@@ -345,7 +345,7 @@ public class UserController {
         return "page/user/my/account-delete";
     }
 
-    // [내부직원] 마이페이지 > 내 정보
+    // [내부직원] 마이페이지 > 회원정보
     @GetMapping("/internal/my/account-edit")
     public String myPageAccountEditGetIn(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
@@ -365,7 +365,7 @@ public class UserController {
         return "page/user/my/account-delete";
     }
 
-    // [협력업체] 마이페이지 > 내 정보
+    // [협력업체] 마이페이지 > 회원정보
     @GetMapping("/external/my/account-edit")
     public String myPageAccountEditGetEx(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
 
@@ -405,7 +405,7 @@ public class UserController {
         return "redirect:/admin/my/user/" + userId;
     }
 
-    // [공통] 마이페이지 > 내 정보 > 비밀번호 변경
+    // [공통] 마이페이지 > 회원정보 > 비밀번호 변경
     @PostMapping("/my/change-password")
     public String changePassword(@RequestParam String currentPassword,
                                  @RequestParam String newPassword,
