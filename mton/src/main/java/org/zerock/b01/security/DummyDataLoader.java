@@ -16,7 +16,7 @@ import java.util.*;
 
 @Configuration
 @RequiredArgsConstructor
-public class DummyDataLoader {
+public class DummyDataLoader { // 회원 계정 생성 (400개)
 
     private final UserRepository userRepository;
     private final PartnerRepository partnerRepository;

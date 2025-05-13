@@ -12,18 +12,18 @@ import org.zerock.b01.repository.user.UserRepository;
 
 @Configuration
 @RequiredArgsConstructor
-public class InitAdminUser { // 관리자 로그인
+public class InitAdminUser { // 관리자 계정 생성
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Bean
     public CommandLineRunner createAdminUser() {
         return args -> {
-            String adminEmail = "sjw725126@gmail.com";
+            String adminEmail = "admin@email.com"; // 관리자 아이디 (실존 이메일 아님)
             if (userRepository.findByuEmail(adminEmail).isEmpty()) {
                 User admin = User.builder()
                         .uEmail(adminEmail)
-                        .uPassword(passwordEncoder.encode("1234"))  // 비밀번호 반드시 암호화
+                        .uPassword(passwordEncoder.encode("1234"))  // 관리자 비밀번호
                         .uName("관리자")
                         .uPhone("010-1234-5678")
                         .uIsActive(UserStatus.ACTIVE)
