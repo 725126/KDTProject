@@ -496,7 +496,9 @@ async function refreshTableView(dest, request = "") {
     return await fetch(dest, {
         method: "POST",
         headers: {
-            "Content-Type": "text/plain",
+            // 토큰 추가
+            'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content'),
+            "Content-Type": "text/plain"
         },
         body: request
     }).then(response => {

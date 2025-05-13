@@ -91,6 +91,8 @@ function tableToFile(table, filename = "") {
     XLSX.writeFile(workbook, downFile);
 }
 
+
+
 // JSON 데이터를 지정한 url 로 업로드.
 // 이후 response 데이터를 받아 넘겨준다.
 async function uploadJsonPost(dest, jdata) {
@@ -98,6 +100,7 @@ async function uploadJsonPost(dest, jdata) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute('content')
         },
         body: JSON.stringify(jdata)
     }).then(response => {
