@@ -360,6 +360,7 @@ async function jsonFetcher(dest, jData) {
         method: "POST",
         headers: {
             "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute('content')
         },
         body: JSON.stringify(jData)
     }).then((res) => {
