@@ -10,21 +10,51 @@ import org.zerock.b01.domain.BaseEntity;
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString(exclude = {"userRole", "uPassword"})
-public class User extends BaseEntity {
+public class User extends BaseEntity { // 회원 (기본 회원 정보)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userId; // 일련번호
+    private Long userId; // 회원 ID (일련번호)
 
-    private String uEmail; // 회원 아이디
+    private String uEmail; // 이메일 (회원 아이디로 사용)
 
-    private String uPassword;
+    private String uPassword; // 비밀번호
 
-    private String uName;
+    private String uName; // 이름
 
-    private String uPhone;
-
-    private String uIsActive;
+    private String uPhone; // 연락처
 
     @Enumerated(EnumType.STRING)
-    private UserRole userRole;
+    private UserStatus uIsActive; // 계정 활성 상태 (활성화, 비활성화)
+
+    @Enumerated(EnumType.STRING)
+    private UserRole userRole; // 역할 (생산부서(내부), 구매부서(내부), 협력 업체(외부), 관리자(내부))
+
+    private String resetToken;
+
+    // 비밀번호 재설정 권한 인증 토큰
+    public void setResetToken(String resetToken) {
+
+        this.resetToken = resetToken;
+    }
+
+    // 비밀번호 재설정
+    public void setPassword(String uPassword) {
+
+        this.uPassword = uPassword;
+    }
+
+    // 기본 정보 재설정
+    public void updateBasicInfo(String name, String uEmail, String phone, UserRole userRole) {
+        this.uName = name;
+        this.uEmail = uEmail;
+        this.uPhone = phone;
+        this.userRole = userRole;
+    }
+
+    // 회원탈퇴를 위한 비활성화
+    public void setuIsActive(UserStatus uIsActive) {
+        this.uIsActive = uIsActive;
+    }
+
+
 }

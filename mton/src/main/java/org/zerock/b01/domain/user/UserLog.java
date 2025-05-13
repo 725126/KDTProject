@@ -12,14 +12,14 @@ import org.zerock.b01.domain.BaseEntity;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserLog extends BaseEntity {
+public class UserLog extends BaseEntity { // 회원 로그 (활동 기록용)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long userLogId;
+    private Long userLogId; // 회원 로그 ID
 
-    private String sActionType;
+    private String sActionType; // 활동 타입 (DELETE / CREATE / UPDATE)
 
-    private String sActionContent;
+    private String sActionContent; // 활동 내용 ([상세 활동명] 활동 내용)
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)

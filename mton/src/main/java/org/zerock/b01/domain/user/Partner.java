@@ -11,18 +11,23 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Partner {
+public class Partner { // 협력업체 (추가 회원 정보)
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long partnerId;
+    private Long partnerId; // 협력업체 ID
 
-    private String pCompany;
+    private String pCompany; // 회사명
 
-    private String pAddr;
+    private String pAddr; // 회사 주소
 
-    private String pBusinessNo;
+    private String pBusinessNo; // 사업자 번호
 
     @ManyToOne
     @JoinColumn(name = "user_id", nullable = false)
     private User user; // (외래키) 회원 ID
+
+    public void updateCompanyInfo(String pCompany, String pAddr) {
+        this.pCompany = pCompany;
+        this.pAddr = pAddr;
+    }
 }

@@ -71,4 +71,9 @@
     color: white;
 }
 
+.inactive-bg {
+    background-color: #F4F4F2;
+}
+
 /* 회원가입 승인 요청 카드 css end */
+

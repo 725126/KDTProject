@@ -1,5 +1,3 @@
-const totalPages = 26;
-let currentPage = 2;
 
 function createPagination(total, current) {
     const container = document.getElementById("pagination");
@@ -35,34 +33,83 @@ function createPagination(total, current) {
     }
 }
 
+
 function updateUI() {
     createPagination(totalPages, currentPage);
     document.getElementById("prevBtn").classList.toggle("disabled", currentPage === 1);
     document.getElementById("nextBtn").classList.toggle("disabled", currentPage === totalPages);
     document.getElementById("gotoSelect").value = currentPage;
+
+    document.querySelectorAll(".page-btn").forEach(btn => {
+        btn.onclick = () => {
+            const page = parseInt(btn.textContent) - 1;
+            goToPage(page);
+        };
+    });
+
+        // 페이지 이동 시 location.href로 쿼리 파라미터 갱신
+    // document.querySelectorAll(".page-btn").forEach(btn => {
+    //     btn.onclick = () => {
+    //         const page = parseInt(btn.textContent) - 1; // Spring은 0-based
+    //         location.href = `/admin/my/${getLastPathSegment()}?page=${page}`;
+    //     };
+    // });
 }
 
+function getLastPathSegment() {
+    const pathname = window.location.pathname; // 쿼리 파라미터 제외
+    const pathSegments = pathname.split('/').filter(segment => segment); // 빈 문자열 제거
+    return pathSegments[pathSegments.length - 1]; // 마지막 segment 반환
+}
+
+console.log(getLastPathSegment()); // 예시 출력: "user-list"
+
+
+// document.getElementById("prevBtn").onclick = () => {
+//     if (currentPage > 1) {
+//         location.href = `/admin/my/join-list?page=${currentPage - 2}`; // -1 (1-based to 0-based)
+//     }
+// };
+// document.getElementById("nextBtn").onclick = () => {
+//     if (currentPage < totalPages) {
+//         location.href = `/admin/my/join-list?page=${currentPage}`; // 그대로
+//     }
+// };
+
+// document.getElementById("goBtn").onclick = () => {
+//     const selected = parseInt(document.getElementById("gotoSelect").value);
+//     if (!isNaN(selected)) {
+//         location.href = `/admin/my/join-list?page=${selected - 1}`;
+//     }
+// };
 document.getElementById("prevBtn").onclick = () => {
     if (currentPage > 1) {
-        currentPage--;
-        updateUI();
+        goToPage(currentPage - 2); // 1-based → 0-based
     }
 };
 
 document.getElementById("nextBtn").onclick = () => {
     if (currentPage < totalPages) {
-        currentPage++;
-        updateUI();
+        goToPage(currentPage); // 1-based → 0-based
     }
 };
 
 document.getElementById("goBtn").onclick = () => {
     const selected = parseInt(document.getElementById("gotoSelect").value);
     if (!isNaN(selected)) {
-        currentPage = selected;
-        updateUI();
+        goToPage(selected - 1);
     }
 };
+
+
+function goToPage(targetPage) {
+    const url = new URL(window.location.href);
+    const params = new URLSearchParams(url.search);
+
+    params.set("page", targetPage);
+    location.href = url.pathname + "?" + params.toString();
+}
+
 
 function populateSelect() {
     const select = document.getElementById("gotoSelect");

@@ -118,7 +118,6 @@ body {
 
 }
 
-
 /* 헤더 스타일 */
 .navbar {
     height: 64px;
@@ -138,7 +137,6 @@ body {
     font-weight: normal;
     font-style: normal;
 }
-
 
 .bi-box {
     background-color: #d4c9be;
@@ -292,37 +290,6 @@ body {
     border-left: 4px solid #394867; /* 왼쪽에 포인트 바 */
     transition: all 0.2s ease-in-out;
 }
-
-
-/* 프로필 css start */
-.profile-icon {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    /* margin-left: 35px; */
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    border: 2px solid #ccd0d6 !important;
-    /* 동그랗게 */
-    font-size: 22px;
-    /* 아이콘 크기 */
-    /*background-color: #EFB036 !important;*/
-    /* 배경색 (light) */
-    color: #fff !important;
-    /* 텍스트/아이콘 색상 */
-
-}
-
-.buyer-profile {
-    background-color: #EFB036 !important;
-}
-
-.partner-profile {
-    background-color: #4C7B8B !important;
-}
-
-/* 구매 EFB036 생산 3B6790 협력업체 4C7B8B */
 
 .department-name {
     color: #747264;

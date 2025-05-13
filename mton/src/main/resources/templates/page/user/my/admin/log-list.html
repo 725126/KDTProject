@@ -14,7 +14,7 @@
 
 <th:block layout:fragment="log-list">
   <div class="container py-5">
-    <h2 class="fw-bold"><i class="bi bi-clipboard-data me-3"></i>회원로그 기록</h2>
+    <h4 class="fw-bold"><i class="bi bi-clipboard-data me-3"></i>회원로그 기록</h4>
 
     <div class="row mb-4 g-3 align-items-end mb-5">
       <div class="col-md-6">
@@ -27,10 +27,10 @@
       <div class="col-md-3">
         <label for="postCountSelect" class="form-label mb-1 fw-semibold small text-muted">게시글 수</label>
         <select class="form-select custom-select" id="postCountSelect">
-          <option selected>12개 보기</option>
+          <option selected>6개 보기</option>
+          <option>12개 보기</option>
           <option>24개 보기</option>
           <option>36개 보기</option>
-          <option>48개 보기</option>
         </select>
       </div>
 
@@ -40,35 +40,55 @@
       </div>
     </div>
 
-    <div class="card mb-3">
-      <div class="card-body d-flex justify-content-between align-items-center">
-        <div>
-          <div class="text-muted small">2025-04-14 10:23:45</div>
-          <div><strong>홍길동</strong>님이 <strong>상품 A</strong>에 대해 "재고 수정" 작업 수행</div>
-        </div>
-        <span class="badge badge-update px-3 py-2">UPDATE</span>
-      </div>
-    </div>
+<!--    <div class="card mb-3">-->
+<!--      <div class="card-body d-flex justify-content-between align-items-center">-->
+<!--        <div>-->
+<!--          <div class="text-muted small">2025-04-14 10:23:45</div>-->
+<!--          <div><strong>홍길동</strong>님이 <strong>상품 A</strong>에 대해 "재고 수정" 작업 수행</div>-->
+<!--        </div>-->
+<!--        <span class="badge badge-update px-3 py-2">UPDATE</span>-->
+<!--      </div>-->
+<!--    </div>-->
 
-    <div class="card mb-3">
-      <div class="card-body d-flex justify-content-between align-items-center">
-        <div>
-          <div class="text-muted small">2025-04-14 09:01:12</div>
-          <div><strong>김민수</strong>님이 <strong>상품 B</strong>에 대해 "신규 등록" 작업 수행</div>
-        </div>
-        <span class="badge badge-create px-3 py-2">CREATE</span>
-      </div>
-    </div>
+<!--    <div class="card mb-3">-->
+<!--      <div class="card-body d-flex justify-content-between align-items-center">-->
+<!--        <div>-->
+<!--          <div class="text-muted small">2025-04-14 09:01:12</div>-->
+<!--          <div><strong>김민수</strong>님이 <strong>상품 B</strong>에 대해 "신규 등록" 작업 수행</div>-->
+<!--        </div>-->
+<!--        <span class="badge badge-create px-3 py-2">CREATE</span>-->
+<!--      </div>-->
+<!--    </div>-->
 
-    <div class="card mb-3">
-      <div class="card-body d-flex justify-content-between align-items-center">
-        <div>
-          <div class="text-muted small">2025-04-13 17:45:10</div>
-          <div><strong>이영희</strong>님이 <strong>상품 C</strong>에 대해 "재고 삭제" 작업 수행</div>
+<!--    <div class="card mb-3">-->
+<!--      <div class="card-body d-flex justify-content-between align-items-center">-->
+<!--        <div>-->
+<!--          <div class="text-muted small">2025-04-13 17:45:10</div>-->
+<!--          <div><strong>이영희</strong>님이 <strong>상품 C</strong>에 대해 "재고 삭제" 작업 수행</div>-->
+<!--        </div>-->
+<!--        <span class="badge badge-delete px-3 py-2">DELETE</span>-->
+<!--      </div>-->
+<!--    </div>-->
+
+    <th:block th:each="log : ${userLogs}">
+      <div class="card mb-3">
+        <div class="card-body d-flex justify-content-between align-items-center">
+          <div>
+            <div class="text-muted small" th:text="${#temporals.format(log.creDate, 'yyyy-MM-dd a hh:mm')}"></div>
+            <div>
+              <strong th:text="${log.user.uName}"></strong>
+              님이
+              <strong th:text="${log.sActionContent}"></strong>
+              작업 수행
+            </div>
+          </div>
+          <span class="badge px-3 py-2"
+                th:classappend="|badge-${log.sActionType.toLowerCase()}|"
+                th:text="${log.sActionType}">
+                    </span>
         </div>
-        <span class="badge badge-delete px-3 py-2">DELETE</span>
       </div>
-    </div>
+    </th:block>
 
     <p class="text-center text-muted small mt-4">※ 최근 30일간 활동만 표시됩니다.</p>
   </div>

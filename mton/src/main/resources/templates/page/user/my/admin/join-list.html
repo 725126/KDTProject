@@ -6,441 +6,152 @@
     <meta charset="UTF-8">
     <title>마이페이지(관리자) > 회원가입 승인</title>
     <link rel="stylesheet" th:href="@{/css/page/user/join-list.css}">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
 </head>
 <body>
 
 <th:block layout:fragment="join-list">
 
     <!-- 필터 start -->
-    <h2 class="ms-2 fw-bold"><i class="bi bi-person-plus-fill me-3"></i>회원가입 승인</h2>
+    <h4 class="ms-2 fw-bold"><i class="bi bi-person-plus-fill me-3"></i>회원가입 승인</h4>
     <div class="row g-3 align-items-end mb-5">
         <!-- 검색창 -->
-        <div class="col-md-6">
+        <div class="col-md-5">
             <div class="input-group">
                 <span class="input-group-text"><i class="bi bi-search"></i></span>
-                <input type="text" class="form-control" placeholder="회원명 검색">
+                <input type="text" class="form-control"
+                       name="keyword"
+                       placeholder="회원명 검색"
+                       th:value="${keyword}">
             </div>
         </div>
 
         <!-- 회원 종류 -->
         <div class="col-md-2">
             <label for="departmentSelect" class="form-label mb-1 fw-semibold small text-muted">회원 종류</label>
-            <select class="form-select custom-select" id="departmentSelect">
-                <option disabled selected>회원 종류</option>
-                <option>협력 업체</option>
-                <option>구매 부서</option>
-                <option>생산 부서</option>
+            <select class="form-select custom-select" id="departmentSelect" name="role">
+                <option value="" disabled th:selected="${selectedRole == null}">회원 종류</option>
+                <option value="" th:selected="${selectedRole == null}">전체</option>
+                <option value="PARTNER" th:selected="${selectedRole == 'PARTNER'}">협력 업체</option>
+                <option value="PURCHASING" th:selected="${selectedRole == 'PURCHASING'}">구매 부서</option>
+                <option value="PRODUCTION" th:selected="${selectedRole == 'PRODUCTION'}">생산 부서</option>
             </select>
         </div>
 
         <!-- 정렬 기준 -->
         <div class="col-md-2">
             <label for="sortSelect" class="form-label mb-1 fw-semibold small text-muted">정렬 기준</label>
-            <select class="form-select custom-select" id="sortSelect">
-                <option selected>이름 순</option>
-                <option>최신 순</option>
-                <option>오래된 순</option>
+            <select class="form-select custom-select" id="sortSelect" name="sort">
+                <option value="newest" th:selected="${selectedSort == 'newest'}">최신 순</option>
+                <option value="oldest" th:selected="${selectedSort == 'oldest'}">오래된 순</option>
+                <option value="nameAsc" th:selected="${selectedSort == 'nameAsc'}">이름 순</option>
             </select>
         </div>
 
         <!-- 게시글 수 -->
         <div class="col-md-2">
             <label for="postCountSelect" class="form-label mb-1 fw-semibold small text-muted">게시글 수</label>
-            <select class="form-select custom-select" id="postCountSelect">
-                <option selected>12개 보기</option>
-                <option>24개 보기</option>
-                <option>36개 보기</option>
-                <option>48개 보기</option>
+            <select class="form-select custom-select" id="postCountSelect" name="size">
+                <option value="12" th:selected="${selectedSize == 12}">12개 보기</option>
+                <option value="24" th:selected="${selectedSize == 24}">24개 보기</option>
+                <option value="36" th:selected="${selectedSize == 36}">36개 보기</option>
+                <option value="48" th:selected="${selectedSize == 48}">48개 보기</option>
             </select>
+        </div>
+
+        <!-- 초기화 버튼 -->
+        <div class="col-md-1">
+            <button class="btn btn-outline-secondary btn-sm w-100 py-2" id="resetFilters">
+                <i class="bi bi-arrow-clockwise me-1"></i> 초기화
+            </button>
         </div>
     </div>
     <!-- 필터 end -->
 
     <div class="row g-3">
 
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
+        <div class="col-md-6 col-lg-4" th:each="user : ${pendingUsers}">
             <div class="card card-in p-3 position-relative border shadow-none">
+
                 <!-- 점 세 개 드롭다운 버튼 -->
                 <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown">
                         <i class="bi bi-three-dots-vertical"></i>
                     </button>
                     <ul class="dropdown-menu dropdown-menu-end border">
-                        <li><a class="dropdown-item" href="#">상세 보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
+                        <li>
+                            <a class="dropdown-item" th:href="@{'/admin/my/user/' + ${user.userId}}"
+                               onclick="sessionStorage.setItem('prevUrl', window.location.href)">
+                                회원정보 보기</a>
+                        </li>
                     </ul>
                 </div>
+
                 <!-- 카드 본문 -->
                 <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-pur me-3"><i class="bi bi-cart-check"></i></div>
+                    <div class="profile-circle me-3"
+                         th:classappend="${user.userRole.profileClass}">
+                        <i class="bi" th:classappend="${user.userRole.iconClass}"></i>
+                    </div>
                     <div class="flex-grow-1">
-                        <div class="fw-bold">이서윤</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
+                        <div class="fw-bold" th:text="${user.uName}">이름</div>
+                        <div class="text-muted small" th:text="${user.uEmail}">이메일</div>
                     </div>
                 </div>
+
                 <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
+                    <div class="d-flex align-items-end text-secondary">
+                        <small>가입 신청일: <span th:text="${#temporals.format(user.creDate, 'yyyy-MM-dd a hh:mm')}"></span></small>
+                    </div>
+                    <button class="btn btn-outline-primary btn-sm approve-btn">승인</button>
                 </div>
             </div>
         </div>
-        <!-- 회원 가입 요청 카드 end -->
 
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-in p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end border">
-                        <li><a class="dropdown-item" href="#">상세보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
+    </div>
+
+    <!-- 승인 확인 모달 -->
+    <div class="modal fade" id="approveConfirmModal" tabindex="-1" aria-labelledby="approveConfirmModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title">회원 승인</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-prod me-3">
-                        <i class="bi bi-tools"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">김민수</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
+                <div class="modal-body text-center">
+                    해당 회원을 승인하시겠습니까?
                 </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                    <button type="button" class="btn btn-primary" id="confirmApproveBtn">확인</button>
                 </div>
             </div>
         </div>
-        <!-- 회원 가입 요청 카드 end -->
+    </div>
 
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-out p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
+    <!-- 승인 결과 모달 -->
+    <div class="modal fade" id="approveResultModal" tabindex="-1" aria-labelledby="approveResultModalLabel" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content border-0 shadow">
+                <div class="modal-header">
+                    <h5 class="modal-title" id="approveResultModalLabel">처리 결과</h5>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
                 </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-partner me-3">
-                        <i class="bi bi-building"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">00기업</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
+                <div class="modal-body text-center" id="approveResultModalBody">
+                    <!-- 메시지가 여기에 동적으로 들어감 -->
                 </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
+                <div class="modal-footer justify-content-center">
+                    <button type="button" class="btn btn-primary" data-bs-dismiss="modal">확인</button>
                 </div>
             </div>
         </div>
-        <!-- 회원 가입 요청 카드 end -->
-
-
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-in p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세 보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
-                </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-pur me-3"><i class="bi bi-cart-check"></i></div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">이서윤</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
-                </div>
-            </div>
-        </div>
-        <!-- 회원 가입 요청 카드 end -->
-
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-out p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
-                </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-partner me-3">
-                        <i class="bi bi-building"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">00기업</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
-                </div>
-            </div>
-        </div>
-        <!-- 회원 가입 요청 카드 end -->
-
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-in p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
-                </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-prod me-3">
-                        <i class="bi bi-tools"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">김민수</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
-                </div>
-            </div>
-        </div>
-        <!-- 회원 가입 요청 카드 end -->
-
-
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-in p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세 보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
-                </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-pur me-3"><i class="bi bi-cart-check"></i></div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">이서윤</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
-                </div>
-            </div>
-        </div>
-        <!-- 회원 가입 요청 카드 end -->
-
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-in p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
-                </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-prod me-3">
-                        <i class="bi bi-tools"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">김민수</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
-                </div>
-            </div>
-        </div>
-        <!-- 회원 가입 요청 카드 end -->
-
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-out p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
-                </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-partner me-3">
-                        <i class="bi bi-building"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">00기업</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
-                </div>
-            </div>
-        </div>
-        <!-- 회원 가입 요청 카드 end -->
-
-
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-in p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세 보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
-                </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-pur me-3"><i class="bi bi-cart-check"></i></div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">이서윤</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
-                </div>
-            </div>
-        </div>
-        <!-- 회원 가입 요청 카드 end -->
-
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-out p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
-                </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-partner me-3">
-                        <i class="bi bi-building"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">00기업</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
-                </div>
-            </div>
-        </div>
-        <!-- 회원 가입 요청 카드 end -->
-
-        <!-- 회원 가입 요청 카드 start -->
-        <div class="col-md-6 col-lg-4">
-            <div class="card card-in p-3 position-relative border shadow-none">
-                <!-- 점 세 개 드롭다운 버튼 -->
-                <div class="dropdown position-absolute top-0 end-0 mt-2 me-2">
-                    <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
-                        <i class="bi bi-three-dots-vertical"></i>
-                    </button>
-                    <ul class="dropdown-menu dropdown-menu-end">
-                        <li><a class="dropdown-item" href="#">상세보기</a></li>
-                        <!-- <li><a class="dropdown-item" href="#">수정</a></li> -->
-                        <!-- <li><a class="dropdown-item text-danger" href="#">삭제</a></li> -->
-                    </ul>
-                </div>
-                <!-- 카드 본문 -->
-                <div class="d-flex align-items-center">
-                    <div class="profile-circle profile-circle-prod me-3">
-                        <i class="bi bi-tools"></i>
-                    </div>
-                    <div class="flex-grow-1">
-                        <div class="fw-bold">김민수</div>
-                        <div class="text-muted small">seoyoon.lee@email.com</div>
-                    </div>
-                </div>
-                <div class="mt-3 d-flex justify-content-between">
-                    <button class="approve-btn">승인</button>
-                    <button class="reject-btn">거절</button>
-                </div>
-            </div>
-        </div>
-        <!-- 회원 가입 요청 카드 end -->
-
     </div>
 
     <!-- 페이지네이션 -->
     <th:block th:replace="fragment/pagination :: paginationFragment"></th:block>
+
+    <script th:src="@{/js/page/user/join-list.js}"></script>
 </th:block>
 
 </body>

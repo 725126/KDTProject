@@ -9,61 +9,66 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css">
     <title>자재ON - 아이디 찾기</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
     <link rel="stylesheet" th:href="@{/css/page/user/find.css}">
 </head>
 <body>
 
-<th:block th:replace="fragment/header :: headerFragment"></th:block>
+<th:block th:replace="~{fragment/header :: headerFragment}"></th:block>
 
-
-<!--<div class="card text-center p-5">-->
-<!--    <div class="icon-circle mb-4">-->
-<!--        <i class="fas fa-user-circle fa-2x"></i> &lt;!&ndash; fa-4x로 아이콘 크기 조정 &ndash;&gt;-->
-<!--    </div>-->
-<!--    <h3 class="mb-3 fw-bold">아이디(이메일) 찾기</h3> &lt;!&ndash; h4 → h3으로 크기 키움 &ndash;&gt;-->
-<!--    <p class="form-text fs-6 mb-4">가입 시 입력한 이름과 전화번호를 입력해주세요.</p> &lt;!&ndash; fs-5로 글자 크기 &ndash;&gt;-->
-
-<!--    <form>-->
-<!--        <div class="mb-3 text-start">-->
-<!--            <label for="inputName" class="form-label fs-5">이름</label>-->
-<!--            <input type="text" class="form-control form-control-lg" id="inputName" placeholder="이름을 입력하세요">-->
-<!--        </div>-->
-<!--        <div class="mb-4 text-start">-->
-<!--            <label for="inputPhone" class="form-label fs-5">전화번호</label>-->
-<!--            <input type="tel" class="form-control form-control-lg" id="inputPhone" placeholder="010-1234-5678">-->
-<!--        </div>-->
-<!--        <button type="submit" class="btn btn-primary btn-lg w-100">아이디 찾기</button>-->
-<!--    </form>-->
-
-<!--    <div class="mt-4">-->
-<!--        <a href="/login" class="form-text fs-6">로그인으로 돌아가기</a>-->
-<!--    </div>-->
-<!--</div>-->
-
-
-<div class="card text-center">
-    <div class="icon-circle">
-        <i class="fas fa-user-circle fa-2x"></i>
-    </div>
-    <h4 class="mb-3 fw-bold">아이디(이메일) 찾기</h4>
-    <p class="form-text pb-4">가입 시 입력한 이름과 전화번호를 입력해주세요.</p>
-
-    <form class="mt-2">
-        <div class="mb-3 text-start">
-            <label for="inputName" class="form-label">이름</label>
-            <input type="text" class="form-control" id="inputName" placeholder="이름을 입력하세요">
+<div class="d-flex justify-content-center align-items-center w-100 h-100 card-container">
+    <div class="card text-center">
+        <div class="icon-circle">
+            <i class="fas fa-user-circle fa-2x"></i>
         </div>
-        <div class="mb-4 text-start">
-            <label for="inputPhone" class="form-label">전화번호</label>
-            <input type="tel" class="form-control" id="inputPhone" placeholder="010-1234-5678">
+        <h4 class="mb-3 fw-bold">아이디(이메일) 찾기</h4>
+        <p class="form-text pb-4">가입 정보를 입력해주세요.</p>
+
+        <form class="mt-2">
+            <div class="mb-3 text-start">
+                <label for="uName" class="form-label">이름</label>
+                <input type="text" class="form-control" id="uName" value="" placeholder="이름을 입력하세요" required>
+                <small id="nameCheckResult"></small>
+            </div>
+            <div class="mb-3 text-start">
+                <label for="uPhone" class="form-label">연락처</label>
+                <input type="tel" class="form-control phone-mask" id="uPhone" placeholder="010-1234-5678" value="" required>
+                <small id="phoneCheckResult"></small>
+            </div>
+            <div class="mb-3 text-start">
+                <label for="userRole" class="form-label">회원 종류</label>
+                <select class="form-select" id="userRole" required>
+                    <option value="" disabled selected>회원 종류를 선택하세요</option>
+                    <option value="PURCHASING">구매부서</option>
+                    <option value="PRODUCTION">생산부서</option>
+                    <option value="PARTNER">협력업체</option>
+                </select>
+            </div>
+            <div class="text-start d-none mb-3" id="pBusinessNoGroup">
+                <label for="pBusinessNo" class="form-label">사업자등록번호</label>
+                <input type="text" class="form-control" id="pBusinessNo" placeholder="예: 123-45-67890">
+                <small id="businessCheckResult"></small>
+            </div>
+            <button type="submit" class="btn btn-primary w-100 mt-4">아이디 찾기</button>
+        </form>
+
+        <!-- 아이디 찾기 결과 메시지 -->
+        <div id="findResult" class="mt-4 text-center">
         </div>
-        <button type="submit" class="btn btn-primary w-100">아이디 찾기</button>
-    </form>
-    <div class="mt-4">
-        <a href="/login" class="form-text">로그인으로 돌아가기</a>
+
+        <div class="mt-4">
+            <a href="/login" class="form-text">로그인으로 돌아가기</a>
+        </div>
     </div>
 </div>
 
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jquery.inputmask/5.0.8/jquery.inputmask.min.js"
+        integrity="sha512-efAcjYoYT0sXxQRtxGY37CKYmqsFVOIwMApaEbrxJr4RwqVVGw8o+Lfh/+59TU07+suZn1BWq4fDl5fdgyCNkw=="
+        crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+<script th:src="@{/js/page/user/find-id.js}"></script>
+<script th:src="@{/js/util/businessNo-check.js}"></script>
+<script th:src="@{/js/util/name-check.js}"></script>
+<script th:src="@{/js/util/phone-check.js}"></script>
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

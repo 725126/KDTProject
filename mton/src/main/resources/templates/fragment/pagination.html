@@ -18,6 +18,10 @@
     </div>
     <!-- 페이지네이션 end -->
 
+    <script th:inline="javascript">
+        const currentPage = [[${currentPage}]];
+        const totalPages = [[${totalPages}]];
+    </script>
     <!-- 페이지네이션 JS -->
     <script th:src="@{/js/fragment/pagination.js}"></script>
 </th:block>

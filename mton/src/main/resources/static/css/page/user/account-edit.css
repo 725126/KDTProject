@@ -30,7 +30,7 @@
 }
 
 .tab-content {
-    padding: 2.5rem;
+    padding: 0rem 2.5rem 2rem 2.5rem;
     font-size: 1.05rem;
 }
 
@@ -87,5 +87,21 @@
 
 .tab-pane {
     width: 80%;
+}
+
+.account-edit-tab {
+    margin: 0 auto;
+}
+
+.account-edit-btn {
+    background-color: #123458;
+}
+
+.account-edit-btn {
+    width: 100%;
+}
+
+.btn-div-margin {
+    margin-top: 3rem;
 }
 
