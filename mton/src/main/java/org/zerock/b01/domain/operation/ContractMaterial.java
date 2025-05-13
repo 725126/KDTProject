@@ -20,7 +20,7 @@ public class ContractMaterial {
     private Contract contract;
 
     @ManyToOne
-    @JoinColumn(name = "mat_id", nullable = false)
+    @JoinColumn(name = "mat_id", nullable = true) // nullable = false > nullable = true
     @OnDelete(action = OnDeleteAction.SET_NULL)
     private Material material;
 

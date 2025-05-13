@@ -32,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
             joinSuccess: {
                 headerClass: "bg-success text-white",
                 title: "✅ 회원가입 완료",
-                message: "회원가입이 완료되었습니다.<br>서비스 이용을 원하시면 로그인을 해주세요.",
+                message: "회원가입이 완료되었습니다.<br>관리자 승인 후 로그인 가능합니다."
             }
         };
 
