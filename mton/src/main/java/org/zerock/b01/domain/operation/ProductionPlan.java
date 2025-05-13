@@ -22,7 +22,7 @@ public class ProductionPlan {
     @Column(nullable = false)
     private int prdplanQty;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDate prdplanDate;
 
     @Column(nullable = false)

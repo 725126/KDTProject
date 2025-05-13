@@ -27,7 +27,7 @@ public class ProcurementPlan {
     @Column(nullable = false)
     private int ppmatQty;
 
-    @Column(nullable = false)
+    @Column(nullable = false, updatable = false)
     private LocalDate pplanDate;
 
     @Column(nullable = false)

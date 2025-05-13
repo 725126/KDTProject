@@ -77,23 +77,27 @@ public class ProductController {
 
             if (id == null || id.isEmpty()) {
                 String count = productionPlanRepository.findLastOrderIdByPrefix("PRDPLAN");
+                log.info(count);
 
                 if (count != null) {
-                    int coundId = Integer.parseInt(count.substring(count.indexOf("PRDPLAN") + 7)) + atomicInteger.getAndIncrement();
-                    id = "PRDPLAN" + String.format("%03d", coundId).replace(" ", "0");
+                    int countId = Integer.parseInt(count.substring(count.indexOf("PRDPLAN") + 7)) + atomicInteger.getAndIncrement();
+                    id = "PRDPLAN" + String.format("%3d", countId).replace(" ", "0");
                 } else {
-                    id = "PRDPLAN001";
+                    int countId = atomicInteger.getAndIncrement();
+                    id = "PRDPLAN" + String.format("%3d", countId).replace(" ", "0");
                 }
             }
 
             return ProductionPlanDTO.builder()
                     .prdplanId(id)
-                    .prodId(hashmap.get(ProductionPlanTableHead.PRDPLAN_ID.getLabel()))
+                    .prodId(hashmap.get(ProductionPlanTableHead.PROD_ID.getLabel()))
                     .prdplanDate(LocalDate.now())
-                    .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel())))
+                    .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel()).substring(0, 10)))
                     .prdplanQty(Integer.parseInt(hashmap.get(ProductionPlanTableHead.PRDPLAN_QTY.getLabel())))
                     .build();
         }).collect(Collectors.toList());
+
+        log.info(productionPlanDTOList.toString());
 
         return productionPlanService.registerAll(productionPlanDTOList);
     }
@@ -120,7 +124,8 @@ public class ProductController {
                     int countId = Integer.parseInt(count.substring(count.indexOf("EW") + 2)) + atomicInteger.getAndIncrement();
                     id = "EW" + String.format("%3d", countId).replace(" ", "0");
                 } else {
-                    id = "EW001";
+                    int countId = atomicInteger.getAndIncrement();
+                    id = "EW" + String.format("%3d", countId).replace(" ", "0");
                 }
             }
 
@@ -158,7 +163,8 @@ public class ProductController {
                     int countId = Integer.parseInt(count.substring(count.indexOf("P") + 1)) + atomicInteger.getAndIncrement();
                     id = "P" + String.format("%3d", countId).replace(" ", "0");
                 } else {
-                    id = "P001";
+                    int countId = atomicInteger.getAndIncrement();
+                    id = "P" + String.format("%3d", countId).replace(" ", "0");
                 }
             }
 
@@ -194,7 +200,8 @@ public class ProductController {
                     int countId = Integer.parseInt(count.substring(count.indexOf("PBOM") + 4)) + atomicInteger.getAndIncrement();
                     id = "PBOM" + String.format("%3d", countId).replace(" ", "0");
                 } else {
-                    id = "PBOM001";
+                    int countId = atomicInteger.getAndIncrement();
+                    id = "PBOM" + String.format("%3d", countId).replace(" ", "0");
                 }
             }
 
@@ -236,7 +243,7 @@ public class ProductController {
         log.info(list.toString());
 
         if (list.isEmpty()) {
-            return new StatusTuple(false, "상품 수정사항은 업습니다.");
+            return new StatusTuple(false, "상품 수정사항은 없습니다.");
         }
 
         List<ProductDTO> productDTOList = list.stream().map(hashmap -> ProductDTO.builder()
@@ -282,7 +289,7 @@ public class ProductController {
                 .prdplanId(hashmap.get(ProductionPlanTableHead.PRDPLAN_ID.getLabel()))
                 .prodId(hashmap.get(ProductionPlanTableHead.PROD_ID.getLabel()))
                 .prdplanQty(Integer.parseInt(hashmap.get(ProductionPlanTableHead.PRDPLAN_QTY.getLabel())))
-                .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel())))
+                .prdplanEnd(LocalDate.parse(hashmap.get(ProductionPlanTableHead.PRDPLAN_END.getLabel()).substring(0, 10)))
                 .build()).collect(Collectors.toList());
 
         return productionPlanService.updateAll(productionPlanDTOList);

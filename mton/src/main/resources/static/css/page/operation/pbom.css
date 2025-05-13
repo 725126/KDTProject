@@ -85,6 +85,10 @@ tr:hover .opacity-btn {
     cursor: default;
 }
 
+.indirect-time {
+    pointer-events: none;
+}
+
 .indirect-time, .indirect-time::-webkit-calendar-picker-indicator {
     border: none;
     background: transparent;
@@ -115,6 +119,10 @@ tr:hover .opacity-btn {
 }
 
 td[contenteditable="true"] .indirect-select {
+    pointer-events: auto;
+}
+
+td[contenteditable="true"] .indirect-time {
     pointer-events: auto;
 }
 
