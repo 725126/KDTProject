@@ -492,7 +492,7 @@ function initEmptyPbomTable(table, isFile = false) {
 }
 
 function initEmptyPrdPlanTable(table, isFile = false) {
-    const prdOptions = prdDBData.map(data => data[dbElementNames.prodId]);
+    const prdOptions = prdDBData.map(data => [data[dbElementNames.prodId], data[dbElementNames.prodName]]);
 
     const makePrdSelect = (row) => {
         makeSelectForRawCell(row.cells[1], prdOptions);
@@ -889,7 +889,7 @@ function viewPrdPlanTable() {
 
             addTableEditButtons(prdplanEditTable);
 
-            makeTableCellDBSelect(prdplanEditTable, 1, prdDBData, dbElementNames.prodId);
+            makeTableCellDBSelectWithLabel(prdplanEditTable, 1, prdDBData, dbElementNames.prodId, dbElementNames.prodName);
             makeTableCellDatePicker(prdplanEditTable, 3);
         } else {
             makeUniCellMessage(prdplanViewTable, "등록된 내용이 없습니다.");
