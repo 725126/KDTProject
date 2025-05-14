@@ -17,6 +17,7 @@ let contmatDBData;
 // 수정 전 원래 값을 담는 변수와 삭제 전 삭제할 ID를 담는 변수
 let originalValues = {};
 
+// 등록 이후 목록으로 넘어가는 이벤트 발생용 함수
 function viewChange() {
     document.querySelector("#mod-view").checked = true;
     document.querySelector("#manage-mod").dispatchEvent(new Event("click"));
@@ -739,8 +740,6 @@ async function refreshPrdPlanDBDataAll() {
                 ePrd[keys[1]] = prd[keys[1]];
                 ePrd[keys[3]] = prd[keys[3]];
                 ePrd[keys[5]] = prd[keys[5]];
-
-                console.log(ePrd);
                 return ePrd;
             });
 
@@ -985,8 +984,6 @@ function makeSelect(cell, ...options) {
 
     for (const option of options[0]) {
         const opt = document.createElement("option");
-
-        console.log(Array.isArray(option));
 
         if (Array.isArray(option)) {
             opt.value = option[0];

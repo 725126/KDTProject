@@ -116,7 +116,7 @@ const pplanInputTable = document.querySelector("#pplan-table");
         tutorialMessage.bindTutorialMessage(insertFileLabel, tmessage.insertFileBtnTutorial);
         tutorialMessage.bindTutorialMessage(insertUploadBtn, tmessage.insertUploadBtnTutorial);
         tutorialMessage.bindTutorialMessage(viewRefreshBtn, tmessage.viewRefreshBtnTutorial);
-        tutorialMessage.bindTutorialMessage(viewDownloadBtn, tmessage.viewDownloadBtnTutorial)
+        tutorialMessage.bindTutorialMessage(viewDownloadBtn, tmessage.viewDownloadBtnTutorial);
         tutorialMessage.bindTutorialMessage(editRefreshBtn, tmessage.editRefreshBtnTutorial);
         tutorialMessage.bindTutorialMessage(editUploadBtn, tmessage.editUploadBtnTutorial);
     });
@@ -125,3 +125,28 @@ const pplanInputTable = document.querySelector("#pplan-table");
 (function () {
     tableFilter.applyTableSorting(pplanViewTable);
 })();
+
+(function () {
+    const result = jsonFetcher("/internal/procurement/calc/pplan", "PRDPLAN001");
+
+    result.then((res) => {
+        console.log(res);
+    });
+})();
+
+async function jsonFetcher(dest, jData) {
+    return await fetch(dest, {
+        method: "POST",
+        headers: {
+            "Content-Type": "text/plain",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute('content')
+        },
+        body: jData
+    }).then((res) => {
+        return res.json();
+    }).then(data => {
+        return data;
+    }).catch(error => {
+        console.log(error);
+    });
+}

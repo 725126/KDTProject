@@ -2,18 +2,18 @@ package org.zerock.b01.controller.operation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.modelmapper.ModelMapper;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.zerock.b01.controller.operation.repository.ContractMaterialRepository;
-import org.zerock.b01.controller.operation.repository.OrderingRepository;
-import org.zerock.b01.controller.operation.repository.ProcurementPlanRepository;
+import org.zerock.b01.controller.operation.repository.*;
 import org.zerock.b01.controller.operation.service.ContractMaterialService;
 import org.zerock.b01.controller.operation.service.OrderingService;
 import org.zerock.b01.controller.operation.service.ProcurementPlanService;
-import org.zerock.b01.domain.operation.StatusTuple;
+import org.zerock.b01.domain.operation.*;
 import org.zerock.b01.domain.operation.tablehead.OrderingTableHead;
 import org.zerock.b01.domain.operation.tablehead.ProcurementPlanTableHead;
+import org.zerock.b01.dto.operation.CalcPbomDTO;
 import org.zerock.b01.dto.operation.OrderingDTO;
 import org.zerock.b01.dto.operation.ProcurementPlanDTO;
 import org.zerock.b01.dto.partner.ContractMaterialDTO;
@@ -22,6 +22,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -30,8 +31,11 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/internal/procurement")
 public class ProcurementController {
+    private final ModelMapper modelMapper;
     private final ProcurementPlanRepository procurementPlanRepository;
     private final OrderingRepository orderingRepository;
+    private final ProductionPlanRepository productionPlanRepository;
+    private final PbomRepository pbomRepository;
 
     private final ProcurementPlanService procurementPlanService;
     private final OrderingService orderingService;
@@ -221,5 +225,23 @@ public class ProcurementController {
     public StatusTuple deleteOrder(@RequestBody ArrayList<String> arrayList) {
         log.info("deleting ID: " + arrayList.toString());
         return orderingService.deleteAll(arrayList);
+    }
+
+    @ResponseBody
+    @PostMapping("/calc/pplan")
+    public List<CalcPbomDTO> calcPplan(@RequestBody String id) {
+        Optional<ProductionPlan> temp = productionPlanRepository.findById(id);
+        if (temp.isEmpty()) {
+            return null;
+        }
+
+        Product product = temp.get().getProduct();
+        var pboms = pbomRepository.findAllBy(product.getProdId());
+
+        return pboms.stream().map(pbom -> CalcPbomDTO.builder()
+                .matId(pbom.getMaterial().getMatId())
+                .pbomQty(pbom.getPbomQty())
+                .build()
+        ).collect(Collectors.toList());
     }
 }
