@@ -66,7 +66,8 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
               .matName(ordering.getContractMaterial().getMaterial().getMatName())
               .drItemQty(deliveryRequestItem.getDrItemQty())
               .drItemDueDate(deliveryRequestItem.getDrItemDueDate())
-              .incomingReturnQty(incomingTotal != null ? incomingTotal.getIncomingReturnTotalQty() : 0)
+              .incomingReturnTotalQty(incomingTotal != null ? incomingTotal.getIncomingReturnTotalQty() : 0)
+              .incomingMissingTotalQty(incomingTotal != null ? incomingTotal.getIncomingMissingTotalQty() : 0)
               .build();
 
       dtoList.add(dto);
@@ -112,6 +113,8 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
     // 입고 생성
     incomingService.createIncomingForDeliveryPartnerItem(savedItem);
 
+    // 출고 상태 갱신
+    updateDeliveryPartnerStatus(deliveryPartner);
 
   }
 
@@ -133,6 +136,9 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
       // 입고 엔티티 생성
       incomingService.createIncomingForDeliveryPartnerItem(savedItem);
 
+      // 출고 상태 갱신
+      updateDeliveryPartnerStatus(deliveryPartner);
+
     }
   }
 
@@ -140,5 +146,34 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
     if (qty < 0) {
       throw new IllegalArgumentException("출고 수량은 음수일 수 없습니다.");
     }
+  }
+
+  public void updateDeliveryPartnerStatus(DeliveryPartner deliveryPartner) {
+    int drQty = deliveryPartner.getDeliveryRequestItem().getDrItemQty();
+    int shippedQty = deliveryPartner.getDeliveryPartnerQty();
+    int returnedQty = deliveryPartner.getIncomingTotal().getIncomingReturnTotalQty();
+    int missingQty = deliveryPartner.getIncomingTotal().getIncomingMissingTotalQty();
+    int netQty = shippedQty - returnedQty - missingQty;
+
+    // 출고가 전혀 안 된 경우
+    if (shippedQty == 0) {
+      deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.진행중);
+
+      // 출고했지만 반품 등으로 실질 수량이 줄어든 경우
+    } else if (netQty < drQty) {
+      deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.부분출고);
+
+      // 출고 완료 수량이고, 입고도 마감됨
+    } else if (netQty == drQty) {
+      if (deliveryPartner.getIncomingTotal().getIncomingStatus() == IncomingStatus.입고마감) {
+        deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.완료);
+      } else {
+        deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.출고);
+      }
+
+    } else {
+      throw new IllegalStateException("반품 수량이 출고 수량보다 많습니다. 데이터 확인이 필요합니다.");
+    }
+
   }
 }

@@ -34,6 +34,9 @@ public class IncomingTotal {
   @Column(nullable = false)
   private int incomingReturnTotalQty = 0 ;
 
+  @Column(nullable = false)
+  private int incomingMissingTotalQty = 0 ;
+
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private IncomingStatus incomingStatus;
@@ -43,15 +46,33 @@ public class IncomingTotal {
     this.incomingStatus = newStatus;
   }
 
-  // 상태를 기준으로 업데이트할 수 있는 빌더 메서드 추가
-  public IncomingTotal updateStatusAndReturn(IncomingStatus newStatus) {
-    return IncomingTotal.builder()
-            .incomingTotalId(this.incomingTotalId)
-            .deliveryRequestItem(this.deliveryRequestItem)
-            .incomingCompletedAt(this.incomingCompletedAt)
-            .incomingTotalQty(this.incomingTotalQty)
-            .incomingReturnTotalQty(this.incomingReturnTotalQty)
-            .incomingStatus(newStatus)  // 새로운 상태 설정
-            .build();
+  public void markAsCompleted() {
+    this.incomingCompletedAt = LocalDateTime.now();
+    this.incomingStatus = IncomingStatus.입고마감;
   }
+
+  public void markFirstIncoming() {
+    if (this.incomingFirstDate == null) {
+      this.incomingFirstDate = LocalDateTime.now();
+    }
+  }
+
+  public void updateTotalAndMissingTotalQty(int totalQty, int missingQty) {
+    this.incomingTotalQty = totalQty;
+    this.incomingMissingTotalQty = missingQty;
+  }
+
+  public void returnTotalQty(int returnQty) {
+    this.incomingReturnTotalQty = returnQty;
+  }
+
+  public void addToTotalAndMissingTotalQty(int totalQty, int missingQty) {
+    this.incomingTotalQty += totalQty;
+    this.incomingMissingTotalQty += missingQty;
+  }
+
+  public void addToReturnTotalQty(int returnQty) {
+    this.incomingReturnTotalQty += returnQty;
+  }
+
 }

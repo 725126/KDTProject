@@ -34,9 +34,9 @@ public class DeliveryRequest {
   // 상태를 발주량과 납입 지시 총 수량 비교 후 업데이트하는 메서드
   public void updateStatus() {
     if (this.drTotalQty == this.ordering.getOrderQty()) {
-      this.drStatus = DeliveryStatus.완료;  // 발주량과 납입 지시 총 수량이 같으면 완료
+      this.drStatus = DeliveryStatus.완료;
     } else {
-      this.drStatus = DeliveryStatus.진행중;  // 다르면 진행중
+      this.drStatus = DeliveryStatus.진행중;
     }
   }
 

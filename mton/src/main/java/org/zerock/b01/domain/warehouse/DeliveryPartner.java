@@ -39,8 +39,11 @@ public class DeliveryPartner extends BaseEntity {
     int incomingReturnTotalQty = (incomingTotal != null)
             ? incomingTotal.getIncomingReturnTotalQty()
             : 0;
-    // 남은 수량 = 발주수량 - 이미 입고된 수량 + 반품 수량
-    int remainingQty = drItemQty - this.deliveryPartnerQty + incomingReturnTotalQty;
+    int incomingMissingTotalQty = (incomingTotal != null)
+            ? incomingTotal.getIncomingMissingTotalQty()
+            : 0;
+    // 남은 수량 = 발주수량 - 이미 출고된 수량 + 반품 수량
+    int remainingQty = drItemQty - this.deliveryPartnerQty + incomingReturnTotalQty + incomingMissingTotalQty;
 
     if (qtyToAdd > remainingQty) {
       throw new IllegalArgumentException(

@@ -5,12 +5,13 @@ import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.warehouse.DeliveryRequestItemDTO;
 
 import java.time.LocalDate;
+import java.util.List;
 
 public interface DeliveryRequestItemService {
 
   String generateDrItemCode();
 
-  DeliveryRequestItemDTO registerDeliveryRequestItem(DeliveryRequestItemDTO deliveryRequestItemDTO);
+  List<DeliveryRequestItemDTO> registerDeliveryRequestItem(List<DeliveryRequestItemDTO> dtoList);
 
   DeliveryRequestItemDTO readDeliveryRequestItem(Long drItemId);
 
