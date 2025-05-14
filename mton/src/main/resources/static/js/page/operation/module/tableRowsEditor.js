@@ -262,7 +262,7 @@ function addEditButtons(table, row, ...protectedCols) {
     revertButton.setAttribute("revert", "disabled");
 
     // 삭제버튼 이벤트. 실제 삭제 로직은 업로드 버튼 눌렀을 때 이루어짐
-    deleteCheck.addEventListener("change", function (e) {
+    deleteCheck.addEventListener("change", function () {
         const isChecked = deleteCheck.checked;
 
         // 켜고 끔에 따라 수정 버튼도 같이 숨기고 보여야함
@@ -574,7 +574,7 @@ function initEmptyOrderingTable(table, isFile = false) {
     const makeMin = (row) => {
         const dates = row.querySelectorAll("input[type='date']");
         console.log(dates);
-        dates[0].addEventListener("change", function (e) {
+        dates[0].addEventListener("change", function () {
             dates[1].min = dates[0].value;
             dates[1].value = dates[1].value < dates[0].value ? dates[0].value : dates[1].value;
             dates[1].dispatchEvent(new Event("change"));
@@ -669,11 +669,11 @@ function reloadTable(table, request, tar) {
             targetDB = prdplanDBEditData;
             break;
         case "pplan":
-        case "productionplan":
+        case "procureplan":
             targetDB = pplanDBData;
             break;
         case "pplanedit":
-        case "productionplanedit":
+        case "procureplanedit":
             targetDB = pplanDBEditData;
             break;
         default:
@@ -948,7 +948,7 @@ function viewOrderingTable() {
                 if (dates === null || dates.length === 0) {
                     continue;
                 }
-                dates[0].addEventListener("change", function (e) {
+                dates[0].addEventListener("change", function () {
                     dates[1].min = dates[0].value;
                     dates[1].value = dates[1].value < dates[0].value ? dates[0].value : dates[1].value;
                     dates[1].dispatchEvent(new Event("change"));
@@ -987,7 +987,7 @@ function makeSelect(cell, ...options) {
         select.appendChild(opt);
     }
 
-    select.addEventListener("change", function (e) {
+    select.addEventListener("change", function () {
         let span = cell.querySelector("span");
         if (span === null) {
             span = document.createElement("span");
@@ -1039,7 +1039,7 @@ function makeDatePicker(cell) {
     date.classList.add("indirect-time");
     date.setAttribute("min", today.substring(0, today.indexOf("T")));
 
-    date.addEventListener("change", function (e) {
+    date.addEventListener("change", function () {
         let span = cell.querySelector("span");
         if (span === null) {
             span = document.createElement("span");
@@ -1079,7 +1079,7 @@ function initPageTable() {
     const viewLabel = manageMod.querySelector("#mod-view");
 
     // 등록, 수정, 목록 라디오 간 전환 시각효과
-    manageMod.addEventListener("click", function (event) {
+    manageMod.addEventListener("click", function () {
         const labels = manageMod.querySelectorAll("label");
 
         for (const label of labels) {
@@ -1096,7 +1096,7 @@ function initPageTable() {
     });
 
     // 등록, 수정, 목록 버튼 클릭시 테이블과 우측 패널 전환 이벤트
-    insertLabel.addEventListener("change", function (event) {
+    insertLabel.addEventListener("change", function () {
         inputGroup.style.display = "block";
         editGroup.style.display = "none";
         viewGroup.style.display = "none";
@@ -1111,7 +1111,7 @@ function initPageTable() {
         }
     });
 
-    editLabel.addEventListener("change", function (event) {
+    editLabel.addEventListener("change", function () {
         inputGroup.style.display = "none";
         editGroup.style.display = "block";
         viewGroup.style.display = "none";
@@ -1126,7 +1126,7 @@ function initPageTable() {
         }
     });
 
-    viewLabel.addEventListener("change", function (event) {
+    viewLabel.addEventListener("change", function () {
         inputGroup.style.display = "none";
         editGroup.style.display = "none";
         viewGroup.style.display = "block";
