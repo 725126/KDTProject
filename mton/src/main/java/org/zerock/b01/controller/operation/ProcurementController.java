@@ -5,8 +5,10 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.zerock.b01.controller.operation.repository.ContractMaterialRepository;
 import org.zerock.b01.controller.operation.repository.OrderingRepository;
 import org.zerock.b01.controller.operation.repository.ProcurementPlanRepository;
+import org.zerock.b01.controller.operation.service.ContractMaterialService;
 import org.zerock.b01.controller.operation.service.OrderingService;
 import org.zerock.b01.controller.operation.service.ProcurementPlanService;
 import org.zerock.b01.domain.operation.StatusTuple;
@@ -14,6 +16,7 @@ import org.zerock.b01.domain.operation.tablehead.OrderingTableHead;
 import org.zerock.b01.domain.operation.tablehead.ProcurementPlanTableHead;
 import org.zerock.b01.dto.operation.OrderingDTO;
 import org.zerock.b01.dto.operation.ProcurementPlanDTO;
+import org.zerock.b01.dto.partner.ContractMaterialDTO;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -32,6 +35,7 @@ public class ProcurementController {
 
     private final ProcurementPlanService procurementPlanService;
     private final OrderingService orderingService;
+    private final ContractMaterialService contractMaterialService;
 
     //조달 계획
     @GetMapping("/procure")
@@ -196,6 +200,13 @@ public class ProcurementController {
     public List<OrderingDTO> viewOrder(@RequestBody String str) {
         log.info("View Order: " + str);
         return orderingService.viewAll();
+    }
+
+    @ResponseBody
+    @PostMapping("/view/contmat")
+    public List<ContractMaterialDTO> viewContmat(@RequestBody String str) {
+        log.info("View Contmat: " + str);
+        return contractMaterialService.viewAll();
     }
 
     @ResponseBody

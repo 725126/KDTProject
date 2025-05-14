@@ -17,3 +17,9 @@ export const pbomProdId = "prodId";
 export const pbomQty = "pbomQty";
 
 export const prdplanId = "prdplanId";
+
+export const conmatId = "cmtId";
+
+export const pplanId = "pplanId";
+
+export const orderId = "orderId";

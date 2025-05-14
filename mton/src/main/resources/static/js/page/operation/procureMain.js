@@ -65,6 +65,7 @@ const pplanInputTable = document.querySelector("#pplan-table");
             alert(res.message);
             viewRefreshBtn.dispatchEvent(new Event("click"));
             editRefreshBtn.dispatchEvent(new Event("click"));
+            tableRowsEditor.viewChange();
         });
     });
 

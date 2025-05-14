@@ -11,9 +11,17 @@ let prdplanDBData;
 let prdplanDBEditData;
 let pplanDBData;
 let pplanDBEditData;
+let orderDBData;
+let contmatDBData;
 
 // 수정 전 원래 값을 담는 변수와 삭제 전 삭제할 ID를 담는 변수
 let originalValues = {};
+
+function viewChange() {
+    document.querySelector("#mod-view").checked = true;
+    document.querySelector("#manage-mod").dispatchEvent(new Event("click"));
+    document.querySelector("#mod-view").dispatchEvent(new Event("change"));
+}
 
 // 테이블 열 개수 파악하고 새 행과 열을 삽입.
 // 일반적으로 등록 테이블에서만 사용한다.
@@ -125,6 +133,10 @@ function addPrdPlanTableUtilBtn(table) {
 
 function addPPlanTableUtilBtn(table) {
     initEmptyPPlanTable(table, true);
+}
+
+function addOrderTableUtilBtn(table) {
+    initEmptyOrderingTable(table, true);
 }
 
 // 수정테이블의 헤더에 조작버튼 추가
@@ -526,11 +538,56 @@ function initEmptyPPlanTable(table, isFile = false) {
             continue;
         }
 
-        if (row.rowIndex !== 0) {
-            addUtilButtons(table, row, makePrdplanSelect, makeMatSelect, makeDate);
-        } else {
-            addUtilButtons(table, row);
+        addUtilButtons(table, row, makePrdplanSelect, makeMatSelect, makeDate);
+    }
+}
+
+function initEmptyOrderingTable(table, isFile = false) {
+    const conmatOptions = contmatDBData.map(data => data[dbElementNames.conmatId]);
+    const pplanOptions = pplanDBData.map(data => data[dbElementNames.pplanId]);
+
+    const makeConmatSelect = (row) => {
+        makeSelectForRawCell(row.cells[1], conmatOptions);
+        return row.cells[1];
+    }
+
+    const makePPlanSelect = (row) => {
+        makeSelectForRawCell(row.cells[2], pplanOptions);
+        return row.cells[2];
+    }
+
+    const makeStartDate = (row) => {
+        makeDatePicker(row.cells[4]);
+        return row.cells[4];
+    }
+
+    const makeEndDate = (row) => {
+        makeDatePicker(row.cells[5]);
+        return row.cells[5];
+    }
+
+    const makeStatSelect = (row) => {
+        makeSelectForRawCell(row.cells[6], ["진행중", "완료"]);
+        return row.cells[6];
+    }
+
+    const makeMin = (row) => {
+        const dates = row.querySelectorAll("input[type='date']");
+        console.log(dates);
+        dates[0].addEventListener("change", function (e) {
+            dates[1].min = dates[0].value;
+            dates[1].value = dates[1].value < dates[0].value ? dates[0].value : dates[1].value;
+            dates[1].dispatchEvent(new Event("change"));
+        });
+        return row.cells[5];
+    }
+
+    for (const row of table.rows) {
+        if (isFile && row.rowIndex === 0) {
+            continue;
         }
+
+        addUtilButtons(table, row, makeConmatSelect, makePPlanSelect, makeStartDate, makeEndDate, makeStatSelect, makeMin);
     }
 }
 
@@ -588,7 +645,7 @@ function viewTable(table, request) {
 }
 
 // DB 받아온 내용으로 테이블을 갱신한다.
-function reloadTable(table, request) {
+function reloadTable(table, request, tar) {
     let targetDB;
 
     switch (request) {
@@ -619,6 +676,8 @@ function reloadTable(table, request) {
         case "productionplanedit":
             targetDB = pplanDBEditData;
             break;
+        default:
+            targetDB = tar;
     }
 
     const sheet = XLSX.utils.json_to_sheet(targetDB);
@@ -719,6 +778,27 @@ async function refreshPPlanDBDataAll() {
                 return ePPlan;
             });
 
+            return values;
+        },
+        (reason) => {
+            return reason;
+        }
+    );
+}
+
+async function refreshOrderingDBDataAll() {
+    const result = Promise.all([
+        refreshTableView("/internal/procurement/view/order", "order"),
+        refreshTableView("/internal/procurement/view/pplan", "pplan"),
+        refreshTableView("/internal/procurement/view/contmat", "contmat")
+    ]);
+
+    return result.then(
+        (values) => {
+            orderDBData = values[0];
+            pplanDBData = values[1];
+            contmatDBData = values[2];
+            console.log(values);
             return values;
         },
         (reason) => {
@@ -844,6 +924,47 @@ function viewPPlanTable() {
     });
 }
 
+function viewOrderingTable() {
+    const refresh = refreshOrderingDBDataAll();
+    refresh.then(value => {
+        const orderViewTable = document.querySelector("#order-table-view");
+        const orderEditTable = document.querySelector("#order-table-edit");
+        const orderInputTable = document.querySelector("#order-table");
+
+        if (value[0].length > 0) {
+            reloadTable(orderViewTable, "", orderDBData);
+            reloadTable(orderEditTable, "", orderDBData);
+
+            addTableEditButtons(orderEditTable);
+
+            makeTableCellDBSelect(orderEditTable, 1, contmatDBData, dbElementNames.conmatId);
+            makeTableCellDBSelect(orderEditTable, 2, pplanDBData, dbElementNames.pplanId);
+            makeTableCellDatePicker(orderEditTable, 4);
+            makeTableCellDatePicker(orderEditTable, 5);
+            makeTableCellSelect(orderEditTable, 6, "진행중", "완료");
+
+            for (const row of orderEditTable.rows) {
+                const dates = row.querySelectorAll("input[type='date']");
+                if (dates === null || dates.length === 0) {
+                    continue;
+                }
+                dates[0].addEventListener("change", function (e) {
+                    dates[1].min = dates[0].value;
+                    dates[1].value = dates[1].value < dates[0].value ? dates[0].value : dates[1].value;
+                    dates[1].dispatchEvent(new Event("change"));
+                });
+            }
+        } else {
+            makeUniCellMessage(orderViewTable, "등록된 내용이 없습니다.");
+            makeUniCellMessage(orderEditTable, "수정할 내용이 없습니다.");
+        }
+
+        originalValues = {};
+
+        initEmptyOrderingTable(orderInputTable);
+    });
+}
+
 // span 을 자식으로 갖지 않은 셀에 select 추가하기
 function makeSelectForRawCell(cell, ...options) {
     let value = cell.innerText;
@@ -892,11 +1013,14 @@ function makeTableCellDBSelect(table, cellIndex, dbData, dbElement) {
 
 function makeTableCellDatePicker(table, cellIndex) {
     const rows = table.rows;
+    const result = [];
 
     for (let i = 1; i < rows.length; i++) {
         const cell = rows[i].cells[cellIndex];
-        makeDatePickerRawCell(cell);
+        result[i - 1] = makeDatePickerRawCell(cell);
     }
+
+    return result;
 }
 
 function makeDatePickerRawCell(cell) {
@@ -905,7 +1029,7 @@ function makeDatePickerRawCell(cell) {
     span.innerHTML = value;
     cell.innerText = "";
     cell.appendChild(span);
-    makeDatePicker(cell);
+    return makeDatePicker(cell);
 }
 
 function makeDatePicker(cell) {
@@ -925,6 +1049,8 @@ function makeDatePicker(cell) {
         span.innerText = date.value;
     });
     cell.appendChild(date);
+
+    return date;
 }
 
 // 임의의 option 을 사용하여 셀을 select 로 만든다.
@@ -1032,10 +1158,13 @@ export {
     viewAllProductTable,
     viewPrdPlanTable,
     viewPPlanTable,
+    viewOrderingTable,
     addTableUtilBtn,
     addTableEditButtons,
     addPbomTableUtilBtn,
     addPrdPlanTableUtilBtn,
     addPPlanTableUtilBtn,
+    addOrderTableUtilBtn,
     uploadEditedTable,
+    viewChange,
 };

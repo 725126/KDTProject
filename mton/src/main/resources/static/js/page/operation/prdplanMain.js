@@ -9,6 +9,8 @@ const prdplanViewTable = document.querySelector("#prdplan-table-view");
 const prdplanEditTable = document.querySelector("#prdplan-table-edit");
 const prdplanInputTable = document.querySelector("#prdplan-table");
 
+
+
 // 계획관리 모드 라디오 버튼 이벤트 등록
 (function () {
     tableRowsEditor.initPageTable();
@@ -65,6 +67,7 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
             alert(res.message);
             viewRefreshBtn.dispatchEvent(new Event("click"));
             editRefreshBtn.dispatchEvent(new Event("click"));
+            tableRowsEditor.viewChange();
         });
     });
 

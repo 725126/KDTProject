@@ -168,6 +168,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
             alert(res.message);
             viewRefreshBtn.dispatchEvent(new Event('click'));
             editRefreshBtn.dispatchEvent(new Event('click'));
+            tableRowsEditor.viewChange();
         });
     });
 
