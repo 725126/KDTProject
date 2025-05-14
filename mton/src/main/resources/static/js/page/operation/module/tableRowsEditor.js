@@ -469,8 +469,8 @@ function initEmptyTable(table) {
 }
 
 function initEmptyPbomTable(table, isFile = false) {
-    const matOptions = matDBData.map(data => data[dbElementNames.pbomMatId]);
-    const prdOptions = prdDBData.map(data => data[dbElementNames.pbomProdId]);
+    const matOptions = matDBData.map(data => [data[dbElementNames.pbomMatId], data[dbElementNames.matName]]);
+    const prdOptions = prdDBData.map(data => [data[dbElementNames.pbomProdId], data[dbElementNames.prodName]]);
 
     const makeMatSelect = (row) => {
         makeSelectForRawCell(row.cells[1], matOptions);
@@ -833,6 +833,9 @@ function viewAllProductTable() {
 
         const pbomInputTable = document.querySelector("#pbom-table");
 
+        console.log(matDBData);
+        console.log(prdDBData);
+
         if (value[0].length > 0) {
             reloadTable(matViewTable, "material");
             reloadTable(matEditTable, "material");
@@ -859,8 +862,8 @@ function viewAllProductTable() {
 
             addTableEditButtons(pbomEditTable);
 
-            makeTableCellDBSelect(pbomEditTable, 1, matDBData, dbElementNames.pbomMatId);
-            makeTableCellDBSelect(pbomEditTable, 2, prdDBData, dbElementNames.pbomProdId);
+            makeTableCellDBSelectWithLabel(pbomEditTable, 1, matDBData, dbElementNames.pbomMatId, dbElementNames.matName);
+            makeTableCellDBSelectWithLabel(pbomEditTable, 2, prdDBData, dbElementNames.pbomProdId, dbElementNames.prodName);
         } else {
             makeUniCellMessage(pbomViewTable, "등록된 내용이 없습니다.");
             makeUniCellMessage(pbomEditTable, "수정할 내용이 없습니다.");
@@ -982,8 +985,16 @@ function makeSelect(cell, ...options) {
 
     for (const option of options[0]) {
         const opt = document.createElement("option");
-        opt.value = option;
-        opt.label = option;
+
+        console.log(Array.isArray(option));
+
+        if (Array.isArray(option)) {
+            opt.value = option[0];
+            opt.label = option[1] + " (" + option[0] + ")";
+        } else {
+            opt.value = option;
+            opt.label = option;
+        }
         select.appendChild(opt);
     }
 
@@ -1004,6 +1015,16 @@ function makeSelect(cell, ...options) {
 function makeTableCellDBSelect(table, cellIndex, dbData, dbElement) {
     const rows = table.rows;
     const options = dbData.map(data => data[dbElement]);
+
+    for (let i = 1; i < rows.length; i++) {
+        const cell = rows[i].cells[cellIndex];
+        makeSelectForRawCell(cell, options);
+    }
+}
+
+function makeTableCellDBSelectWithLabel(table, cellIndex, dbData, dbElement, dbLabel) {
+    const rows = table.rows;
+    const options = dbData.map(data => [data[dbElement], data[dbLabel]]);
 
     for (let i = 1; i < rows.length; i++) {
         const cell = rows[i].cells[cellIndex];
