@@ -239,7 +239,7 @@ public class ProcurementController {
         }
 
         Product product = temp.get().getProduct();
-        var pboms = pbomRepository.findAllBy(product.getProdId());
+        var pboms = pbomRepository.findAllByProdId(product.getProdId());
 
         return pboms.stream().map(pbom -> CalcPbomDTO.builder()
                 .matId(pbom.getMaterial().getMatId())
@@ -249,5 +249,34 @@ public class ProcurementController {
                 .prdplanEnd(temp.get().getPrdplanEnd())
                 .build()
         ).collect(Collectors.toList());
+    }
+
+    @ResponseBody
+    @PostMapping("/calc/pplan/all")
+    public List<CalcPbomDTO> calcPplanAll(@RequestBody List<String> ids) {
+        List<CalcPbomDTO> calcPbomDTOList = new ArrayList<>();
+
+        for (String id : ids) {
+            Optional<ProductionPlan> temp = productionPlanRepository.findById(id);
+            if (temp.isEmpty()) {
+                return null;
+            }
+
+            Product product = temp.get().getProduct();
+            var pboms = pbomRepository.findAllByProdId(product.getProdId());
+
+            var pp = pboms.stream().map(pbom -> CalcPbomDTO.builder()
+                    .matId(pbom.getMaterial().getMatId())
+                    .prdplanId(temp.get().getPrdplanId())
+                    .pbomQty(pbom.getPbomQty())
+                    .pbomMaxQty(pbom.getPbomQty() * temp.get().getPrdplanQty())
+                    .prdplanEnd(temp.get().getPrdplanEnd())
+                    .build()
+            ).collect(Collectors.toList());
+
+            calcPbomDTOList.addAll(pp);
+        }
+
+        return calcPbomDTOList;
     }
 }

@@ -133,14 +133,14 @@ let pbomList = [];
             editRefreshBtn.dispatchEvent(new Event("click"));
             viewRefreshBtn.dispatchEvent(new Event("click"));
         });
-
-        tutorialMessage.bindTutorialMessage(insertFileLabel, tmessage.insertFileBtnTutorial);
-        tutorialMessage.bindTutorialMessage(insertUploadBtn, tmessage.insertUploadBtnTutorial);
-        tutorialMessage.bindTutorialMessage(viewRefreshBtn, tmessage.viewRefreshBtnTutorial);
-        tutorialMessage.bindTutorialMessage(viewDownloadBtn, tmessage.viewDownloadBtnTutorial);
-        tutorialMessage.bindTutorialMessage(editRefreshBtn, tmessage.editRefreshBtnTutorial);
-        tutorialMessage.bindTutorialMessage(editUploadBtn, tmessage.editUploadBtnTutorial);
     });
+
+    tutorialMessage.bindTutorialMessage(insertFileLabel, tmessage.insertFileBtnTutorial);
+    tutorialMessage.bindTutorialMessage(insertUploadBtn, tmessage.insertUploadBtnTutorial);
+    tutorialMessage.bindTutorialMessage(viewRefreshBtn, tmessage.viewRefreshBtnTutorial);
+    tutorialMessage.bindTutorialMessage(viewDownloadBtn, tmessage.viewDownloadBtnTutorial);
+    tutorialMessage.bindTutorialMessage(editRefreshBtn, tmessage.editRefreshBtnTutorial);
+    tutorialMessage.bindTutorialMessage(editUploadBtn, tmessage.editUploadBtnTutorial);
 })();
 
 (function () {
@@ -157,6 +157,26 @@ let pbomList = [];
 
         const result = jsonFetcher(dest, pplanId);
         result.then(res => {
+            pbomList = res;
+            automaticPplan(res, pplanInputTable);
+            tableRowsEditor.addPPlanTableUtilBtn(pplanInputTable);
+        });
+    });
+
+    const pplanAllBtn = document.getElementById("pplan-btn-all");
+    pplanAllBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        const pplan = document.getElementById("prdplan-select");
+        const pplanIds = Array.from(pplan.options).map(x => x.value);
+        console.log(pplanIds);
+        const dest = "/internal/procurement/calc/pplan/all";
+
+        const result = jsonFetcherList(dest, pplanIds);
+        result.then(res => {
+            console.log(res);
+            pbomList = res;
             automaticPplan(res, pplanInputTable);
             tableRowsEditor.addPPlanTableUtilBtn(pplanInputTable);
         });
@@ -181,7 +201,24 @@ async function jsonFetcher(dest, jData) {
     });
 }
 
-function automaticPplan(jData, table) {
+async function jsonFetcherList(dest, jDatas) {
+    return await fetch(dest, {
+        method: "POST",
+        headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute('content')
+        },
+        body: JSON.stringify(jDatas)
+    }).then(res => {
+        return res.json();
+    }).then(data => {
+        return data;
+    }).catch(error => {
+        console.log(error);
+    });
+}
+
+function automaticPplan(jData, table, append = false) {
     const newContent = [];
 
     for (const data of jData) {
@@ -194,8 +231,6 @@ function automaticPplan(jData, table) {
         }
         newContent.push(row);
     }
-
-    console.log(newContent);
 
     const sheet = XLSX.utils.json_to_sheet(newContent);
     const htmlSheet = XLSX.utils.sheet_to_html(sheet, {editable: true});
@@ -210,5 +245,13 @@ function automaticPplan(jData, table) {
     const htmlRow = htmlSheet.substring(startIndex, endIndex);
 
     const tbody = table.querySelector("tbody");
-    tbody.innerHTML = htmlRow;
+    if (append) {
+        tbody.innerHTML = tbody.innerHTML + htmlRow;
+    } else {
+        tbody.innerHTML = htmlRow;
+    }
+}
+
+function automaticAllPplan(jdata, table) {
+
 }

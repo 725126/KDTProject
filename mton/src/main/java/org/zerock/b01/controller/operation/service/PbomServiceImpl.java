@@ -11,10 +11,7 @@ import org.zerock.b01.domain.operation.Pbom;
 import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.dto.operation.PbomDTO;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Service
@@ -37,13 +34,24 @@ public class PbomServiceImpl implements PbomService {
                     .build()
             ).collect(Collectors.toList());
 
+
             boolean hasDuple = false;
             boolean hasTwin = false;
+            boolean hasEqual = false;
             HashSet<String> twins = new HashSet<>();
+            HashSet<String> equals = new HashSet<>();
             StringBuilder dupleMessage = new StringBuilder("다음 자재코드가 이미 존재합니다: ");
             StringBuilder twinMessage = new StringBuilder("다음 자재코드는 두 번 이상 입력되었습니다: ");
+            StringBuilder equalMessage = new StringBuilder("다음 자재:상품 조합은 이미 존재합니다, 등록 대신 수정을 해 주세요: ");
 
             for (var pbom : pboms) {
+                String prodIdp = pbom.getProduct().getProdId();
+                String matIdp = pbom.getMaterial().getMatId();
+                Optional<Pbom> pbomOptional = pbomRepository.findByProdAndMatId(prodIdp, matIdp);
+                if (!equals.add(pbom.getMaterial().getMatId() + ":" + pbom.getProduct().getProdId()) || pbomOptional.isPresent()) {
+                    hasEqual = true;
+                }
+
                 String id = pbom.getPbomId();
                 log.info("넘어온값: " + id);
 
@@ -56,6 +64,12 @@ public class PbomServiceImpl implements PbomService {
                     hasTwin = true;
                     twinMessage.append(id).append(", ");
                 }
+            }
+
+            if (hasEqual) {
+                equalMessage.append(equals);
+                equalMessage.append("PBOM 등록이 취소되었습니다.");
+                return new StatusTuple(false, equalMessage.toString());
             }
 
             if (hasDuple) {

@@ -6,7 +6,10 @@ import org.modelmapper.convention.MatchingStrategies;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.zerock.b01.domain.operation.ProcurementPlan;
+import org.zerock.b01.domain.operation.tablehead.ProcurementPlanTableHead;
 import org.zerock.b01.dto.operation.ProcurementPlanDTO;
+
+import java.util.HashMap;
 
 @Configuration
 public class RootConfig {
