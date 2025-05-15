@@ -45,6 +45,15 @@
             <button type="button" class="btn btn-outline-secondary" id="view-refresh">&circlearrowright;</button>
             <button type="button" class="btn btn-outline-secondary" id="view-download">D</button>
         </div>
+        <div class="card p-4 mb-3 d-flex flex-row" id="btn-card">
+            <div class="form-floating w-75">
+                <select id="prdplan-select" class="form-select">
+                    <option th:each="prdplan: ${prdplans}" th:value="${prdplan.getPrdplanId()}" th:label="${prdplan.getPrdplanId().toString() + ' - ' + prdplan.getProduct().getProdName()}"></option>
+                </select>
+                <label for="prdplan-select">진행중인 생산계획</label>
+            </div>
+            <button type="button" id="pplan-btn" class="btn btn-outline-primary ms-3">조달계획 자동생성</button>
+        </div>
         <div class="card p-4" id="table-card">
             <div id="tables-input">
                 <table class="table table-bordered table-hover data-table text-center table-excel" id="pplan-table">

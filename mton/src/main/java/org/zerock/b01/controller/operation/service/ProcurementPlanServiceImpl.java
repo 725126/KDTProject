@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.zerock.b01.controller.operation.repository.MaterialRepository;
+import org.zerock.b01.controller.operation.repository.OrderingRepository;
 import org.zerock.b01.controller.operation.repository.ProcurementPlanRepository;
 import org.zerock.b01.controller.operation.repository.ProductionPlanRepository;
 import org.zerock.b01.domain.operation.ProcurementPlan;
@@ -25,6 +26,7 @@ public class ProcurementPlanServiceImpl implements ProcurementPlanService {
     private final ProcurementPlanRepository procurementPlanRepository;
     private final MaterialRepository materialRepository;
     private final ProductionPlanRepository productionPlanRepository;
+    private final OrderingRepository orderingRepository;
 
     @Override
     public StatusTuple registerAll(List<ProcurementPlanDTO> list) {

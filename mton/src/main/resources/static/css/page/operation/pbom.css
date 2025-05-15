@@ -9,6 +9,10 @@
     position: relative;
 }
 
+.max-height-pplan {
+    max-height: calc(100vh - 440px) !important;
+}
+
 .transparent-file {
     opacity: 0;
     position: absolute;

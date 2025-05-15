@@ -772,8 +772,6 @@ async function refreshPPlanDBDataAll() {
                 ePPlan[keys[4]] = pplan[keys[4]];
                 ePPlan[keys[6]] = pplan[keys[6]];
                 ePPlan[keys[7]] = pplan[keys[7]];
-
-                console.log(ePPlan);
                 return ePPlan;
             });
 

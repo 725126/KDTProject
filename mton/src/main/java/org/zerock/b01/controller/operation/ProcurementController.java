@@ -45,6 +45,9 @@ public class ProcurementController {
     @GetMapping("/procure")
     public String procureGet(Model model) {
         model.addAttribute("pplanTH", ProcurementPlanTableHead.values());
+        model.addAttribute("prdplans", productionPlanRepository.findAll().stream().filter(x ->
+                LocalDate.now().isBefore(x.getPrdplanEnd()) || LocalDate.now().isEqual(x.getPrdplanEnd())
+        ).collect(Collectors.toList()));
         return "/page/operation/procurement/procure";
     }
 
@@ -240,7 +243,10 @@ public class ProcurementController {
 
         return pboms.stream().map(pbom -> CalcPbomDTO.builder()
                 .matId(pbom.getMaterial().getMatId())
+                .prdplanId(temp.get().getPrdplanId())
                 .pbomQty(pbom.getPbomQty())
+                .pbomMaxQty(pbom.getPbomQty() * temp.get().getPrdplanQty())
+                .prdplanEnd(temp.get().getPrdplanEnd())
                 .build()
         ).collect(Collectors.toList());
     }
