@@ -1,6 +1,8 @@
 package org.zerock.b01.repository.user;
 
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.zerock.b01.domain.user.Partner;
 import org.zerock.b01.domain.user.User;
 
@@ -15,4 +17,8 @@ public interface PartnerRepository extends JpaRepository<Partner, Long> {
 
     // 사업자등록번호로 회원 조회
     Optional<Partner> findBypBusinessNo(String pBusinessNo);
+
+    // 협력업체 ID로 회사명 조회
+    @Query("SELECT p.pCompany FROM Partner p WHERE p.partnerId = :id")
+    Optional<String> findCompanyNameById(@Param("id") Long id);
 }

@@ -13,5 +13,5 @@ export const editModifyBtnTutorial = "행의 내용을 수정합니다.";
 export const editRevertBtnTutorial = "수정한 내용을 원래대로 되돌립니다.";
 export const editAllRevertTutorial = "모든 수정한 행의 내용을 원래대로 되돌립니다.";
 export const editAllDeleteTutorial = "모든 행을 삭제하거나 삭제 취소합니다.";
-export const editRefreshBtnTutorial = "최신 데이터베이스를 반영해 표를 새로고침합니다. 모든 수정사항과 삭제사항은 파기됩니다.";
+export const editRefreshBtnTutorial = "최신 데이터베이스를 반영해 표를 새로고침합니다. <br>모든 수정사항과 삭제사항은 파기됩니다.";
 export const editUploadBtnTutorial = "수정사항과 삭제사항을 데이터베이스에 반영합니다.";

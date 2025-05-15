@@ -14,18 +14,15 @@ import java.time.LocalDate;
 @ToString
 public class Contract {
     @Id
-    private String conId;
+    private String conId; // [기본키] 계약코드
 
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
-    private Partner partner;
+    private Partner partner; // [외래키] 협력업체 ID
 
     @Column(nullable = false)
-    private LocalDate conDate;
+    private LocalDate conDate; // 계약일
 
     @Column(nullable = false)
-    private LocalDate conEnd;
-
-    @Column(length = 800, nullable = false)
-    private String conContent;
+    private LocalDate conEnd; // 만료일
 }

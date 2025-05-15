@@ -45,6 +45,7 @@
             <button type="button" class="btn btn-outline-secondary" id="view-refresh">&circlearrowright;</button>
             <button type="button" class="btn btn-outline-secondary" id="view-download">D</button>
         </div>
+
         <div class="card p-4" id="table-card">
             <form id="view-filter" class="mb-3">
                 <div class="form-check form-check-inline">
@@ -204,6 +205,7 @@
         </div>
     </div>
 
+    <script type="module" th:src="@{/js/page/operation/tooltip.js}"></script>
     <script th:src="@{/js/util/file-preview.js}"></script>
     <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
     <script th:src="@{/js/page/operation/pbomMain.js}" type="module"></script>

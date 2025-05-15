@@ -2,6 +2,10 @@ package org.zerock.b01.controller.operation;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -9,7 +13,9 @@ import org.zerock.b01.controller.operation.repository.ProcurementPlanRepository;
 import org.zerock.b01.controller.operation.service.ProcurementPlanService;
 import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.domain.operation.tablehead.ProcurementPlanTableHead;
+import org.zerock.b01.dto.operation.ContractMaterialViewDTO;
 import org.zerock.b01.dto.operation.ProcurementPlanDTO;
+import org.zerock.b01.service.operation.ContractService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -27,6 +33,8 @@ public class ProcurementController {
 
     private final ProcurementPlanService procurementPlanService;
 
+    private final ContractService contractService;
+
     //조달 계획
     @GetMapping("/procure")
     public String procureGet(Model model) {
@@ -36,7 +44,29 @@ public class ProcurementController {
 
     // 계약 정보
     @GetMapping("/contract")
-    public String contractGet() {
+    public String contractGet(@RequestParam(defaultValue = "0") int page,
+                              @RequestParam(defaultValue = "10") int size,
+                              @RequestParam(required = false) String keyword,
+                              @RequestParam(defaultValue = "newest") String sort,
+                              Model model) {
+
+        Sort sorting = switch (sort) {
+            case "oldest" -> Sort.by("contract.conDate").ascending();
+            default -> Sort.by("contract.conDate").descending(); // newest
+        };
+
+        Pageable pageable = PageRequest.of(page, size, sorting);
+
+        Page<ContractMaterialViewDTO> contracts = contractService.getFilteredContracts(keyword, pageable);
+
+        model.addAttribute("contracts", contracts.getContent());
+        model.addAttribute("currentPage", contracts.getNumber() + 1);
+        model.addAttribute("totalPages", contracts.getTotalPages());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("selectedSize", size);
+
+
         return "/page/operation/procurement/contract";
     }
 

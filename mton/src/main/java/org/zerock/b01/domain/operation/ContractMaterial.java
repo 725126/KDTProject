@@ -13,20 +13,26 @@ import org.hibernate.annotations.OnDeleteAction;
 @ToString
 public class ContractMaterial {
     @Id
-    private String cmtId;
+    private String cmtId; // [기본키] 계약자재코드
 
     @ManyToOne
     @JoinColumn(name = "con_id", nullable = false)
-    private Contract contract;
+    private Contract contract; // [외래키] 계약코드
 
     @ManyToOne
     @JoinColumn(name = "mat_id", nullable = true) // nullable = false > nullable = true
     @OnDelete(action = OnDeleteAction.SET_NULL)
-    private Material material;
+    private Material material; // [외래키] 자재코드
 
     @Column(nullable = false)
-    private int cmtPrice;
+    private int cmtPrice; // 단가(원)
 
     @Column(nullable = false)
-    private int cmtReq;
+    private int cmtReq; // 소요일(일)
+
+    @Column(nullable = false)
+    private int cmtQty; // 수량
+
+    @Column(length = 100, nullable = false)
+    private String cmtExplains; // 합의내용
 }

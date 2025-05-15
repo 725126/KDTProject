@@ -85,6 +85,21 @@ tr:hover .opacity-btn {
     cursor: default;
 }
 
+/* 새로운 툴팁 css start */
+.tooltip-custom .tooltip-inner {
+    background-color: #123458;
+    color: #fff;
+    font-size: 0.875rem;
+    padding: 8px 12px;
+    border-radius: 0.5rem;
+    min-width: 470px;
+}
+
+.tooltip-custom.bs-tooltip-start .tooltip-arrow::before {
+    border-left-color: #123458;
+}
+/* 새로운 툴팁 css end */
+
 .indirect-time {
     pointer-events: none;
 }
