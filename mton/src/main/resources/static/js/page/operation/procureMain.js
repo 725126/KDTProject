@@ -3,7 +3,6 @@ import * as tableRowsEditor from "./module/tableRowsEditor.js"
 import * as tutorialMessage from "./module/tutorialMessage.js"
 import * as tmessage from "./module/tmessage.js"
 import * as tableFilter from "./module/tableFilter.js"
-import {addPPlanTableUtilBtn} from "./module/tableRowsEditor.js";
 
 // 테이블
 const pplanViewTable = document.querySelector("#pplan-table-view");
@@ -80,13 +79,72 @@ let pbomList = [];
         e.stopPropagation();
 
         const currentTable = document.querySelector("div[style='display: block;'] table");
-        const dest = "/internal/procurement/register/pplan";
-        const result = excelParser.tableUpload(dest, currentTable);
-        result.then(res => {
-            alert(res.message);
-            viewRefreshBtn.dispatchEvent(new Event("click"));
-            editRefreshBtn.dispatchEvent(new Event("click"));
-            tableRowsEditor.viewChange();
+
+        const insertValues = Array.from(pplanInputTable.rows).map((row) => {
+            return {
+                prdplanId: row.cells[1].innerText,
+                matId: row.cells[2].innerText,
+                qty: Number.parseInt(row.cells[3].innerText)
+            };
+        });
+        insertValues.shift();
+
+        const viewValues = Array.from(pplanViewTable.rows).map((row) => {
+            return {
+                prdplanId: row.cells[1].innerText,
+                matId: row.cells[2].innerText,
+                qty: Number.parseInt(row.cells[4].innerText)
+            };
+        });
+        viewValues.shift();
+
+        for (const value of viewValues) {
+            const test = insertValues.filter(i => i.prdplanId === value.prdplanId && i.matId === value.matId);
+            if (test.length > 0) {
+                test[0].qty += value.qty;
+            }
+        }
+
+        const pplan = document.getElementById("prdplan-select");
+        const pplanIds = Array.from(pplan.options).map(x => x.value);
+        console.log(pplanIds);
+        const cDest = "/internal/procurement/calc/pplan/all";
+
+        const cResult = jsonFetcherList(cDest, pplanIds);
+        cResult.then(res => {
+            pbomList = res;
+            console.log(pbomList);
+
+            let nameList = [];
+            let flag = true;
+
+            for (const value of insertValues) {
+                const test = pbomList.filter(p => p.prdplanId === value.prdplanId && p.matId === value.matId && p.pbomMaxQty < value.qty);
+                if (test.length > 0) {
+                    nameList.push(test[0].prdplanId + ":" + test[0].matId + "(" + value.qty + ":" + test[0].pbomMaxQty + ")");
+                }
+            }
+
+            if (nameList.length > 0) {
+                let message = "";
+                for (const name of nameList) {
+                    message = message.concat(name + "\n");
+                }
+                flag = confirm("다음 계획:자재 조합은 (현재치:허용치)를 넘어섰습니다:\n" + message + "\n진행하시겠습니까?");
+            }
+
+            if (flag) {
+                const dest = "/internal/procurement/register/pplan";
+                const result = excelParser.tableUpload(dest, currentTable);
+                result.then(res => {
+                    alert(res.message);
+                    viewRefreshBtn.dispatchEvent(new Event("click"));
+                    editRefreshBtn.dispatchEvent(new Event("click"));
+                    tableRowsEditor.viewChange();
+                });
+            } else {
+                alert("PPLAN 등록이 취소되었습니다.");
+            }
         });
     });
 
