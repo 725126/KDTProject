@@ -81,6 +81,14 @@ let pbomList = [];
         const currentTable = document.querySelector("div[style='display: block;'] table");
 
         const insertValues = Array.from(pplanInputTable.rows).map((row) => {
+            if (row.cells.length < 4) {
+                return {
+                    prdplanId: "",
+                    matId: "",
+                    qty: 0
+                }
+            }
+
             return {
                 prdplanId: row.cells[1].innerText,
                 matId: row.cells[2].innerText,
@@ -90,6 +98,14 @@ let pbomList = [];
         insertValues.shift();
 
         const viewValues = Array.from(pplanViewTable.rows).map((row) => {
+            if (row.cells.length < 5) {
+                return {
+                    prdplanId: "",
+                    matId: "",
+                    qty: 0
+                }
+            }
+
             return {
                 prdplanId: row.cells[1].innerText,
                 matId: row.cells[2].innerText,
