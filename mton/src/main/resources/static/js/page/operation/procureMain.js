@@ -52,7 +52,7 @@ let pbomList = [];
         row.deleteCell(3);
     }
 
-    tableRowsEditor.viewPPlanTable();
+    tableRowsEditor.viewPPlanTable(true);
     tableRowsEditor.initEditButtons(pplanEditTable);
 })();
 
@@ -237,6 +237,7 @@ let pbomList = [];
         });
     });
 
+    // 모든 조달계획 자동생성 버튼 이벤트 등록
     const pplanAllBtn = document.getElementById("pplan-btn-all");
     pplanAllBtn.addEventListener("click", function (e) {
         e.preventDefault();
@@ -324,8 +325,4 @@ function automaticPplan(jData, table, append = false) {
     } else {
         tbody.innerHTML = htmlRow;
     }
-}
-
-function automaticAllPplan(jdata, table) {
-
 }

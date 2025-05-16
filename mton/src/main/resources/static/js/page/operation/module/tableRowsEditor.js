@@ -548,12 +548,12 @@ function initEmptyOrderingTable(table, isFile = false) {
     const pplanOptions = pplanDBData.map(data => data[dbElementNames.pplanId]);
 
     const makeConmatSelect = (row) => {
-        makeSelectForRawCell(row.cells[1], conmatOptions);
+        makeSelectForRawCell(row.cells[2], conmatOptions);
         return row.cells[1];
     }
 
     const makePPlanSelect = (row) => {
-        makeSelectForRawCell(row.cells[2], pplanOptions);
+        makeSelectForRawCell(row.cells[1], pplanOptions);
         return row.cells[2];
     }
 
@@ -817,7 +817,7 @@ function makeUniCellMessage(table, message) {
 }
 
 // Product 페이지의 모든 수정 및 목록 테이블 갱신
-function viewAllProductTable() {
+function viewAllProductTable(init = false) {
     const refresh = refreshProductDBDataAll();
     refresh.then(value => {
         const matViewTable = document.querySelector("#mat-table-view");
@@ -867,13 +867,14 @@ function viewAllProductTable() {
         }
 
         originalValues = {};
-
-        initEmptyPbomTable(pbomInputTable);
+        if (init) {
+            initEmptyPbomTable(pbomInputTable);
+        }
     });
 }
 
 // 생산계획 테이블 목록 갱신
-function viewPrdPlanTable() {
+function viewPrdPlanTable(init = false) {
     const refresh = refreshPrdPlanDBDataAll();
     refresh.then(value => {
         const prdplanViewTable = document.querySelector("#prdplan-table-view");
@@ -893,12 +894,13 @@ function viewPrdPlanTable() {
             makeUniCellMessage(prdplanEditTable, "수정할 내용이 없습니다.");
         }
         originalValues = {};
-
-        initEmptyPrdPlanTable(prdplanInputTable);
+        if (init) {
+            initEmptyPrdPlanTable(prdplanInputTable);
+        }
     });
 }
 
-function viewPPlanTable() {
+function viewPPlanTable(init = false) {
     const refresh = refreshPPlanDBDataAll();
     refresh.then(value => {
         const pplanViewTable = document.querySelector("#pplan-table-view");
@@ -919,12 +921,13 @@ function viewPPlanTable() {
         }
 
         originalValues = {};
-
-        initEmptyPPlanTable(pplanInputTable);
+        if (init) {
+            initEmptyPPlanTable(pplanInputTable);
+        }
     });
 }
 
-function viewOrderingTable() {
+function viewOrderingTable(init = false) {
     const refresh = refreshOrderingDBDataAll();
     refresh.then(value => {
         const orderViewTable = document.querySelector("#order-table-view");
@@ -937,8 +940,8 @@ function viewOrderingTable() {
 
             addTableEditButtons(orderEditTable);
 
-            makeTableCellDBSelect(orderEditTable, 1, contmatDBData, dbElementNames.conmatId);
-            makeTableCellDBSelect(orderEditTable, 2, pplanDBData, dbElementNames.pplanId);
+            makeTableCellDBSelect(orderEditTable, 2, contmatDBData, dbElementNames.conmatId);
+            makeTableCellDBSelect(orderEditTable, 1, pplanDBData, dbElementNames.pplanId);
             makeTableCellDatePicker(orderEditTable, 4);
             makeTableCellDatePicker(orderEditTable, 5);
             makeTableCellSelect(orderEditTable, 6, "진행중", "완료");
@@ -961,7 +964,9 @@ function viewOrderingTable() {
 
         originalValues = {};
 
-        initEmptyOrderingTable(orderInputTable);
+        if (init) {
+            initEmptyOrderingTable(orderInputTable);
+        }
     });
 }
 

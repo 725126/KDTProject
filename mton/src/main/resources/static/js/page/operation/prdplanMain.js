@@ -34,7 +34,7 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
         row.deleteCell(2);
     }
 
-    tableRowsEditor.viewPrdPlanTable();
+    tableRowsEditor.viewPrdPlanTable(true);
     tableRowsEditor.initEditButtons(prdplanEditTable);
 })();
 

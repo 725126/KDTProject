@@ -235,7 +235,7 @@ const pbomInputTable = inputGroup.querySelector("table[id|='pbom']");
 
 // 테이블 뷰 관련 초기화
 (function () {
-    tableRowsEditor.viewAllProductTable();
+    tableRowsEditor.viewAllProductTable(true);
 
     for (const table of editTables) {
         tableRowsEditor.initEditButtons(table);
