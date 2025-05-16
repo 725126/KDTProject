@@ -55,7 +55,7 @@ public class UserController {
             }
         }
 
-        return "/page/user/intro";
+        return "page/user/intro";
     }
 
     // [내부직원] 로그인 시 홈 화면
