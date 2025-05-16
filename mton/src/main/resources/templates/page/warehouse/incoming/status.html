@@ -11,36 +11,46 @@
 <th:block layout:fragment="incoming-status">
     <div class="container py-5">
         <h1 class="mb-4">입고 현황 조회</h1>
-        <div class="card p-4 mb-4">
-            <form id="searchForm">
-                <div class="row g-3">
-                    <div class="col-md-4">
-                        <label for="receiveDateStart" class="form-label">입고마감일</label>
-                        <div class="d-flex gap-1">
-                            <input type="date" class="form-control" id="receiveDateStart" name="receiveDateStart">
-                            <span class="pt-2">~</span>
-                            <input type="date" class="form-control" id="receiveDateEnd" name="receiveDateEnd">
+
+        <form action="/internal/incoming/status" method="get">
+            <div class="card p-4 mb-4">
+                <form id="searchForm">
+                    <div class="row g-3">
+                        <div class="col-md-4">
+                            <label class="form-label">입고마감일</label>
+                            <div class="d-flex gap-1">
+                                <input type="date" class="form-control" id="incomingCompletedAtStart" name="incomingCompletedAtStart"
+                                       th:value="${pageRequestDTO.incomingCompletedAtStart != null ?
+                                       #temporals.format(pageRequestDTO.incomingCompletedAtStart, 'yyyy-MM-dd') : ''}">
+                                <span class="pt-2">~</span>
+                                <input type="date" class="form-control" id="incomingCompletedAtEnd" name="incomingCompletedAtEnd"
+                                       th:value="${pageRequestDTO.incomingCompletedAtEnd != null ?
+                                       #temporals.format(pageRequestDTO.incomingCompletedAtEnd, 'yyyy-MM-dd') : ''}">
+                            </div>
+                        </div>
+                        <div class="col-md-2">
+                            <label for="pCompany" class="form-label">협력사</label>
+                            <input type="text" class="form-control" id="pCompany" name="pCompany"
+                                   th:value="${pageRequestDTO.pCompany}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="matId" class="form-label">자재코드</label>
+                            <input type="text" class="form-control" id="matId" name="matId"
+                                   th:value="${pageRequestDTO.matId}">
+                        </div>
+                        <div class="col-md-2">
+                            <label for="matName" class="form-label">자재명</label>
+                            <input type="text" class="form-control" id="matName" name="matName"
+                                   th:value="${pageRequestDTO.matName}">
+                        </div>
+                        <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
+                            <button type="button" class="btn btn-outline-secondary clearBtn"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                         </div>
                     </div>
-                    <div class="col-md-2">
-                        <label for="supplier" class="form-label">협력사</label>
-                        <input type="text" class="form-control" id="supplier" name="supplier">
-                    </div>
-                    <div class="col-md-2">
-                        <label for="materialCode" class="form-label">자재코드</label>
-                        <input type="text" class="form-control" id="materialCode" name="materialCode">
-                    </div>
-                    <div class="col-md-2">
-                        <label for="materialName" class="form-label">자재명</label>
-                        <input type="text" class="form-control" id="materialName" name="materialName">
-                    </div>
-                    <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
-                    </div>
-                </div>
-            </form>
-        </div>
+                </form>
+            </div>
+        </form>
 
         <div class="card p-4">
             <table class="table table-bordered table-hover text-center" id="resultTable">
@@ -54,46 +64,27 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>2025-04-24</td>
-                    <td>삼성소재</td>
-                    <td>MAT-1001</td>
-                    <td>알루미늄 프레임</td>
-                    <td>300</td>
-                </tr>
-                <tr>
-                    <td>2025-04-25</td>
-                    <td>신화전자</td>
-                    <td>MAT-1002</td>
-                    <td>배터리 셀</td>
-                    <td>120</td>
-                </tr>
-                <tr>
-                    <td>2025-04-26</td>
-                    <td>세방전기</td>
-                    <td>MAT-1003</td>
-                    <td>모터</td>
-                    <td>80</td>
-                </tr>
-                <tr>
-                    <td>2025-04-27</td>
-                    <td>에코플라텍</td>
-                    <td>MAT-1004</td>
-                    <td>플라스틱 커버</td>
-                    <td>500</td>
-                </tr>
-                <tr>
-                    <td>2025-04-28</td>
-                    <td>태화하이텍</td>
-                    <td>MAT-1005</td>
-                    <td>제어보드</td>
-                    <td>150</td>
+                <tr th:each="incomingTotal:${incomingTotalList}" th:data-id="${incomingTotal.incomingTotalId}">
+                    <td th:text="${#temporals.format(incomingTotal.incomingCompletedAt,
+                                    'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td th:text="${incomingTotal.pCompany}"></td>
+                    <td th:text="${incomingTotal.matId}"></td>
+                    <td th:text="${incomingTotal.matName}"></td>
+                    <td th:text="${incomingTotal.incomingEffectiveQty}"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/internal/incoming/status'
+    }, false)
+</script>
 
 </body>
 </html>

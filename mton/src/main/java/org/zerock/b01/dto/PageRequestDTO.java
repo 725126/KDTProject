@@ -72,6 +72,10 @@ public class PageRequestDTO {
 
     private LocalDate modifyDateEnd;
 
+    private LocalDate incomingCompletedAtStart;
+
+    private LocalDate incomingCompletedAtEnd;
+
     private String incomingItemStatus;
 
     public String[] getTypes() {
