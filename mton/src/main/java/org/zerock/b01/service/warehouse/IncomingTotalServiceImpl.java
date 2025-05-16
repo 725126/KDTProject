@@ -3,11 +3,13 @@ package org.zerock.b01.service.warehouse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import org.zerock.b01.domain.warehouse.DeliveryRequestItem;
-import org.zerock.b01.domain.warehouse.IncomingStatus;
-import org.zerock.b01.domain.warehouse.IncomingTotal;
+import org.zerock.b01.domain.warehouse.*;
+import org.zerock.b01.dto.warehouse.IncomingTotalDTO;
+import org.zerock.b01.repository.warehouse.DeliveryPartnerRepository;
 import org.zerock.b01.repository.warehouse.DeliveryRequestItemRepository;
 import org.zerock.b01.repository.warehouse.IncomingTotalRepository;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +18,8 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
 
   private final IncomingTotalRepository incomingTotalRepository;
   private final DeliveryRequestItemRepository deliveryRequestItemRepository;
+//  private final DeliveryPartnerRepository deliveryPartnerRepository;
+//  private final DeliveryPartnerService deliveryPartnerService;
 
   public void updateIncomingStatus(Long drItemId) {
     DeliveryRequestItem item = deliveryRequestItemRepository.findById(drItemId)
@@ -25,33 +29,51 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
             .orElseThrow(() -> new IllegalStateException("해당 납입지시 항목에 대한 입고정보가 없습니다."));
 
     int deliveredQty = incomingTotal.getIncomingTotalQty();
+    int returnQty = incomingTotal.getIncomingReturnTotalQty();
+    int missingQty = incomingTotal.getIncomingMissingTotalQty();
+    int totalQty = deliveredQty - returnQty - missingQty;
     int expectedQty = item.getDrItemQty();
 
     IncomingStatus newStatus;
     if (deliveredQty == 0) {
       newStatus = IncomingStatus.미입고;
-    } else if (deliveredQty < expectedQty) {
+    } else if (totalQty < expectedQty) {
       newStatus = IncomingStatus.부분입고;
     } else {
       newStatus = IncomingStatus.입고마감대기중;
     }
 
-    incomingTotalRepository.save(incomingTotal.updateStatusAndReturn(newStatus));
+    incomingTotal.updateIncomingStatus(newStatus);  // 상태만 수정
+    incomingTotalRepository.save(incomingTotal);   // 저장
   }
 
 
-  public void closeIncoming(Long drItemId) {
-    DeliveryRequestItem item = deliveryRequestItemRepository.findById(drItemId)
+  public void closeIncoming(Long incomingTotalId) {
+    IncomingTotal incomingTotal = incomingTotalRepository.findById(incomingTotalId)
             .orElseThrow(() -> new IllegalArgumentException("해당 납입지시 항목이 존재하지 않습니다."));
 
-    IncomingTotal incoming = incomingTotalRepository.findByDeliveryRequestItem(item)
-            .orElseThrow(() -> new IllegalStateException("입고 정보가 없습니다."));
+    int totalQty = incomingTotal.getIncomingEffectiveQty();
+    int expectedQty = incomingTotal.getDeliveryRequestItem().getDrItemQty();
 
-    if (incoming.getIncomingTotalQty() != item.getDrItemQty()) {
+    if (totalQty != expectedQty) {
       throw new IllegalStateException("전량 입고된 경우에만 마감할 수 있습니다.");
     }
 
-    incomingTotalRepository.save(incoming.updateStatusAndReturn(IncomingStatus.입고마감));
+    incomingTotal.markAsCompleted();
+    incomingTotalRepository.save(incomingTotal);
+
+  }
+
+  @Override
+  public IncomingTotalDTO readIncomingTotalOne(Long drItemId) {
+
+    Optional<IncomingTotal> result = incomingTotalRepository.findByDeliveryRequestItem_drItemId(drItemId);
+
+    IncomingTotal incomingTotal = result.orElseThrow();
+
+    IncomingTotalDTO incomingTotalDTO = entityToIncomingTotalDto(incomingTotal);
+
+    return incomingTotalDTO;
   }
 
 }

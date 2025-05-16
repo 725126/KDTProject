@@ -4,6 +4,8 @@
       layout:decorate="~{layout/basic/ex-home.html}">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>자재ON(협력업체 전용) > 납품 지시 요청</title>
 </head>
 <body>
@@ -82,6 +84,7 @@
                     <th>납품요청수량</th>
                     <th>출고수량</th>
                     <th>반품수량</th>
+                    <th>미입고수량</th>
                     <th>남은수량</th>
                     <th>납품요청일</th>
                     <th>상태</th>
@@ -95,8 +98,10 @@
                     <td th:text="${partner.matName}"></td>
                     <td th:text="${partner.drItemQty}"></td>
                     <td th:text="${partner.deliveryPartnerQty}"></td>
-                    <td th:text="${partner.incomingReturnQty}"></td>
-                    <td th:text="${partner.drItemQty - partner.deliveryPartnerQty + partner.incomingReturnQty}"></td>
+                    <td th:text="${partner.incomingReturnTotalQty}"></td>
+                    <td th:text="${partner.incomingMissingTotalQty}"></td>
+                    <td th:text="${partner.drItemQty - partner.deliveryPartnerQty
+                                    + partner.incomingReturnTotalQty + partner.incomingMissingTotalQty}"></td>
                     <td th:text="${partner.drItemDueDate}"></td>
                     <td class="text-center"><span class="badge bg-warning text-dark" th:text="${partner.deliveryPartnerStatus}"></span></td>
                 </tr>
@@ -131,7 +136,7 @@
         const deliveryPartnerId = row.getAttribute("data-id");
 
         // 남은 수량 읽어올 때 trim + 10진수 파싱
-        const remainingQtyText = row.children[7].innerText.trim();
+        const remainingQtyText = row.children[8].innerText.trim();
         const remainingQty = parseInt(remainingQtyText, 10);
 
         const inputQty = prompt("출고할 수량을 입력하세요 (남은 수량: " + remainingQty + "):");
@@ -152,7 +157,8 @@
         fetch('/api/delivery/partial', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
             },
             body: JSON.stringify({
                 deliveryPartnerId: deliveryPartnerId,
@@ -180,21 +186,30 @@
             return;
         }
 
-        const dtoList = selected.map(cb => {
+        const dtoList = [];
+
+        for (const cb of selected) {
             const row = cb.closest("tr");
             const deliveryPartnerId = row.getAttribute("data-id");
-            const remainingQty = parseInt(row.children[7].innerText);
+            const remainingQtyText = row.children[8].innerText.trim();
+            const remainingQty = parseInt(remainingQtyText);
 
-            return {
+            if (remainingQty <= 0) {
+                alert(`출고 가능 수량이 없습니다.`);
+                return;
+            }
+
+            dtoList.push({
                 deliveryPartnerId: deliveryPartnerId,
                 deliveryPartnerQty: remainingQty
-            };
-        });
+            });
+        }
 
         fetch('/api/delivery/full', {
             method: 'POST',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
             },
             body: JSON.stringify(dtoList)
         }).then(res => {
@@ -210,7 +225,7 @@
     document.addEventListener("DOMContentLoaded", function () {
         document.querySelectorAll(".rowCheck").forEach(cb => {
             const row = cb.closest("tr");
-            const remainingQtyText = row.children[7].innerText.trim();
+            const remainingQtyText = row.children[8].innerText.trim();
             const remainingQty = parseInt(remainingQtyText, 10);
 
             if (remainingQty <= 0) {

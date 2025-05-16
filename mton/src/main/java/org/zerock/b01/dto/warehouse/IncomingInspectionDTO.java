@@ -5,19 +5,24 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class IncomingItemDTO {
+public class IncomingInspectionDTO {
 
-  private Long incomingItemId;
+  private Long incomingId;
+
+  private Long drItemId;
+
+  private Long incomingTotalId;
+
+  private LocalDate deliveryPartnerItemDate;
 
   private String incomingCode;
-
-  private LocalDateTime modifyDate;
 
   private String pCompany;
 
@@ -25,13 +30,18 @@ public class IncomingItemDTO {
 
   private String matName;
 
+  private int deliveryPartnerItemQty;
+
   private int incomingQty;
 
   private int incomingReturnQty;
 
   private int incomingMissingQty;
 
-  private String incomingItemStatus;
+  private LocalDateTime incomingFirstDate;
 
+  private String cstorageId;
+
+  private String incomingStatus;
 
 }

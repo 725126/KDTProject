@@ -13,7 +13,9 @@ import org.zerock.b01.service.warehouse.DeliveryRequestItemService;
 
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RestController
@@ -26,10 +28,11 @@ public class DeliveryRequestController {
 
   @Operation(description = "DeliveryRequestItem POST")
   @PostMapping(value = "/", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public Map<String, Object> registerDeliveryRequestItem(@Valid @RequestBody DeliveryRequestItemDTO deliveryRequestItemDTO,
+  public Map<String, Object> registerDeliveryRequestItems(@Valid @RequestBody List<DeliveryRequestItemDTO> dtoList,
                                                          BindingResult bindingResult) throws BindException {
 
-    log.info("Received DTO: {}", deliveryRequestItemDTO);
+
+    log.info("Received DTO List: {}", dtoList);
 
     // 입력값 검증
     if (bindingResult.hasErrors()) {
@@ -39,21 +42,18 @@ public class DeliveryRequestController {
     Map<String, Object> resultMap = new HashMap<>();
 
     try {
-      DeliveryRequestItemDTO resultDTO = deliveryRequestItemService.registerDeliveryRequestItem(deliveryRequestItemDTO);
-
-      String formattedDate = resultDTO.getCreDate()
-              .format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"));
+      // Service에서 여러 항목을 저장
+      List<DeliveryRequestItemDTO> savedItems = deliveryRequestItemService.registerDeliveryRequestItem(dtoList);
 
       resultMap.put("status", "success");
-      resultMap.put("drItemId", resultDTO.getDrItemId()); // 생성된 drItemId
-      resultMap.put("drItemCode", resultDTO.getDrItemCode()); // 생성된 drItemCode
-      resultMap.put("creDate", formattedDate);
-      resultMap.put("message", "납입지시 아이템 등록 성공");
+      resultMap.put("count", savedItems.size());
+      resultMap.put("items", savedItems);  // 반환된 DTO는 drItemCode 포함
+      resultMap.put("message", "납입지시 아이템 다중 등록 성공");
 
     } catch (Exception e) {
       resultMap.put("status", "failure");
       resultMap.put("message", e.getMessage());
-      log.error("Error occurred while registering delivery request item", e);
+      log.error("Error occurred while registering delivery request items in batch", e);
     }
 
     return resultMap;

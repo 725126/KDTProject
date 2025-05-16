@@ -29,9 +29,11 @@ public class DeliveryPartnerDTO {
 
   private LocalDate drItemDueDate;
 
-  private int incomingReturnQty;
+  private int incomingReturnTotalQty;
+
+  private int incomingMissingTotalQty;
 
   public int getRemainingQty() {
-    return drItemQty - deliveryPartnerQty + incomingReturnQty;
+    return drItemQty - deliveryPartnerQty + incomingReturnTotalQty + incomingMissingTotalQty;
   }
 }

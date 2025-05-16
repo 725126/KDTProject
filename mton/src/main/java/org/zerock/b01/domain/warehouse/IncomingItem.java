@@ -3,7 +3,7 @@ package org.zerock.b01.domain.warehouse;
 import jakarta.persistence.*;
 import lombok.*;
 
-import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Entity
 @Getter
@@ -21,17 +21,20 @@ public class IncomingItem {
   @JoinColumn(name = "incoming_id",nullable = false)
   private Incoming incoming;
 
-  @ManyToOne
-  @JoinColumn(name = "cstorage_item_id", nullable = false)
-  private CompanyStorageItem companyStorageItem;
+  @Column(nullable = false)
+  private LocalDateTime modifyDate;
 
   @Column(nullable = false)
-  private LocalDate incomingItemDate;
+  private int incomingQty;
 
   @Column(nullable = false)
-  private int incomingItemQty = 0;
+  private int incomingReturnQty;
 
   @Column(nullable = false)
-  private int incomingItemReturnQty = 0;
+  private int incomingMissingQty;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private IncomingItemStatus incomingItemStatus;
 
 }

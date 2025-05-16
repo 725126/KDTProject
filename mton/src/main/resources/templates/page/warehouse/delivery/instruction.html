@@ -4,6 +4,8 @@
       layout:decorate="~{layout/basic/in-home.html}">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
     <title>자재ON - 납입지시 > 납입지시 등록</title>
 </head>
 <body>
@@ -57,6 +59,11 @@
                 </div>
 
                 <div class="col-12 text-end">
+
+                    <button id="saveButton" class="btn btn-success rounded me-1" onclick="saveInstructions()">
+                        <i class="bi bi-save me-1"></i> 저장
+                    </button>
+
                     <button id="addButton" class="btn btn-primary rounded me-1" onclick="addInstruction()">
                         <i class="bi bi-plus-circle me-1"></i> 지시 추가
                     </button>
@@ -90,7 +97,7 @@
                     <th>지시수량</th>
                     <th>납입지시등록일</th>
                     <th>창고</th>
-                    <th>수정</th>
+                    <th style="width: 70px"></th>
                 </tr>
                 </thead>
                 <tbody id="instructionTable">
@@ -207,113 +214,157 @@
     }
 
 
-    // 지시 추가 버튼 클릭 시 호출되는 함수
+    function getFormattedDateTime() {
+        const now = new Date();
+
+        const year = now.getFullYear();
+        const month = String(now.getMonth() + 1).padStart(2, '0'); // 월은 0부터 시작
+        const day = String(now.getDate()).padStart(2, '0');
+
+        const hours = String(now.getHours()).padStart(2, '0');
+        const minutes = String(now.getMinutes()).padStart(2, '0');
+        const seconds = String(now.getSeconds()).padStart(2, '0');
+
+        return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+    }
+
+    let instructionList = []; // 임시 저장 배열
+
     function addInstruction() {
-        // 입력된 값 가져오기
         const drItemDueDate = document.getElementById('drItemDueDate').value;
-        const drItemQty = document.getElementById('drItemQty').value;
+        const drItemQty = parseInt(document.getElementById('drItemQty').value);
         const cstorageId = document.getElementById('cstorage').value;
         const drId = document.getElementById('drId').value;
-        const creDate = new Date().toISOString();
         const currentTotal = parseInt(document.getElementById('drTotalQty').textContent);
         const maxOrderQty = parseInt(document.getElementById('orderQty').textContent || document.getElementById('orderQty').innerText);
         const remainingQty = maxOrderQty - currentTotal;
 
         let errorMessages = [];
 
-        // 입력 값 체크
         if (!drItemDueDate || !drItemQty || !cstorageId) {
             errorMessages.push('모든 필드를 입력해주세요.');
         }
+
+        if (lastDrItemDueDate && parseDateOnly(drItemDueDate) < parseDateOnly(lastDrItemDueDate)) {
+            errorMessages.push(`입력된 납입지시일자(${drItemDueDate})가 이전 납입지시일자(${lastDrItemDueDate})보다 이전입니다.
+            ${lastDrItemDueDate} 이후 날짜를 입력해주세요`);
+        }
+
 
         if (drItemQty < 0) {
             errorMessages.push('수량은 음수일 수 없습니다.');
         }
 
-        if (lastDrItemDueDate && parseDateOnly(drItemDueDate) < parseDateOnly(lastDrItemDueDate)) {
-            errorMessages.push(`입력된 납입지시일자(${drItemDueDate})가 이전 납입지시일자(${lastDrItemDueDate})보다 이전입니다. ${lastDrItemDueDate} 이후 날짜를 입력해주세요`);
-        }
-
-        if (currentTotal + parseInt(drItemQty) > maxOrderQty) {
+        if (currentTotal + drItemQty > maxOrderQty) {
             errorMessages.push(`총 지시수량이 발주량을 초과할 수 없습니다.\n현재 남은 수량은 ${remainingQty}입니다.`);
         }
 
-        // 오류가 하나라도 있으면 모두 보여주기
         if (errorMessages.length > 0) {
             alert(errorMessages.join('\n\n'));
             return;
         }
 
-        // 서버로 AJAX 요청 보내기
+        const creDate = getFormattedDateTime();
+        // 화면에만 추가
+        addRowToTable('생성예정', drItemDueDate, drItemQty, creDate, cstorageId);
+
+        instructionList.push({
+            drId,
+            drItemDueDate,
+            drItemQty,
+            cstorageId,
+            creDate
+        });
+
+        // 입력 초기화
+        document.getElementById('drItemDueDate').value = '';
+        document.getElementById('drItemQty').value = '';
+        document.getElementById('cstorage').value = '';
+
+        updateTotalQty();
+    }
+
+    //테이블추가
+    function addRowToTable(drItemCode, drItemDueDate, drItemQty, creDate, cstorageId) {
+        const table = document.getElementById('instructionTable');
+        const newRow = document.createElement('tr');
+
+        newRow.innerHTML = `
+        <td>${drItemCode}</td>
+        <td>${drItemDueDate}</td>
+        <td>${drItemQty}</td>
+        <td>${creDate}</td>
+        <td>${cstorageId}</td>
+        <td class="text-center">
+            <button class="btn btn-sm btn-outline-danger" onclick="deleteRow(this)">삭제</button>
+        </td>
+    `;
+
+        table.appendChild(newRow);
+    }
+
+    function deleteRow(button) {
+        const row = button.closest('tr');
+        const table = document.getElementById('instructionTable');
+
+        // 화면에서 행 삭제
+        row.remove();
+
+        // 지운 항목의 값 확인
+        const drItemDueDate = row.children[1].textContent;
+        const drItemQty = parseInt(row.children[2].textContent);
+        const cstorageId = row.children[4].textContent;
+
+        // instructionList에서 해당 항목 제거 (단순 비교)
+        instructionList = instructionList.filter(item =>
+            !(item.drItemDueDate === drItemDueDate &&
+                item.drItemQty === drItemQty &&
+                item.cstorageId === cstorageId)
+        );
+
+        // 총 지시수량도 다시 계산
+        updateTotalQty();
+    }
+
+    function saveInstructions() {
+        if (instructionList.length === 0) {
+            alert("저장할 납입 지시 항목이 없습니다.");
+            return;
+        }
+
+        // 1. 납기일자 순서대로 정렬
+        instructionList.sort((a, b) => {
+            const dateA = new Date(a.drItemDueDate);
+            const dateB = new Date(b.drItemDueDate);
+            return dateA - dateB; // 오름차순 정렬 (날짜가 빠른 순)
+        });
+
+        console.log(instructionList)
+
+        // 2. 백엔드로 전송
         fetch('/api/delivery-request/', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
             },
-            body: JSON.stringify({
-                drId: drId,
-                drItemDueDate: drItemDueDate,
-                drItemQty: drItemQty,
-                cstorageId: cstorageId,
-                creDate: creDate,
-            })
+            body: JSON.stringify(instructionList)
         })
-            .then(response => response.json())
-            .then(data => {
-                console.log(data);
-
-                const drItemId = data.drItemId;
-                const drItemCode = data.drItemCode;
-                const creDate = data.creDate;
-
-
-                addRowToTable(drItemId, drItemCode, drItemDueDate, drItemQty, creDate, cstorageId);
-
-
-                // 입력 필드 초기화
-                document.getElementById('drItemDueDate').value = '';
-                document.getElementById('drItemQty').value = '';
-                document.getElementById('cstorage').value = '';
-
-                getLastDrItemDueDate(drId);
-
+            .then(res => {
+                if (!res.ok) throw new Error("저장 실패");
+                return res.json();
             })
-            .catch(error => {
-                console.error('Error:', error);
+            .then(result => {
+                alert("저장 완료되었습니다.");
+                location.reload(); // 또는 테이블 리셋
+            })
+            .catch(err => {
+                console.error(err);
+                alert("저장 중 오류가 발생했습니다.");
             });
     }
 
-    // 테이블에 새로운 행 추가
-    function addRowToTable(drItemId, drItemCode, drItemDueDate, drItemQty, creDate, cstorageId) {
-        const table = document.getElementById('instructionTable');
 
-        // 새 행 생성
-        const newRow = document.createElement('tr');
-
-        // 새 행에 데이터 추가
-        newRow.innerHTML = `
-            <td>${drItemCode}</td>
-            <td>${drItemDueDate}</td>
-            <td>${drItemQty}</td>
-            <td>${creDate}</td>
-            <td>${cstorageId}</td>
-            <td class="text-center">
-                <button class="btn btn-sm btn-outline-primary"
-                data-dr-item-id="${drItemId}"
-                onclick="editInstruction(this)">수정</button>
-            </td>
-        `;
-
-        // 테이블에 새 행 추가
-        table.appendChild(newRow);
-
-        // 총 지시수량 갱신
-        updateTotalQty();
-
-        if (drItemDueDate > lastEnteredDate) {
-            lastEnteredDate = drItemDueDate;
-        }
-    }
 
     // 수정 취소 버튼 클릭 시 호출되는 함수
     function cancelEdit() {
@@ -423,6 +474,7 @@
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
             },
             body: JSON.stringify({
                 drItemDueDate: drItemDueDate,
@@ -497,7 +549,10 @@
 
             // 서버에서 삭제 요청
             fetch(`/api/delivery-request/${drItemId}`, {
-                method: 'DELETE'
+                method: 'DELETE',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+                }
             })
                 .then(response => {
                     if (response.ok) {

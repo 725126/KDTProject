@@ -54,81 +54,85 @@ public class DeliveryRequestItemServiceImpl implements DeliveryRequestItemServic
 
 
   @Override
-  public DeliveryRequestItemDTO registerDeliveryRequestItem(DeliveryRequestItemDTO deliveryRequestItemDTO) {
+  public List<DeliveryRequestItemDTO> registerDeliveryRequestItem(List<DeliveryRequestItemDTO> dtoList) {
 
-    if (deliveryRequestItemDTO.getDrItemQty() < 0) {
-      throw new IllegalArgumentException("납입 지시 수량은 음수일 수 없습니다.");
+    List<DeliveryRequestItemDTO> resultList = new ArrayList<>();
+
+    for (DeliveryRequestItemDTO dto : dtoList) {
+      if (dto.getDrItemQty() < 0) {
+        throw new IllegalArgumentException("납입 지시 수량은 음수일 수 없습니다.");
+      }
+
+      // 필요한 객체를 준비
+      DeliveryRequest deliveryRequest = deliveryRequestRepository.findById(dto.getDrId())
+              .orElseThrow(() -> new IllegalArgumentException("해당 납입지시(drId)를 찾을 수 없습니다: " + dto.getDrId()));
+
+      // 발주 수량 및 납입 지시 수량 체크
+      int orderQty = deliveryRequest.getOrdering().getOrderQty();
+      int drTotalQty = deliveryRequest.getDrTotalQty();
+      int newTotal = drTotalQty + dto.getDrItemQty();
+
+      if (newTotal > orderQty) {
+        throw new IllegalArgumentException("납입 지시 수량이 발주량을 초과할 수 없습니다.");
+      }
+
+      // 창고 정보
+      CompanyStorage companyStorage = companyStorageRepository.findById(dto.getCstorageId())
+              .orElseThrow(() -> new IllegalArgumentException("해당 창고를 찾을 수 없습니다: " + dto.getCstorageId()));
+
+      // 코드 생성
+      String drItemCode = generateDrItemCode();
+
+      // 납입 지시 아이템 객체 생성
+      DeliveryRequestItem deliveryRequestItem = DeliveryRequestItem.builder()
+              .deliveryRequest(deliveryRequest)
+              .companyStorage(companyStorage)
+              .drItemCode(drItemCode)  // 생성된 코드 포함
+              .drItemQty(dto.getDrItemQty())
+              .drItemDueDate(dto.getDrItemDueDate())
+              .build();
+
+      // 기타 엔티티 준비 (IncomingTotal, DeliveryPartner)
+      IncomingTotal incomingTotal = IncomingTotal.builder()
+              .deliveryRequestItem(deliveryRequestItem)
+              .incomingEffectiveQty(0)
+              .incomingTotalQty(0)
+              .incomingReturnTotalQty(0)
+              .incomingMissingTotalQty(0)
+              .incomingStatus(IncomingStatus.미입고)
+              .build();
+
+      DeliveryPartner deliveryPartner = DeliveryPartner.builder()
+              .deliveryRequestItem(deliveryRequestItem)
+              .incomingTotal(incomingTotal)
+              .deliveryPartnerQty(0)
+              .deliveryPartnerStatus(DeliveryPartnerStatus.진행중)
+              .build();
+
+      // 저장
+      deliveryRequestItemRepository.save(deliveryRequestItem);
+      incomingTotalRepository.save(incomingTotal);
+      deliveryPartnerRepository.save(deliveryPartner);
+
+      // DTO에 생성된 코드 포함하여 반환
+      DeliveryRequestItemDTO resultDTO = DeliveryRequestItemDTO.builder()
+              .drItemCode(deliveryRequestItem.getDrItemCode())  // 생성된 코드 포함
+              .drId(deliveryRequestItem.getDeliveryRequest().getDrId())
+              .drItemQty(deliveryRequestItem.getDrItemQty())
+              .drItemDueDate(deliveryRequestItem.getDrItemDueDate())
+              .cstorageId(deliveryRequestItem.getCompanyStorage().getCstorageId())
+              .build();
+
+      resultList.add(resultDTO);
     }
 
-    DeliveryRequest deliveryRequest = deliveryRequestRepository.findById(deliveryRequestItemDTO.getDrId())
-            .orElseThrow(() -> new IllegalArgumentException("해당 납입지시(drId)를 찾을 수 없습니다: " + deliveryRequestItemDTO.getDrId()));
-
-    int orderQty = deliveryRequest.getOrdering().getOrderQty(); // 총 발주 수량
-    int drTotalQty = deliveryRequest.getDrTotalQty(); // 현재까지 누적 납입지시 수량
-
-    int newTotal = drTotalQty + deliveryRequestItemDTO.getDrItemQty();
-
-    if (newTotal > orderQty) {
-      throw new IllegalArgumentException("납입 지시 수량이 발주량을 초과할 수 없습니다. "
-              + "현재 남은 수량: " + (orderQty - drTotalQty));
+    // ✅ 수량 및 상태 갱신
+    if (!dtoList.isEmpty()) {
+      Long drId = dtoList.get(0).getDrId();
+      deliveryRequestService.updateDeliveryRequestStatus(drId);
     }
 
-
-    CompanyStorage companyStorage = companyStorageRepository.findById(deliveryRequestItemDTO.getCstorageId())
-            .orElseThrow(() -> new IllegalArgumentException("해당 창고를 찾을 수 없습니다: " + deliveryRequestItemDTO.getCstorageId()));
-
-    String drItemCode = generateDrItemCode();
-
-    DeliveryRequestItem deliveryRequestItem = DeliveryRequestItem.builder()
-            .deliveryRequest(deliveryRequest)
-            .companyStorage(companyStorage)
-            .drItemCode(drItemCode)
-            .drItemQty(deliveryRequestItemDTO.getDrItemQty())
-            .drItemDueDate(deliveryRequestItemDTO.getDrItemDueDate())
-            .build();
-
-    log.info(deliveryRequestItem);
-
-    DeliveryRequestItem saved = deliveryRequestItemRepository.save(deliveryRequestItem);
-
-    deliveryRequestService.updateDeliveryRequestStatus(deliveryRequest.getDrId());
-
-    // IncomingTotal 생성
-    IncomingTotal incomingTotal = IncomingTotal.builder()
-            .deliveryRequestItem(saved) // 필수
-            .incomingEffectiveQty(0)
-            .incomingTotalQty(0)
-            .incomingReturnTotalQty(0)
-            .incomingStatus(IncomingStatus.미입고) // 또는 적절한 enum 값
-            .build();
-
-// 저장
-    IncomingTotal savedIncomingTotal = incomingTotalRepository.save(incomingTotal);
-
-    // DeliveryPartner 생성
-    DeliveryPartner deliveryPartner = DeliveryPartner.builder()
-            .deliveryRequestItem(saved)
-            .incomingTotal(savedIncomingTotal)
-            .deliveryPartnerQty(0)
-            .deliveryPartnerStatus(DeliveryPartnerStatus.진행중)
-            .build();
-
-    deliveryPartnerRepository.save(deliveryPartner);
-
-
-    DeliveryRequestItemDTO resultDTO = DeliveryRequestItemDTO.builder()
-            .drItemId(saved.getDrItemId())
-            .drId(saved.getDeliveryRequest().getDrId())
-            .drItemCode(saved.getDrItemCode())
-            .drItemQty(saved.getDrItemQty())
-            .drItemDueDate(saved.getDrItemDueDate())
-            .cstorageId(saved.getCompanyStorage().getCstorageId())
-            .creDate(saved.getCreDate())
-            .build();
-
-    log.info(resultDTO);
-
-    return resultDTO;
+    return resultList;
   }
 
   @Override

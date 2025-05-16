@@ -104,7 +104,6 @@ public class IncomingSearchImpl extends QuerydslRepositorySupport implements Inc
                                                  String incomingStatus, Pageable pageable) {
 
     QIncomingTotal incomingTotal = QIncomingTotal.incomingTotal;
-    QIncomingItem incomingItem = QIncomingItem.incomingItem;
     QIncoming incoming = QIncoming.incoming;
     QDeliveryPartnerItem deliveryPartnerItem = QDeliveryPartnerItem.deliveryPartnerItem;
     QDeliveryPartner deliveryPartner = QDeliveryPartner.deliveryPartner;
@@ -116,7 +115,6 @@ public class IncomingSearchImpl extends QuerydslRepositorySupport implements Inc
     QPartner partner = QPartner.partner;
 
     JPQLQuery<Incoming> query = from(incoming)
-            .join(incomingItem.incoming, incoming)
             .leftJoin(incoming.incomingTotal, incomingTotal)
             .join(incoming.deliveryPartnerItem, deliveryPartnerItem)
             .leftJoin(deliveryPartnerItem.deliveryPartner, deliveryPartner)

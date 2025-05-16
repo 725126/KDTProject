@@ -12,81 +12,105 @@
     <div class="container py-5">
         <h1 class="mb-4">입고 이력</h1>
 
-        <div class="card p-4 mb-4">
-            <div class="row g-3 align-items-end">
-                <div class="col-lg-4 col-md-6">
-                    <label class="form-label">입고일</label>
-                    <div class="d-flex gap-1">
-                        <input type="date" class="form-control" id="search-incoming-start">
-                        <span class="pt-2">~</span>
-                        <input type="date" class="form-control" id="search-incoming-end">
+        <form action="/internal/incoming/history" method="get">
+            <div class="card p-4 mb-4">
+                <div class="row g-3 align-items-end">
+                    <div class="col-lg-4 col-md-6">
+                        <label class="form-label">처리일</label>
+                        <div class="d-flex gap-1">
+                            <input type="date" class="form-control" name="modifyDateStart"
+                                   th:value="${pageRequestDTO.modifyDateStart != null ?
+                                   #temporals.format(pageRequestDTO.modifyDateStart, 'yyyy-MM-dd') : ''}">
+                            <span class="pt-2">~</span>
+                            <input type="date" class="form-control" name="modifyDateEnd"
+                                   th:value="${pageRequestDTO.modifyDateEnd != null ?
+                                   #temporals.format(pageRequestDTO.modifyDateEnd, 'yyyy-MM-dd') : ''}">
+                        </div>
+                    </div>
+                    <div class="col-lg-2 col-md-3">
+                        <label class="form-label" for="incomingCode">입고코드</label>
+                        <input type="text" class="form-control" id="incomingCode" name="incomingCode"
+                               th:value="${pageRequestDTO.incomingCode}">
+                    </div>
+
+                    <!-- 협력사 -->
+                    <div class="col-md-2">
+                        <label class="form-label" for="pCompany">협력사</label>
+                        <input type="text" class="form-control" id="pCompany" name="pCompany"
+                               th:value="${pageRequestDTO.pCompany}">
+                    </div>
+
+                    <div class="col-md-2">
+                        <label class="form-label" for="matId">자재코드</label>
+                        <input type="text" class="form-control" id="matId" name="matId"
+                               th:value="${pageRequestDTO.matId}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label"  for="matName" >자재명</label>
+                        <input type="text" class="form-control" id="matName" name="matName"
+                               th:value="${pageRequestDTO.matName}">
+                    </div>
+                    <div class="col-md-2">
+                        <label class="form-label" for="incomingItemStatus">상태</label>
+                        <select class="form-select" id="incomingItemStatus" name="incomingItemStatus">
+                            <option value="" th:selected="${pageRequestDTO.incomingItemStatus == null}">전체</option>
+                            <option value="입고" th:selected="${pageRequestDTO.incomingItemStatus == '입고'}">입고</option>
+                            <option value="수정" th:selected="${pageRequestDTO.incomingItemStatus == '수정'}">수정</option>
+                            <option value="반품" th:selected="${pageRequestDTO.incomingItemStatus == '반품'}">반품</option>
+                        </select>
+                    </div>
+
+                    <div class="col-12 d-flex justify-content-end gap-2 mt-4">
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary clearBtn"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                     </div>
                 </div>
-                <div class="col-lg-2 col-md-3">
-                    <label class="form-label">입고코드</label>
-                    <input type="text" class="form-control" id="search-incoming-code">
-                </div>
-
-                <div class="col-md-2">
-                    <label for="search-material-code" class="form-label">자재코드</label>
-                    <input type="text" class="form-control" id="search-material-code">
-                </div>
-                <div class="col-md-2">
-                    <label for="search-material-name" class="form-label">자재명</label>
-                    <input type="text" class="form-control" id="search-material-name">
-                </div>
-                <div class="col-md-2">
-                    <label for="search-status" class="form-label">상태</label>
-                    <select id="search-status" class="form-select">
-                        <option value="">전체</option>
-                        <option value="부분입고">부분입고</option>
-                        <option value="입고마감">입고마감</option>
-                    </select>
-                </div>
-                <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                    <button type="button" class="btn btn-primary" onclick="searchTable()"><i class="bi bi-search"></i> 검색</button>
-                    <button type="button" class="btn btn-outline-secondary" onclick="resetSearch()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
-                </div>
             </div>
-        </div>
+        </form>
 
         <div class="card p-4">
             <table class="table table-bordered table-hover data-table text-center">
                 <thead class="table-light">
                 <tr>
-                    <th scope="col">입고코드</th>
-                    <th scope="col">입고일</th>
-                    <th scope="col">자재코드</th>
-                    <th scope="col">자재명</th>
-                    <th scope="col">입고수량</th>
-                    <th scope="col">반품수량</th>
-                    <th scope="col">상태</th>
+                    <th>처리일</th>
+                    <th>입고코드</th>
+                    <th>협력사</th>
+                    <th>자재코드</th>
+                    <th>자재명</th>
+                    <th>입고수량</th>
+                    <th>미입고수량</th>
+                    <th>반품수량</th>
+                    <th>상태</th>
                 </tr>
                 </thead>
                 <tbody id="incoming-history-body">
-                <tr>
-                    <td>IN-24041001</td>
-                    <td>2025-04-10</td>
-                    <td>MAT-001</td>
-                    <td>전기자전거 모터</td>
-                    <td>2</td>
-                    <td>0</td>
-                    <td class="text-center"><span class="badge bg-warning text-dark">부분입고</span></td>
-                </tr>
-                <tr>
-                    <td>IN-24041001</td>
-                    <td>2025-04-12</td>
-                    <td>MAT-001</td>
-                    <td>전기자전거 모터</td>
-                    <td>8</td>
-                    <td>1</td>
-                    <td class="text-center"><span class="badge bg-success">입고마감</span></td>
+                <tr th:each="incomingItem:${incomingItemList}" th:data-id="${incomingItem.incomingItemId}">
+                    <td th:text="${#temporals.format(incomingItem.modifyDate,
+                                    'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td th:text="${incomingItem.incomingCode}"></td>
+                    <td th:text="${incomingItem.pCompany}"></td>
+                    <td th:text="${incomingItem.matId}"></td>
+                    <td th:text="${incomingItem.matName}"></td>
+                    <td th:text="${incomingItem.incomingQty}"></td>
+                    <td th:text="${incomingItem.incomingMissingQty}"></td>
+                    <td th:text="${incomingItem.incomingReturnQty}"></td>
+                    <td class="text-center"><span class="badge bg-warning text-dark" th:text="${incomingItem.incomingItemStatus}">부분입고</span></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/internal/incoming/history'
+    }, false)
+
+</script>
+
 
 </body>
 </html>

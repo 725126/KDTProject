@@ -4,6 +4,8 @@
       layout:decorate="~{layout/basic/in-home.html}">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>자재ON - 입고 > 입고 검수</title>
     <link rel="stylesheet" th:href="@{/css/component/bottom-nav.css}">
 </head>
@@ -103,35 +105,50 @@
                     <th>협력사</th>
                     <th>자재코드</th>
                     <th>자재명</th>
-                    <th>납입지시수량</th>
                     <th>입고예정수량</th>
                     <th>입고수량</th>
                     <th>반품수량</th>
-                    <th>잔여 입고 수량</th>
+                    <th>미입고수량</th>
+                    <th>남은수량</th>
                     <th>입고일</th>
-                    <th>입고마감일</th>
                     <th>창고</th>
                     <th>진행상태</th>
                 </tr>
                 </thead>
                 <tbody id="inspection-body">
-                <tr th:each="incomingItem:${incomingItemList}" th:data-id="${incomingItem.incomingItemId}">
-                    <td><input type="checkbox" class="row-check"></td>
-                    <td th:text="${incomingItem.deliveryPartnerItemDate}"></td>
-                    <td th:text="${incomingItem.incomingCode}"></td>
-                    <td th:text="${incomingItem.pCompany}"></td>
-                    <td th:text="${incomingItem.matId}"></td>
-                    <td th:text="${incomingItem.matName}"></td>
-                    <td th:text="${incomingItem.drItemQty}"></td>
-                    <td th:text="${incomingItem.deliveryPartnerItemQty}"></td>
-                    <td th:text="${incomingItem.incomingTotalQty}"></td>
-                    <td th:text="${incomingItem.incomingReturnTotalQty}"></td>
-                    <td th:text="${incomingItem.drItemQty - incomingItem.incomingTotalQty
-                                                    + incomingItem.incomingReturnTotalQty}"></td>
-                    <td th:text="${incomingItem.incomingFirstDate}"></td>
-                    <td th:text="${incomingItem.incomingCompletedAt}"></td>
-                    <td></td>
-                    <td class="text-center"><span class="badge bg-secondary" th:text="${incomingItem.incomingStatus}"></span></td>
+                <tr th:each="incomingInspection:${incomingInspectionList}" th:data-id="${incomingInspection.incomingId}">
+                    <td><input type="checkbox" class="rowCheck"></td>
+                    <td th:text="${incomingInspection.deliveryPartnerItemDate}"></td>
+                    <td th:text="${incomingInspection.incomingCode}"></td>
+                    <td th:text="${incomingInspection.pCompany}"></td>
+                    <td th:text="${incomingInspection.matId}"></td>
+                    <td th:text="${incomingInspection.matName}"></td>
+                    <td th:text="${incomingInspection.deliveryPartnerItemQty}"></td>
+                    <td th:text="${incomingInspection.incomingQty}"></td>
+                    <td th:text="${incomingInspection.incomingReturnQty}"></td>
+                    <td th:text="${incomingInspection.incomingMissingQty}"></td>
+                    <td th:text="${incomingInspection.deliveryPartnerItemQty - incomingInspection.incomingQty
+                                    - incomingInspection.incomingMissingQty }"></td>
+                    <td th:text="${incomingInspection.incomingFirstDate != null ?
+                                    #temporals.format(incomingInspection.incomingFirstDate,
+                                    'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
+                    <td th:text="${incomingInspection.cstorageId}"></td>
+                    <td class="text-center">
+  <span th:if="${incomingInspection.incomingStatus != '입고마감대기중'}"
+        th:text="${incomingInspection.incomingStatus}"
+        th:classappend="${incomingInspection.incomingStatus == '입고마감' ? ' badge bg-success' :
+                        incomingInspection.incomingStatus == '부분입고' ? ' badge bg-info text-dark' :
+                        incomingInspection.incomingStatus == '미입고' ? ' badge bg-warning text-dark' :
+                        ' badge bg-secondary'}">
+  </span>
+
+                        <a th:if="${incomingInspection.incomingStatus == '입고마감대기중'}"
+                           th:text="${incomingInspection.incomingStatus}"
+                           th:href="@{/internal/incoming/close(drItemId=${incomingInspection.drItemId})}"
+                           class="badge bg-primary text-white text-decoration-none">
+                        </a>
+                    </td>
+
                 </tr>
                 </tbody>
             </table>
@@ -143,13 +160,13 @@
                 <i class="bi bi-box-arrow-in-down"></i>
                 <span>부분입고</span>
             </a>
-            <a class="nav-item nav-link" href="#" onclick="returnItems()">
-                <i class="bi bi-arrow-counterclockwise"></i>
-                <span>반품처리</span>
-            </a>
             <a class="nav-item nav-link" href="#" onclick="fullReceive()">
                 <i class="bi bi-check-circle"></i>
                 <span>입고</span>
+            </a>
+            <a class="nav-item nav-link" href="#" onclick="returnItems()">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                <span>반품처리</span>
             </a>
             <a class="nav-item nav-link" href="#" onclick="finalizeReceive()">
                 <i class="bi bi-archive"></i>
@@ -168,6 +185,202 @@
 
         self.location = '/internal/incoming/inspection'
     }, false)
+
+    // 체크박스 전체 선택
+    function toggleAll(source) {
+        document.querySelectorAll(".rowCheck").forEach(cb => cb.checked = source.checked);
+    }
+
+    //부분입고 처리
+    function partialReceive() {
+        const checkedRows = document.querySelectorAll(".rowCheck:checked");
+
+        if (checkedRows.length !== 1) {
+            alert("부분입고는 하나만 선택할 수 있습니다.");
+            return;
+        }
+
+        const row = checkedRows[0].closest("tr");
+        const incomingId = row.getAttribute("data-id");
+
+        const remainingQtyText = row.children[10].innerText.trim();
+        const EstimatedQtyText = row.children[6].innerText.trim();
+        const remainingQty = parseInt(remainingQtyText, 10);
+        const EstimatedQty = parseInt(EstimatedQtyText, 10);
+
+        const isModifyMode = remainingQty === 0;
+
+        if (isModifyMode) {
+            const confirmed = confirm("기존 입고 수량을 수정하시겠습니까?");
+            if (!confirmed) return;
+        }
+
+        // 수량 입력 요청 메시지
+        const promptMessage = isModifyMode
+            ? `수정할 수량을 입력하세요 (수정 가능 수량: ${EstimatedQty})`
+            : `입고할 수량을 입력하세요 (입고 가능 수량: ${remainingQty})`;
+
+
+        const inputQty = prompt(promptMessage);
+        if (inputQty === null) return;
+
+        const qty = parseInt(inputQty.trim(), 10);
+
+        if (isNaN(qty) || qty <= 0 || (!isModifyMode && qty > remainingQty)) {
+            alert(
+                isModifyMode
+                    ? "유효한 수량이 아닙니다. 0보다 큰 수를 입력하세요."
+                    : `유효한 수량이 아닙니다.\n남은 입고 가능 수량: ${remainingQty}개 이하로 입력하세요.`
+            );
+            return;
+        }
+
+        const url = isModifyMode ? '/api/inspection/modify' : '/api/inspection/partial';
+
+        fetch(url, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                incomingId: incomingId,
+                incomingQty: qty
+            })
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert(isModifyMode ? "입고 수량이 수정되었습니다." : "부분입고가 완료되었습니다.");
+                    location.reload();
+                } else {
+                    alert("입고 처리 중 오류가 발생했습니다.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("서버 통신 중 오류가 발생했습니다.");
+            });
+    }
+
+    // 전체입고 처리
+    function fullReceive() {
+        const checkedRows = document.querySelectorAll(".rowCheck:checked");
+
+        if (checkedRows.length === 0) {
+            alert("전체입고할 항목을 선택해주세요.");
+            return;
+        }
+
+        const dtoList = [];
+
+        for (let row of checkedRows) {  // forEach 대신 for문 사용
+            const incomingId = row.closest("tr").getAttribute("data-id");
+            const rowQty = row.closest("tr").children[6].innerText.trim();
+            const remainingQty = row.closest("tr").children[10].innerText.trim();
+
+            const qty = parseInt(rowQty, 10);
+            const remaining = parseInt(remainingQty, 10);
+
+            if (isNaN(qty) || qty <= 0) {
+                alert("유효한 수량이 아닙니다.");
+                return; // 수량이 잘못된 경우
+            }
+
+            if (remaining <= 0) {
+                alert("이미 입고가 완료된 항목입니다.");
+                return; // 남은 수량이 0 이하일 때
+            }
+
+            dtoList.push({ incomingId, incomingQty: qty });
+        }
+
+        fetch('/api/inspection/full', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify(dtoList)
+        }).then(res => {
+            if (res.ok) {
+                alert("전체입고가 완료되었습니다.");
+                location.reload(); // 페이지 새로고침
+            } else {
+                alert("전체입고 처리 중 오류가 발생했습니다.");
+            }
+        }).catch(err => {
+            console.error(err);
+            alert("서버 통신 중 오류가 발생했습니다.");
+        });
+    }
+
+    // 반품처리
+    function returnItems() {
+        const checkedRows = document.querySelectorAll(".rowCheck:checked");
+
+        if (checkedRows.length !== 1) {
+            alert("반품처리는 하나의 항목만 선택할 수 있습니다.");
+            return;
+        }
+
+        const row = checkedRows[0].closest("tr");
+        const incomingId = row.getAttribute("data-id");
+
+        const receivedQtyText = row.children[7].innerText.trim();
+        const returnedQtyText = row.children[8].innerText.trim();
+
+        const receivedQty = parseInt(receivedQtyText, 10);
+        const returnedQty = parseInt(returnedQtyText, 10);
+
+        const remainingReturnableQty = receivedQty - returnedQty;
+
+        if (remainingReturnableQty <= 0) {
+            alert("더 이상 반품할 수 없습니다. (입고수량과 동일하게 반품됨)");
+            return;
+        }
+
+
+        const inputQty = prompt("반품할 수량을 입력하세요 (반품 가능 수량: " + remainingReturnableQty + "):");
+        if (inputQty === null) {
+            return; // 사용자가 취소함
+        }
+
+        const returnQty = parseInt(inputQty.trim(), 10);
+
+
+        if (isNaN(returnQty) || returnQty <= 0) {
+            alert("반품수량은 0보다 커야 합니다.");
+            return;
+        }
+
+        if (returnQty > remainingReturnableQty) {
+            alert("반품수량은 남은 반품 가능 수량(" + remainingReturnableQty + ")을 초과할 수 없습니다.");
+            return;
+        }
+
+        fetch('/api/inspection/return', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                incomingId: incomingId,
+                incomingReturnQty: returnQty
+            })
+        }).then(res => {
+            if (res.ok) {
+                alert("반품처리가 완료되었습니다.");
+                location.reload();
+            } else {
+                alert("반품처리 중 오류가 발생했습니다.");
+            }
+        }).catch(err => {
+            console.error(err);
+            alert("서버 통신 중 오류가 발생했습니다.");
+        });
+    }
+
 </script>
 </body>
 </html>
