@@ -39,7 +39,7 @@ public class IncomingController { // 입고
         model.addAttribute("pageRequestDTO", pageRequestDTO);
         model.addAttribute("totalCount", incomingList.getTotal());
 
-        return "/page/warehouse/incoming/planned";
+        return "page/warehouse/incoming/planned";
     }
 
     // 입고 검수
@@ -54,7 +54,7 @@ public class IncomingController { // 입고
         model.addAttribute("pageRequestDTO", pageRequestDTO);
         model.addAttribute("totalCount", incomingInspectionList.getTotal());
 
-        return "/page/warehouse/incoming/inspection";
+        return "page/warehouse/incoming/inspection";
     }
 
     @GetMapping("/close")
@@ -71,7 +71,7 @@ public class IncomingController { // 입고
         model.addAttribute("pageRequestDTO", pageRequestDTO);
         model.addAttribute("totalCount", closeList.getTotal());
 
-        return "/page/warehouse/incoming/close";
+        return "page/warehouse/incoming/close";
 
     }
 
@@ -87,7 +87,7 @@ public class IncomingController { // 입고
         model.addAttribute("pageRequestDTO", pageRequestDTO);
         model.addAttribute("totalCount", incomingItemList.getTotal());
 
-        return "/page/warehouse/incoming/history";
+        return "page/warehouse/incoming/history";
     }
 
     // 입고 현황 조회
@@ -102,6 +102,6 @@ public class IncomingController { // 입고
         model.addAttribute("pageRequestDTO", pageRequestDTO);
         model.addAttribute("totalCount", incomingTotalList.getTotal());
 
-        return "/page/warehouse/incoming/status";
+        return "page/warehouse/incoming/status";
     }
 }
