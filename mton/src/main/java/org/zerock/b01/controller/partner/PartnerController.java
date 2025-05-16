@@ -25,31 +25,31 @@ public class PartnerController {
     // 계약 정보 열람
     @GetMapping("/contract/view")
     public String contractViewGet() {
-        return "/page/partner/contract-view";
+        return "page/partner/contract-view";
     }
 
     // 계약 자재 등록
     @GetMapping("/contmat")
     public String contmatGet() {
-        return "/page/partner/contmat";
+        return "page/partner/contmat";
     }
 
     // 진척 검수 수행
     @GetMapping("/inspect")
     public String inspectGet() {
-        return "/page/partner/inspect";
+        return "page/partner/inspect";
     }
 
     // 자재 재고 관리
     @GetMapping("/mat/inventory")
     public String matInventoryGet() {
-        return "/page/partner/mat-inventory";
+        return "page/partner/mat-inventory";
     }
 
     // 거래 명세 활용
     @GetMapping("/trans")
     public String transGet() {
-        return "/page/partner/trans";
+        return "page/partner/trans";
     }
 
     // 협력사 납품 지시 요청
@@ -64,7 +64,7 @@ public class PartnerController {
         model.addAttribute("pageRequestDTO", pageRequestDTO);
         model.addAttribute("totalCount", drPartnerList.getTotal());
 
-        return "/page/partner/delivery";
+        return "page/partner/delivery";
     }
 
     @ResponseBody

@@ -39,7 +39,7 @@ public class DeliveryController {
         model.addAttribute("pageRequestDTO", pageRequestDTO);
         model.addAttribute("totalCount", responseDTO.getTotal());
 
-        return "/page/warehouse/delivery/request";
+        return "page/warehouse/delivery/request";
     }
 
     //납입지시등록페이지
@@ -62,7 +62,7 @@ public class DeliveryController {
         model.addAttribute("pageRequestDTO", pageRequestDTO);
         model.addAttribute("totalCount", drItemList.getTotal());
 
-        return "/page/warehouse/delivery/instruction";
+        return "page/warehouse/delivery/instruction";
 
     }
 
@@ -78,7 +78,7 @@ public class DeliveryController {
         model.addAttribute("pageRequestDTO", pageRequestDTO);
         model.addAttribute("totalCount", drItemList.getTotal());
 
-        return "/page/warehouse/delivery/status";
+        return "page/warehouse/delivery/status";
     }
 
 }

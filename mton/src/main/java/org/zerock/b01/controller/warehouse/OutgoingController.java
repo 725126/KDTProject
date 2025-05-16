@@ -14,18 +14,18 @@ public class OutgoingController {
     // 출고 조회
     @GetMapping("/status")
     public String statusGet() {
-        return "/page/warehouse/outgoing/status";
+        return "page/warehouse/outgoing/status";
     }
 
     // 출고 이력
     @GetMapping("/history")
     public String historyGet() {
-        return "/page/warehouse/outgoing/history";
+        return "page/warehouse/outgoing/history";
     }
 
     // 출고 처리 결과 조회
     @GetMapping("/result")
     public String resultGet() {
-        return "/page/warehouse/outgoing/result";
+        return "page/warehouse/outgoing/result";
     }
 }

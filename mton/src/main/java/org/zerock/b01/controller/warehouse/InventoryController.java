@@ -14,18 +14,18 @@ public class InventoryController {
     // 재고 조회
     @GetMapping("/status")
     public String statusGet() {
-        return "/page/warehouse/inventory/status";
+        return "page/warehouse/inventory/status";
     }
 
     // 재고 이력
     @GetMapping("/history")
     public String historyGet() {
-        return "/page/warehouse/inventory/history";
+        return "page/warehouse/inventory/history";
     }
 
     // 재고 금액
     @GetMapping("/price")
     public String priceGet() {
-        return "/page/warehouse/inventory/price";
+        return "page/warehouse/inventory/price";
     }
 }
