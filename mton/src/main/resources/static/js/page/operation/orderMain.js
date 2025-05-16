@@ -18,7 +18,7 @@ const orderInputTable = document.querySelector("#order-table");
 // 수정, 등록용 테이블 초기화
 // 필요없는 열을 삭제하고 수정 테이블에는 초기 내용을 삽입
 (function () {
-    tableRowsEditor.viewOrderingTable();
+    tableRowsEditor.viewOrderingTable(true);
     tableRowsEditor.initEditButtons(orderEditTable);
 })();
 

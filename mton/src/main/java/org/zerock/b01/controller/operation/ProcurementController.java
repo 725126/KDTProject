@@ -17,11 +17,8 @@ import org.zerock.b01.controller.operation.service.ProcurementPlanService;
 import org.zerock.b01.domain.operation.*;
 import org.zerock.b01.domain.operation.tablehead.OrderingTableHead;
 import org.zerock.b01.domain.operation.tablehead.ProcurementPlanTableHead;
-import org.zerock.b01.dto.operation.ContractMaterialViewDTO;
-import org.zerock.b01.dto.operation.ProcurementPlanDTO;
+import org.zerock.b01.dto.operation.*;
 import org.zerock.b01.service.operation.ContractService;
-import org.zerock.b01.dto.operation.CalcPbomDTO;
-import org.zerock.b01.dto.operation.OrderingDTO;
 import org.zerock.b01.dto.operation.ProcurementPlanDTO;
 import org.zerock.b01.dto.partner.ContractMaterialDTO;
 
@@ -92,6 +89,9 @@ public class ProcurementController {
     @GetMapping("/order")
     public String orderGet(Model model) {
         model.addAttribute("orderTH", OrderingTableHead.values());
+        model.addAttribute("pplans", procurementPlanRepository.findAll().stream().filter(x ->
+                x.getPplanStat().equals("진행중")
+        ).collect(Collectors.toList()));
         return "/page/operation/procurement/order";
     }
 
@@ -309,5 +309,17 @@ public class ProcurementController {
         }
 
         return calcPbomDTOList;
+    }
+
+    @ResponseBody
+    @PostMapping("/calc/order")
+    public List<CalcOrderingDTO> calcOrder(@RequestBody String id) {
+        Optional<ProcurementPlan> temp = procurementPlanRepository.findById(id);
+
+        if (temp.isEmpty()) {
+            return null;
+        }
+
+        return null;
     }
 }
