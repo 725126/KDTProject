@@ -31,7 +31,7 @@ public class DeliveryPartner extends BaseEntity {
   @Column(nullable = false)
   private DeliveryPartnerStatus deliveryPartnerStatus;
 
-  // 출고 수량 업데이트 메서드
+  // 출하 수량 업데이트 메서드
   public void updateDeliveryPartnerQty(int qtyToAdd) {
     // 발주된 총 수량
     int drItemQty = deliveryRequestItem.getDrItemQty();
@@ -42,7 +42,7 @@ public class DeliveryPartner extends BaseEntity {
     int incomingMissingTotalQty = (incomingTotal != null)
             ? incomingTotal.getIncomingMissingTotalQty()
             : 0;
-    // 남은 수량 = 발주수량 - 이미 출고된 수량 + 반품 수량
+    // 남은 수량 = 발주수량 - 이미 출하된 수량 + 반품 수량
     int remainingQty = drItemQty - this.deliveryPartnerQty + incomingReturnTotalQty + incomingMissingTotalQty;
 
     if (qtyToAdd > remainingQty) {
@@ -54,7 +54,7 @@ public class DeliveryPartner extends BaseEntity {
     this.deliveryPartnerQty += qtyToAdd;
   }
 
-  // 출고 상태 업데이트 메서드
+  // 출하 상태 업데이트 메서드
   public void updateDeliveryPartnerStatus(DeliveryPartnerStatus status) {
     this.deliveryPartnerStatus = status; // 상태 변경
   }

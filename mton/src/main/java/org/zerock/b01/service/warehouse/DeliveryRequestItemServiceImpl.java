@@ -162,7 +162,7 @@ public class DeliveryRequestItemServiceImpl implements DeliveryRequestItemServic
 
     DeliveryRequestItem deliveryRequestItem = ItemOptional.orElseThrow();
 
-    // 출고 수량 유효성 검사 추가
+    // 출하 수량 유효성 검사 추가
     Optional<DeliveryPartner> dpOptional = deliveryPartnerRepository.findByDeliveryRequestItem(deliveryRequestItem);
     if (dpOptional.isPresent()) {
       DeliveryPartner deliveryPartner = dpOptional.get();
@@ -235,7 +235,7 @@ public class DeliveryRequestItemServiceImpl implements DeliveryRequestItemServic
 
         // 남은 수량이 전체 수량과 동일해야 삭제 허용
         if (remainingQty != drItemQty) {
-          throw new IllegalStateException("출고 후 전량 반품된 경우에만 삭제할 수 있습니다.");
+          throw new IllegalStateException("출하 후 전량 반품된 경우에만 삭제할 수 있습니다.");
         }
 
         deliveryPartnerRepository.delete(deliveryPartner);

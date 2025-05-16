@@ -94,14 +94,14 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
             .build();
   }
 
-  // 부분출고
+  // 부분출하
   public void partialDelivery(DeliveryPartnerDTO dto) {
     validateDeliveryQty(dto.getDeliveryPartnerQty());
 
     DeliveryPartner deliveryPartner = deliveryPartnerRepository.findById(dto.getDeliveryPartnerId())
             .orElseThrow(() -> new IllegalArgumentException("해당 항목 없음"));
 
-    // 출고 수량 누적
+    // 출하 수량 누적
     deliveryPartner.updateDeliveryPartnerQty(dto.getDeliveryPartnerQty());
 
     deliveryPartnerRepository.save(deliveryPartner);
@@ -113,19 +113,19 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
     // 입고 생성
     incomingService.createIncomingForDeliveryPartnerItem(savedItem);
 
-    // 출고 상태 갱신
+    // 출하 상태 갱신
     updateDeliveryPartnerStatus(deliveryPartner);
 
   }
 
-  // 출고
+  // 출하
   public void fullDelivery(List<DeliveryPartnerDTO> dtoList) {
     for (DeliveryPartnerDTO dto : dtoList) {
 
       DeliveryPartner deliveryPartner = deliveryPartnerRepository.findById(dto.getDeliveryPartnerId())
               .orElseThrow(() -> new IllegalArgumentException("해당 항목 없음"));
 
-      int totalQty = dto.getDeliveryPartnerQty(); // 전체출고량
+      int totalQty = dto.getDeliveryPartnerQty(); // 전체출하량
       deliveryPartner.updateDeliveryPartnerQty(totalQty);
 
       deliveryPartnerRepository.save(deliveryPartner);
@@ -136,7 +136,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
       // 입고 엔티티 생성
       incomingService.createIncomingForDeliveryPartnerItem(savedItem);
 
-      // 출고 상태 갱신
+      // 출하 상태 갱신
       updateDeliveryPartnerStatus(deliveryPartner);
 
     }
@@ -144,7 +144,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
 
   private void validateDeliveryQty(int qty) {
     if (qty < 0) {
-      throw new IllegalArgumentException("출고 수량은 음수일 수 없습니다.");
+      throw new IllegalArgumentException("출하 수량은 음수일 수 없습니다.");
     }
   }
 
@@ -155,24 +155,24 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
     int missingQty = deliveryPartner.getIncomingTotal().getIncomingMissingTotalQty();
     int netQty = shippedQty - returnedQty - missingQty;
 
-    // 출고가 전혀 안 된 경우
+    // 출하가 전혀 안 된 경우
     if (shippedQty == 0) {
       deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.진행중);
 
-      // 출고했지만 반품 등으로 실질 수량이 줄어든 경우
+      // 출하했지만 반품 등으로 실질 수량이 줄어든 경우
     } else if (netQty < drQty) {
-      deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.부분출고);
+      deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.부분출하);
 
-      // 출고 완료 수량이고, 입고도 마감됨
+      // 출하 완료 수량이고, 입고도 마감됨
     } else if (netQty == drQty) {
       if (deliveryPartner.getIncomingTotal().getIncomingStatus() == IncomingStatus.입고마감) {
         deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.완료);
       } else {
-        deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.출고);
+        deliveryPartner.updateDeliveryPartnerStatus(DeliveryPartnerStatus.출하);
       }
 
     } else {
-      throw new IllegalStateException("반품 수량이 출고 수량보다 많습니다. 데이터 확인이 필요합니다.");
+      throw new IllegalStateException("반품 수량이 출하 수량보다 많습니다. 데이터 확인이 필요합니다.");
     }
 
   }

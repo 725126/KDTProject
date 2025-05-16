@@ -486,7 +486,7 @@
                 if (!response.ok) {
                     // 서버에서 수정 실패 시
                     return response.json().then(data => {
-                        const msg = data.message || '수정에 실패했습니다. 이미 출고된 수량보다 작게 수정할 수 없습니다.';
+                        const msg = data.message || '수정에 실패했습니다. 이미 출하된 수량보다 작게 수정할 수 없습니다.';
                         alert(msg);
                         // throw 대신 명시적인 리턴 (catch에서 처리 막기)
                         return Promise.reject('handled');
@@ -565,7 +565,7 @@
                         getLastDrItemDueDate(drId);
 
                     } else {
-                        alert('이미 출고 된 항목은 삭제할 수 없습니다. ');
+                        alert('이미 출하 된 항목은 삭제할 수 없습니다. ');
                     }
                 })
                 .catch(error => {

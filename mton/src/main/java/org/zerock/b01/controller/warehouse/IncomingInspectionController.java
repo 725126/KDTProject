@@ -71,11 +71,11 @@ public class IncomingInspectionController {
     // 서비스 호출로 입고 마감 처리
     incomingTotalService.closeIncoming(incomingTotalId);
 
-    // 2. 해당 입고와 연결된 협력사 출고 정보 가져오기
+    // 2. 해당 입고와 연결된 협력사 출하 정보 가져오기
     DeliveryPartner deliveryPartner = deliveryPartnerRepository.findByIncomingTotal(incomingTotal)
-            .orElseThrow(() -> new IllegalStateException("해당 입고와 연결된 협력사 출고 정보가 없습니다."));
+            .orElseThrow(() -> new IllegalStateException("해당 입고와 연결된 협력사 출하 정보가 없습니다."));
 
-    // 3. 출고 상태 업데이트
+    // 3. 출하 상태 업데이트
     deliveryPartnerService.updateDeliveryPartnerStatus(deliveryPartner);
 
     // 4. 저장
