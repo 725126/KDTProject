@@ -1,6 +1,8 @@
 package org.zerock.b01.service.warehouse;
 
 import org.zerock.b01.domain.warehouse.IncomingTotal;
+import org.zerock.b01.dto.PageRequestDTO;
+import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.warehouse.IncomingTotalDTO;
 
 public interface IncomingTotalService {
@@ -10,6 +12,8 @@ public interface IncomingTotalService {
   void closeIncoming(Long incomingTotalId);
 
   IncomingTotalDTO readIncomingTotalOne(Long drItemId);
+
+  PageResponseDTO<IncomingTotalDTO> listWithIncomingTotal(PageRequestDTO pageRequestDTO);
 
   default IncomingTotalDTO entityToIncomingTotalDto(IncomingTotal incomingTotal) {
 

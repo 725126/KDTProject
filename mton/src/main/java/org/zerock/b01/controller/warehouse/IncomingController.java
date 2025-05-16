@@ -92,7 +92,16 @@ public class IncomingController { // 입고
 
     // 입고 현황 조회
     @GetMapping("/status")
-    public String statusGet() {
+    public String listIncomingTotal(PageRequestDTO pageRequestDTO, Model model) {
+
+        // 전체 납입지시 상세 항목 페이징 조회
+        PageResponseDTO<IncomingTotalDTO> incomingTotalList =
+                incomingTotalService.listWithIncomingTotal(pageRequestDTO);
+
+        model.addAttribute("incomingTotalList", incomingTotalList.getDtoList());
+        model.addAttribute("pageRequestDTO", pageRequestDTO);
+        model.addAttribute("totalCount", incomingTotalList.getTotal());
+
         return "/page/warehouse/incoming/status";
     }
 }

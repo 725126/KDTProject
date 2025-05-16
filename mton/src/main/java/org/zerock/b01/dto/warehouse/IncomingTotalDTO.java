@@ -6,6 +6,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 @Data
 @Builder
@@ -15,7 +16,7 @@ public class IncomingTotalDTO {
 
   private Long incomingTotalId;
 
-  private LocalDate incomingCompletedAt;
+  private LocalDateTime incomingCompletedAt;
 
   private String pCompany;
 
