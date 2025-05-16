@@ -320,6 +320,8 @@ public class ProcurementController {
             return null;
         }
 
+        Material material = temp.get().getMaterial();
+
         return null;
     }
 }
