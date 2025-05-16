@@ -51,14 +51,14 @@ public class ProductController {
         model.addAttribute("materialTH", MaterialTableHead.values());
         model.addAttribute("productTH", ProductTableHead.values());
         model.addAttribute("pbomTH", PbomTableHead.values());
-        return "/page/operation/product/pbom";
+        return "page/operation/product/pbom";
     }
 
     // 생산 계획
     @GetMapping("/prdplan")
     public String prdplanGet(Model model) {
         model.addAttribute("prdplanTH", ProductionPlanTableHead.values());
-        return "/page/operation/product/prdplan";
+        return "page/operation/product/prdplan";
     }
 
     @ResponseBody

@@ -15,6 +15,6 @@ public class IncomingController { // 입고
     // 거래 명세
     @GetMapping("/trans")
     public String transGet() {
-        return "/page/operation/incoming/trans";
+        return "page/operation/incoming/trans";
     }
 }
