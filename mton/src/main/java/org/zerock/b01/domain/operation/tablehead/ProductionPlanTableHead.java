@@ -9,7 +9,7 @@ public enum ProductionPlanTableHead {
     PROD_NAME("제품명"),
     PRDPLAN_QTY("생산량"),
     PRDPLAN_DATE("계획일자"),
-    PRDPLAN_END("종료일"),
+    PRDPLAN_END("생산일"),
     PRDPLAN_STAT("상태")
     ;
 

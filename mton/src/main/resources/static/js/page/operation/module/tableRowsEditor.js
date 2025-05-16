@@ -11,9 +11,18 @@ let prdplanDBData;
 let prdplanDBEditData;
 let pplanDBData;
 let pplanDBEditData;
+let orderDBData;
+let contmatDBData;
 
 // 수정 전 원래 값을 담는 변수와 삭제 전 삭제할 ID를 담는 변수
 let originalValues = {};
+
+// 등록 이후 목록으로 넘어가는 이벤트 발생용 함수
+function viewChange() {
+    document.querySelector("#mod-view").checked = true;
+    document.querySelector("#manage-mod").dispatchEvent(new Event("click"));
+    document.querySelector("#mod-view").dispatchEvent(new Event("change"));
+}
 
 // 테이블 열 개수 파악하고 새 행과 열을 삽입.
 // 일반적으로 등록 테이블에서만 사용한다.
@@ -125,6 +134,10 @@ function addPrdPlanTableUtilBtn(table) {
 
 function addPPlanTableUtilBtn(table) {
     initEmptyPPlanTable(table, true);
+}
+
+function addOrderTableUtilBtn(table) {
+    initEmptyOrderingTable(table, true);
 }
 
 // 수정테이블의 헤더에 조작버튼 추가
@@ -250,7 +263,7 @@ function addEditButtons(table, row, ...protectedCols) {
     revertButton.setAttribute("revert", "disabled");
 
     // 삭제버튼 이벤트. 실제 삭제 로직은 업로드 버튼 눌렀을 때 이루어짐
-    deleteCheck.addEventListener("change", function (e) {
+    deleteCheck.addEventListener("change", function () {
         const isChecked = deleteCheck.checked;
 
         // 켜고 끔에 따라 수정 버튼도 같이 숨기고 보여야함
@@ -373,7 +386,7 @@ async function jsonFetcher(dest, jData) {
 }
 
 // 수정 테이블의 사항을 데이터베이스에 반영한다.
-function uploadEditedTable(table, request) {
+function uploadEditedTable(table, request, del, upd) {
     let jsonData;
     let jsonFinalData;
     let deleteDest;
@@ -388,6 +401,7 @@ function uploadEditedTable(table, request) {
         console.log("삭제사항은 없습니다.");
     }
 
+    // 왠만하면 여기에 경우의 수를 추가하지 말 것. 써보니까 엄청 힘듦.
     switch (request) {
         case "mat":
         case "material":
@@ -414,7 +428,8 @@ function uploadEditedTable(table, request) {
             updateDest = "/internal/procurement/update/pplan";
             break;
         default:
-            jsonData = null;
+            deleteDest = del;
+            updateDest = upd;
     }
 
     jsonData = jsonFetcher(deleteDest, deleteList);
@@ -455,8 +470,8 @@ function initEmptyTable(table) {
 }
 
 function initEmptyPbomTable(table, isFile = false) {
-    const matOptions = matDBData.map(data => data[dbElementNames.pbomMatId]);
-    const prdOptions = prdDBData.map(data => data[dbElementNames.pbomProdId]);
+    const matOptions = matDBData.map(data => [data[dbElementNames.pbomMatId], data[dbElementNames.matName]]);
+    const prdOptions = prdDBData.map(data => [data[dbElementNames.pbomProdId], data[dbElementNames.prodName]]);
 
     const makeMatSelect = (row) => {
         makeSelectForRawCell(row.cells[1], matOptions);
@@ -478,7 +493,7 @@ function initEmptyPbomTable(table, isFile = false) {
 }
 
 function initEmptyPrdPlanTable(table, isFile = false) {
-    const prdOptions = prdDBData.map(data => data[dbElementNames.prodId]);
+    const prdOptions = prdDBData.map(data => [data[dbElementNames.prodId], data[dbElementNames.prodName]]);
 
     const makePrdSelect = (row) => {
         makeSelectForRawCell(row.cells[1], prdOptions);
@@ -524,11 +539,56 @@ function initEmptyPPlanTable(table, isFile = false) {
             continue;
         }
 
-        if (row.rowIndex !== 0) {
-            addUtilButtons(table, row, makePrdplanSelect, makeMatSelect, makeDate);
-        } else {
-            addUtilButtons(table, row);
+        addUtilButtons(table, row, makePrdplanSelect, makeMatSelect, makeDate);
+    }
+}
+
+function initEmptyOrderingTable(table, isFile = false) {
+    const conmatOptions = contmatDBData.map(data => data[dbElementNames.conmatId]);
+    const pplanOptions = pplanDBData.map(data => data[dbElementNames.pplanId]);
+
+    const makeConmatSelect = (row) => {
+        makeSelectForRawCell(row.cells[1], conmatOptions);
+        return row.cells[1];
+    }
+
+    const makePPlanSelect = (row) => {
+        makeSelectForRawCell(row.cells[2], pplanOptions);
+        return row.cells[2];
+    }
+
+    const makeStartDate = (row) => {
+        makeDatePicker(row.cells[4]);
+        return row.cells[4];
+    }
+
+    const makeEndDate = (row) => {
+        makeDatePicker(row.cells[5]);
+        return row.cells[5];
+    }
+
+    const makeStatSelect = (row) => {
+        makeSelectForRawCell(row.cells[6], ["진행중", "완료"]);
+        return row.cells[6];
+    }
+
+    const makeMin = (row) => {
+        const dates = row.querySelectorAll("input[type='date']");
+        console.log(dates);
+        dates[0].addEventListener("change", function () {
+            dates[1].min = dates[0].value;
+            dates[1].value = dates[1].value < dates[0].value ? dates[0].value : dates[1].value;
+            dates[1].dispatchEvent(new Event("change"));
+        });
+        return row.cells[5];
+    }
+
+    for (const row of table.rows) {
+        if (isFile && row.rowIndex === 0) {
+            continue;
         }
+
+        addUtilButtons(table, row, makeConmatSelect, makePPlanSelect, makeStartDate, makeEndDate, makeStatSelect, makeMin);
     }
 }
 
@@ -586,7 +646,7 @@ function viewTable(table, request) {
 }
 
 // DB 받아온 내용으로 테이블을 갱신한다.
-function reloadTable(table, request) {
+function reloadTable(table, request, tar) {
     let targetDB;
 
     switch (request) {
@@ -610,13 +670,15 @@ function reloadTable(table, request) {
             targetDB = prdplanDBEditData;
             break;
         case "pplan":
-        case "productionplan":
+        case "procureplan":
             targetDB = pplanDBData;
             break;
         case "pplanedit":
-        case "productionplanedit":
+        case "procureplanedit":
             targetDB = pplanDBEditData;
             break;
+        default:
+            targetDB = tar;
     }
 
     const sheet = XLSX.utils.json_to_sheet(targetDB);
@@ -678,8 +740,6 @@ async function refreshPrdPlanDBDataAll() {
                 ePrd[keys[1]] = prd[keys[1]];
                 ePrd[keys[3]] = prd[keys[3]];
                 ePrd[keys[5]] = prd[keys[5]];
-
-                console.log(ePrd);
                 return ePrd;
             });
 
@@ -712,11 +772,30 @@ async function refreshPPlanDBDataAll() {
                 ePPlan[keys[4]] = pplan[keys[4]];
                 ePPlan[keys[6]] = pplan[keys[6]];
                 ePPlan[keys[7]] = pplan[keys[7]];
-
-                console.log(ePPlan);
                 return ePPlan;
             });
 
+            return values;
+        },
+        (reason) => {
+            return reason;
+        }
+    );
+}
+
+async function refreshOrderingDBDataAll() {
+    const result = Promise.all([
+        refreshTableView("/internal/procurement/view/order", "order"),
+        refreshTableView("/internal/procurement/view/pplan", "pplan"),
+        refreshTableView("/internal/procurement/view/contmat", "contmat")
+    ]);
+
+    return result.then(
+        (values) => {
+            orderDBData = values[0];
+            pplanDBData = values[1];
+            contmatDBData = values[2];
+            console.log(values);
             return values;
         },
         (reason) => {
@@ -751,6 +830,9 @@ function viewAllProductTable() {
 
         const pbomInputTable = document.querySelector("#pbom-table");
 
+        console.log(matDBData);
+        console.log(prdDBData);
+
         if (value[0].length > 0) {
             reloadTable(matViewTable, "material");
             reloadTable(matEditTable, "material");
@@ -777,8 +859,8 @@ function viewAllProductTable() {
 
             addTableEditButtons(pbomEditTable);
 
-            makeTableCellDBSelect(pbomEditTable, 1, matDBData, dbElementNames.pbomMatId);
-            makeTableCellDBSelect(pbomEditTable, 2, prdDBData, dbElementNames.pbomProdId);
+            makeTableCellDBSelectWithLabel(pbomEditTable, 1, matDBData, dbElementNames.pbomMatId, dbElementNames.matName);
+            makeTableCellDBSelectWithLabel(pbomEditTable, 2, prdDBData, dbElementNames.pbomProdId, dbElementNames.prodName);
         } else {
             makeUniCellMessage(pbomViewTable, "등록된 내용이 없습니다.");
             makeUniCellMessage(pbomEditTable, "수정할 내용이 없습니다.");
@@ -804,7 +886,7 @@ function viewPrdPlanTable() {
 
             addTableEditButtons(prdplanEditTable);
 
-            makeTableCellDBSelect(prdplanEditTable, 1, prdDBData, dbElementNames.prodId);
+            makeTableCellDBSelectWithLabel(prdplanEditTable, 1, prdDBData, dbElementNames.prodId, dbElementNames.prodName);
             makeTableCellDatePicker(prdplanEditTable, 3);
         } else {
             makeUniCellMessage(prdplanViewTable, "등록된 내용이 없습니다.");
@@ -842,6 +924,47 @@ function viewPPlanTable() {
     });
 }
 
+function viewOrderingTable() {
+    const refresh = refreshOrderingDBDataAll();
+    refresh.then(value => {
+        const orderViewTable = document.querySelector("#order-table-view");
+        const orderEditTable = document.querySelector("#order-table-edit");
+        const orderInputTable = document.querySelector("#order-table");
+
+        if (value[0].length > 0) {
+            reloadTable(orderViewTable, "", orderDBData);
+            reloadTable(orderEditTable, "", orderDBData);
+
+            addTableEditButtons(orderEditTable);
+
+            makeTableCellDBSelect(orderEditTable, 1, contmatDBData, dbElementNames.conmatId);
+            makeTableCellDBSelect(orderEditTable, 2, pplanDBData, dbElementNames.pplanId);
+            makeTableCellDatePicker(orderEditTable, 4);
+            makeTableCellDatePicker(orderEditTable, 5);
+            makeTableCellSelect(orderEditTable, 6, "진행중", "완료");
+
+            for (const row of orderEditTable.rows) {
+                const dates = row.querySelectorAll("input[type='date']");
+                if (dates === null || dates.length === 0) {
+                    continue;
+                }
+                dates[0].addEventListener("change", function () {
+                    dates[1].min = dates[0].value;
+                    dates[1].value = dates[1].value < dates[0].value ? dates[0].value : dates[1].value;
+                    dates[1].dispatchEvent(new Event("change"));
+                });
+            }
+        } else {
+            makeUniCellMessage(orderViewTable, "등록된 내용이 없습니다.");
+            makeUniCellMessage(orderEditTable, "수정할 내용이 없습니다.");
+        }
+
+        originalValues = {};
+
+        initEmptyOrderingTable(orderInputTable);
+    });
+}
+
 // span 을 자식으로 갖지 않은 셀에 select 추가하기
 function makeSelectForRawCell(cell, ...options) {
     let value = cell.innerText;
@@ -859,12 +982,18 @@ function makeSelect(cell, ...options) {
 
     for (const option of options[0]) {
         const opt = document.createElement("option");
-        opt.value = option;
-        opt.label = option;
+
+        if (Array.isArray(option)) {
+            opt.value = option[0];
+            opt.label = option[1] + " (" + option[0] + ")";
+        } else {
+            opt.value = option;
+            opt.label = option;
+        }
         select.appendChild(opt);
     }
 
-    select.addEventListener("change", function (e) {
+    select.addEventListener("change", function () {
         let span = cell.querySelector("span");
         if (span === null) {
             span = document.createElement("span");
@@ -888,13 +1017,26 @@ function makeTableCellDBSelect(table, cellIndex, dbData, dbElement) {
     }
 }
 
-function makeTableCellDatePicker(table, cellIndex) {
+function makeTableCellDBSelectWithLabel(table, cellIndex, dbData, dbElement, dbLabel) {
     const rows = table.rows;
+    const options = dbData.map(data => [data[dbElement], data[dbLabel]]);
 
     for (let i = 1; i < rows.length; i++) {
         const cell = rows[i].cells[cellIndex];
-        makeDatePickerRawCell(cell);
+        makeSelectForRawCell(cell, options);
     }
+}
+
+function makeTableCellDatePicker(table, cellIndex) {
+    const rows = table.rows;
+    const result = [];
+
+    for (let i = 1; i < rows.length; i++) {
+        const cell = rows[i].cells[cellIndex];
+        result[i - 1] = makeDatePickerRawCell(cell);
+    }
+
+    return result;
 }
 
 function makeDatePickerRawCell(cell) {
@@ -903,7 +1045,7 @@ function makeDatePickerRawCell(cell) {
     span.innerHTML = value;
     cell.innerText = "";
     cell.appendChild(span);
-    makeDatePicker(cell);
+    return makeDatePicker(cell);
 }
 
 function makeDatePicker(cell) {
@@ -913,7 +1055,7 @@ function makeDatePicker(cell) {
     date.classList.add("indirect-time");
     date.setAttribute("min", today.substring(0, today.indexOf("T")));
 
-    date.addEventListener("change", function (e) {
+    date.addEventListener("change", function () {
         let span = cell.querySelector("span");
         if (span === null) {
             span = document.createElement("span");
@@ -923,6 +1065,8 @@ function makeDatePicker(cell) {
         span.innerText = date.value;
     });
     cell.appendChild(date);
+
+    return date;
 }
 
 // 임의의 option 을 사용하여 셀을 select 로 만든다.
@@ -951,7 +1095,7 @@ function initPageTable() {
     const viewLabel = manageMod.querySelector("#mod-view");
 
     // 등록, 수정, 목록 라디오 간 전환 시각효과
-    manageMod.addEventListener("click", function (event) {
+    manageMod.addEventListener("click", function () {
         const labels = manageMod.querySelectorAll("label");
 
         for (const label of labels) {
@@ -968,7 +1112,7 @@ function initPageTable() {
     });
 
     // 등록, 수정, 목록 버튼 클릭시 테이블과 우측 패널 전환 이벤트
-    insertLabel.addEventListener("change", function (event) {
+    insertLabel.addEventListener("change", function () {
         inputGroup.style.display = "block";
         editGroup.style.display = "none";
         viewGroup.style.display = "none";
@@ -983,7 +1127,7 @@ function initPageTable() {
         }
     });
 
-    editLabel.addEventListener("change", function (event) {
+    editLabel.addEventListener("change", function () {
         inputGroup.style.display = "none";
         editGroup.style.display = "block";
         viewGroup.style.display = "none";
@@ -998,7 +1142,7 @@ function initPageTable() {
         }
     });
 
-    viewLabel.addEventListener("change", function (event) {
+    viewLabel.addEventListener("change", function () {
         inputGroup.style.display = "none";
         editGroup.style.display = "none";
         viewGroup.style.display = "block";
@@ -1030,10 +1174,13 @@ export {
     viewAllProductTable,
     viewPrdPlanTable,
     viewPPlanTable,
+    viewOrderingTable,
     addTableUtilBtn,
     addTableEditButtons,
     addPbomTableUtilBtn,
     addPrdPlanTableUtilBtn,
     addPPlanTableUtilBtn,
+    addOrderTableUtilBtn,
     uploadEditedTable,
+    viewChange,
 };

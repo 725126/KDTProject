@@ -5,62 +5,103 @@
 <head>
     <meta charset="UTF-8">
     <title>자재ON - 구매 및 발주 > 자재 발주</title>
+    <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
+    <link rel="stylesheet" th:href="@{/css/page/operation/pbom.css}">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
 </head>
 <body>
 
 <th:block layout:fragment="procurement-order">
-    <div class="container py-5">
-        <h2 class="mb-4">자재 발주</h2>
-        <div class="card p-4 mb-5">
-            <form id="order-input" class="row g-3">
-                <div class="col-md-3">
-                    <label for="ord-plan" class="form-label">조달계획</label>
-                    <input type="text" class="form-control" id="ord-plan">
+    <div class="tutorial" id="tutorial-box">튜토리얼 메시지</div>
+    <div class="container py-5 pb-0 position-relative">
+        <h2 class="mb-4" id="upload-test">자재발주 관리</h2>
+        <div class="row g-4 mb-3">
+            <form id="manage-mod" class="mb-3">
+                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-view">
+                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-view" checked>
+                    <label class="form-check-label btn btn-primary pe-none" for="mod-view" id="view-label">목록</label>
                 </div>
-                <div class="col-md-3">
-                    <label for="ord-mat" class="form-label">자재</label>
-                    <input type="text" class="form-control" id="ord-mat">
+                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-edit">
+                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-edit">
+                    <label class="form-check-label btn btn-outline-secondary" for="mod-edit" id="edit-label">수정</label>
                 </div>
-                <div class="col-md-3">
-                    <label for="ord-qty" class="form-label">발주 수</label>
-                    <input type="number" class="form-control" id="ord-qty">
-                </div>
-                <div class="col-md-3">
-                    <label for="ord-date" class="form-label">납기일</label>
-                    <input type="date" class="form-control" id="ord-date">
-                </div>
-                <div class="col-12 text-end mt-4">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-plus"></i> 등록</button>
+                <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-insert">
+                    <input class="form-check-input opacity-0 position-absolute pe-none" type="radio" name="i-filter" id="mod-insert">
+                    <label class="form-check-label btn btn-outline-secondary" for="mod-insert" id="insert-label">등록</label>
                 </div>
             </form>
         </div>
+        <div id="input-manage-btn" class="left-panel">
+            <input type="file" id="insert-file" class="transparent-file">
+            <label for="insert-file" class="btn btn-outline-secondary" id="insert-file-label">F</label>
+            <button type="button" class="btn btn-outline-secondary" id="insert-upload">U</button>
+        </div>
+        <div id="edit-manage-btn" class="left-panel">
+            <button type="button" class="btn btn-outline-secondary" id="edit-refresh">R</button>
+            <button type="button" class="btn btn-outline-secondary" id="edit-upload">U</button>
+        </div>
+        <div id="view-manage-btn" class="left-panel">
+            <button type="button" class="btn btn-outline-secondary" id="view-refresh">&circlearrowright;</button>
+            <button type="button" class="btn btn-outline-secondary" id="view-download">D</button>
+        </div>
+        <div class="card p-4" id="table-card">
+            <div id="tables-input">
+                <table class="table table-bordered table-hover data-table text-center table-excel" id="order-table">
+                    <thead class="table-light">
+                    <tr>
+                        <th scope="col" th:each="head: ${orderTH}">[[${head.getLabel()}]]</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="" th:each="i: ${#numbers.sequence(0, orderTH.length - 1)}">
+                            <span contenteditable="true"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
 
-        <h2 class="mb-4">등록된 계약정보</h2>
-        <div class="card p-4">
-            <table class="table table-bordered table-hover data-table text-center">
-                <thead class="table-light">
-                <tr>
-                    <th scope="col">조달코드</th>
-                    <th scope="col">자재명</th>
-                    <th scope="col">소요량</th>
-                    <th scope="col">계획일자</th>
-                    <th scope="col">납기일</th>
-                    <th scope="col">상태</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr>
-                    <td>OR001A01</td>
-                    <td>가이던스 FV 그립 핸들</td>
-                    <td>200</td>
-                    <td>2025-04-20</td>
-                    <td>2025-05-20</td>
-                    <td class="text-center"><span class="badge bg-info text-dark">진행중</span></td>
-                </tr>
-                </tbody>
-            </table>
+            <div id="tables-view">
+                <table class="table table-bordered table-hover data-table text-center table-excel" id="order-table-view">
+                    <thead class="table-light">
+                    <tr>
+                        <th scope="col" th:each="head: ${orderTH}">[[${head.getLabel()}]]</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="" th:each="i: ${#numbers.sequence(0, orderTH.length - 1)}">
+                            <span contenteditable="false"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div id="tables-edit">
+                <table class="table table-bordered table-hover data-table text-center table-excel" id="order-table-edit">
+                    <thead class="table-light">
+                    <tr>
+                        <th scope="col" th:each="head: ${orderTH}">[[${head.getLabel()}]]</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td class="" th:each="i: ${#numbers.sequence(0, orderTH.length - 1)}">
+                            <span contenteditable="false"></span>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
     </div>
+
+    <script th:src="@{/js/util/file-preview.js}"></script>
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script th:src="@{/js/page/operation/orderMain.js}" type="module"></script>
 </th:block>
 
 </body>

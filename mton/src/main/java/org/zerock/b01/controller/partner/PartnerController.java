@@ -4,18 +4,22 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.*;
+import org.zerock.b01.controller.operation.service.ContractMaterialService;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
+import org.zerock.b01.dto.partner.ContractMaterialDTO;
 import org.zerock.b01.dto.warehouse.DeliveryPartnerDTO;
 import org.zerock.b01.service.warehouse.DeliveryPartnerService;
+
+import java.util.List;
 
 @Controller
 @Log4j2
 @RequiredArgsConstructor
 @RequestMapping("/external")
 public class PartnerController {
+    private final ContractMaterialService contractMaterialService;
 
     private final DeliveryPartnerService deliveryPartnerService;
     // 계약 정보 열람
@@ -61,5 +65,12 @@ public class PartnerController {
         model.addAttribute("totalCount", drPartnerList.getTotal());
 
         return "/page/partner/delivery";
+    }
+
+    @ResponseBody
+    @PostMapping("/contmat/viewdata")
+    public List<ContractMaterialDTO> viewContmat(@RequestBody String str) {
+        log.info("view contmat: " + str);
+        return contractMaterialService.viewAll();
     }
 }
