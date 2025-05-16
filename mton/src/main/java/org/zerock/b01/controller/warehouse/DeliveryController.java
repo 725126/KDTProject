@@ -59,6 +59,8 @@ public class DeliveryController {
                 deliveryRequestItemService.getListDeliveryRequestItem(drId, pageRequestDTO);
 
         model.addAttribute("drItemList", drItemList.getDtoList());
+        model.addAttribute("pageRequestDTO", pageRequestDTO);
+        model.addAttribute("totalCount", drItemList.getTotal());
 
         return "/page/warehouse/delivery/instruction";
 

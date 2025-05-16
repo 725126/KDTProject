@@ -3,11 +3,13 @@ package org.zerock.b01.service.warehouse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
-import org.zerock.b01.domain.warehouse.DeliveryRequestItem;
-import org.zerock.b01.domain.warehouse.IncomingStatus;
-import org.zerock.b01.domain.warehouse.IncomingTotal;
+import org.zerock.b01.domain.warehouse.*;
+import org.zerock.b01.dto.warehouse.IncomingTotalDTO;
+import org.zerock.b01.repository.warehouse.DeliveryPartnerRepository;
 import org.zerock.b01.repository.warehouse.DeliveryRequestItemRepository;
 import org.zerock.b01.repository.warehouse.IncomingTotalRepository;
+
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -16,6 +18,8 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
 
   private final IncomingTotalRepository incomingTotalRepository;
   private final DeliveryRequestItemRepository deliveryRequestItemRepository;
+//  private final DeliveryPartnerRepository deliveryPartnerRepository;
+//  private final DeliveryPartnerService deliveryPartnerService;
 
   public void updateIncomingStatus(Long drItemId) {
     DeliveryRequestItem item = deliveryRequestItemRepository.findById(drItemId)
@@ -44,17 +48,12 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
   }
 
 
-  public void closeIncoming(Long drItemId) {
-    DeliveryRequestItem item = deliveryRequestItemRepository.findById(drItemId)
+  public void closeIncoming(Long incomingTotalId) {
+    IncomingTotal incomingTotal = incomingTotalRepository.findById(incomingTotalId)
             .orElseThrow(() -> new IllegalArgumentException("해당 납입지시 항목이 존재하지 않습니다."));
 
-    IncomingTotal incomingTotal = incomingTotalRepository.findByDeliveryRequestItem(item)
-            .orElseThrow(() -> new IllegalStateException("입고 정보가 없습니다."));
-
-    int deliveredQty = incomingTotal.getIncomingTotalQty();
-    int returnQty = incomingTotal.getIncomingReturnTotalQty();
-    int totalQty = deliveredQty - returnQty;
-    int expectedQty = item.getDrItemQty();
+    int totalQty = incomingTotal.getIncomingEffectiveQty();
+    int expectedQty = incomingTotal.getDeliveryRequestItem().getDrItemQty();
 
     if (totalQty != expectedQty) {
       throw new IllegalStateException("전량 입고된 경우에만 마감할 수 있습니다.");
@@ -62,6 +61,19 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
 
     incomingTotal.markAsCompleted();
     incomingTotalRepository.save(incomingTotal);
+
+  }
+
+  @Override
+  public IncomingTotalDTO readIncomingTotalOne(Long drItemId) {
+
+    Optional<IncomingTotal> result = incomingTotalRepository.findByDeliveryRequestItem_drItemId(drItemId);
+
+    IncomingTotal incomingTotal = result.orElseThrow();
+
+    IncomingTotalDTO incomingTotalDTO = entityToIncomingTotalDto(incomingTotal);
+
+    return incomingTotalDTO;
   }
 
 }

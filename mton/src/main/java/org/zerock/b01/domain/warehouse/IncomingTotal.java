@@ -57,22 +57,22 @@ public class IncomingTotal {
     }
   }
 
-  public void updateTotalAndMissingTotalQty(int totalQty, int missingQty) {
-    this.incomingTotalQty = totalQty;
-    this.incomingMissingTotalQty = missingQty;
+  public void updateEffectiveQty() {
+    this.incomingEffectiveQty = this.incomingTotalQty
+            - this.incomingReturnTotalQty
+            - this.incomingMissingTotalQty;
   }
 
-  public void returnTotalQty(int returnQty) {
-    this.incomingReturnTotalQty = returnQty;
-  }
 
   public void addToTotalAndMissingTotalQty(int totalQty, int missingQty) {
     this.incomingTotalQty += totalQty;
     this.incomingMissingTotalQty += missingQty;
+    updateEffectiveQty();
   }
 
   public void addToReturnTotalQty(int returnQty) {
     this.incomingReturnTotalQty += returnQty;
+    updateEffectiveQty();
   }
 
 }

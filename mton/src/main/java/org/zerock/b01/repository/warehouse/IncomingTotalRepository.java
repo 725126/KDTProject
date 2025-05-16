@@ -10,4 +10,6 @@ import java.util.Optional;
 public interface IncomingTotalRepository extends JpaRepository<IncomingTotal, Long>, IncomingItemSearch {
 
   Optional<IncomingTotal> findByDeliveryRequestItem(DeliveryRequestItem deliveryRequestItem);
+
+  Optional<IncomingTotal> findByDeliveryRequestItem_drItemId(Long drItemId);
 }

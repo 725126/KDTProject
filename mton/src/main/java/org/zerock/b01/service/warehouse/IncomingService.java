@@ -26,6 +26,11 @@ public interface IncomingService {
 
   void fullIncoming(List<IncomingInspectionDTO> dtoList);
 
-  void returnItems(IncomingInspectionDTO dto);
+  void modifyIncoming(IncomingInspectionDTO dto);
+
+  void returnIncoming(IncomingInspectionDTO dto);
+
+  PageResponseDTO<IncomingInspectionDTO> getListIncomingWithTotal(Long incomingTotalId,
+                                                                  PageRequestDTO pageRequestDTO);
 
 }

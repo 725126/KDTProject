@@ -22,7 +22,7 @@ public class IncomingItem {
   private Incoming incoming;
 
   @Column(nullable = false)
-  private LocalDateTime ModifyDate;
+  private LocalDateTime modifyDate;
 
   @Column(nullable = false)
   private int incomingQty;
@@ -32,5 +32,9 @@ public class IncomingItem {
 
   @Column(nullable = false)
   private int incomingMissingQty;
+
+  @Enumerated(EnumType.STRING)
+  @Column(nullable = false)
+  private IncomingItemStatus incomingItemStatus;
 
 }

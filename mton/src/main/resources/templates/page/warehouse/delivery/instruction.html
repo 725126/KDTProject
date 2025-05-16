@@ -214,82 +214,6 @@
     }
 
 
-    // // 지시 추가 버튼 클릭 시 호출되는 함수
-    // function addInstruction() {
-    //     // 입력된 값 가져오기
-    //     const drItemDueDate = document.getElementById('drItemDueDate').value;
-    //     const drItemQty = document.getElementById('drItemQty').value;
-    //     const cstorageId = document.getElementById('cstorage').value;
-    //     const drId = document.getElementById('drId').value;
-    //     const creDate = new Date().toISOString();
-    //     const currentTotal = parseInt(document.getElementById('drTotalQty').textContent);
-    //     const maxOrderQty = parseInt(document.getElementById('orderQty').textContent || document.getElementById('orderQty').innerText);
-    //     const remainingQty = maxOrderQty - currentTotal;
-    //
-    //     let errorMessages = [];
-    //
-    //     // 입력 값 체크
-    //     if (!drItemDueDate || !drItemQty || !cstorageId) {
-    //         errorMessages.push('모든 필드를 입력해주세요.');
-    //     }
-    //
-    //     if (drItemQty < 0) {
-    //         errorMessages.push('수량은 음수일 수 없습니다.');
-    //     }
-    //
-    //     if (lastDrItemDueDate && parseDateOnly(drItemDueDate) < parseDateOnly(lastDrItemDueDate)) {
-    //         errorMessages.push(`입력된 납입지시일자(${drItemDueDate})가 이전 납입지시일자(${lastDrItemDueDate})보다 이전입니다. ${lastDrItemDueDate} 이후 날짜를 입력해주세요`);
-    //     }
-    //
-    //     if (currentTotal + parseInt(drItemQty) > maxOrderQty) {
-    //         errorMessages.push(`총 지시수량이 발주량을 초과할 수 없습니다.\n현재 남은 수량은 ${remainingQty}입니다.`);
-    //     }
-    //
-    //     // 오류가 하나라도 있으면 모두 보여주기
-    //     if (errorMessages.length > 0) {
-    //         alert(errorMessages.join('\n\n'));
-    //         return;
-    //     }
-    //
-    //     // 서버로 AJAX 요청 보내기
-    //     fetch('/api/delivery-request/', {
-    //         method: 'POST',
-    //         headers: {
-    //             'Content-Type': 'application/json',
-    //         },
-    //         body: JSON.stringify({
-    //             drId: drId,
-    //             drItemDueDate: drItemDueDate,
-    //             drItemQty: drItemQty,
-    //             cstorageId: cstorageId,
-    //             creDate: creDate,
-    //         })
-    //     })
-    //         .then(response => response.json())
-    //         .then(data => {
-    //             console.log(data);
-    //
-    //             const drItemId = data.drItemId;
-    //             const drItemCode = data.drItemCode;
-    //             const creDate = data.creDate;
-    //
-    //
-    //             addRowToTable(drItemId, drItemCode, drItemDueDate, drItemQty, creDate, cstorageId);
-    //
-    //
-    //             // 입력 필드 초기화
-    //             document.getElementById('drItemDueDate').value = '';
-    //             document.getElementById('drItemQty').value = '';
-    //             document.getElementById('cstorage').value = '';
-    //
-    //             getLastDrItemDueDate(drId);
-    //
-    //         })
-    //         .catch(error => {
-    //             console.error('Error:', error);
-    //         });
-    // }
-
     function getFormattedDateTime() {
         const now = new Date();
 
@@ -414,6 +338,8 @@
             const dateB = new Date(b.drItemDueDate);
             return dateA - dateB; // 오름차순 정렬 (날짜가 빠른 순)
         });
+
+        console.log(instructionList)
 
         // 2. 백엔드로 전송
         fetch('/api/delivery-request/', {

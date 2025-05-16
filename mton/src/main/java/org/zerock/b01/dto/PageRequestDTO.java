@@ -11,7 +11,6 @@ import org.springframework.data.domain.Sort;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.time.LocalDate;
-import java.time.LocalDateTime;
 
 @Builder
 @Data
@@ -68,6 +67,12 @@ public class PageRequestDTO {
     private LocalDate incomingFirstDateStart;
 
     private LocalDate incomingFirstDateEnd;
+
+    private LocalDate modifyDateStart;
+
+    private LocalDate modifyDateEnd;
+
+    private String incomingItemStatus;
 
     public String[] getTypes() {
         if (type == null || type.isEmpty()) {

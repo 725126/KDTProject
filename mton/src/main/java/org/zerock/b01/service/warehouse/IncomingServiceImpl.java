@@ -5,11 +5,9 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
-import org.zerock.b01.domain.warehouse.DeliveryPartnerItem;
-import org.zerock.b01.domain.warehouse.Incoming;
-import org.zerock.b01.domain.warehouse.IncomingItem;
-import org.zerock.b01.domain.warehouse.IncomingTotal;
+import org.zerock.b01.domain.warehouse.*;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.warehouse.IncomingDTO;
@@ -21,6 +19,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -152,6 +151,7 @@ public class IncomingServiceImpl implements IncomingService {
       // DTO 생성
       IncomingInspectionDTO dto = IncomingInspectionDTO.builder()
               .incomingId(incoming.getIncomingId())
+              .drItemId(deliveryPartnerItem.getDeliveryPartner().getDeliveryRequestItem().getDrItemId())
               .deliveryPartnerItemDate(deliveryPartnerItem.getDeliveryPartnerItemDate().toLocalDate())
               .incomingCode(incoming.getIncomingCode())
               .pCompany(deliveryPartnerItem.getDeliveryPartner().getDeliveryRequestItem().getDeliveryRequest()
@@ -206,9 +206,10 @@ public class IncomingServiceImpl implements IncomingService {
 
     IncomingItem itemLog = IncomingItem.builder()
             .incoming(incoming)
-            .ModifyDate(LocalDateTime.now())
+            .modifyDate(LocalDateTime.now())
             .incomingQty(dto.getIncomingQty())
             .incomingMissingQty(missingQty)
+            .incomingItemStatus(IncomingItemStatus.입고)
             .build();
 
     incomingItemRepository.save(itemLog);
@@ -249,38 +250,88 @@ public class IncomingServiceImpl implements IncomingService {
 
       IncomingItem itemLog = IncomingItem.builder()
               .incoming(incoming)
-              .ModifyDate(LocalDateTime.now())
+              .modifyDate(LocalDateTime.now())
               .incomingQty(dto.getIncomingQty())
-              .incomingReturnQty(dto.getIncomingReturnQty())
-              .incomingMissingQty(dto.getIncomingMissingQty())
+              .incomingItemStatus(IncomingItemStatus.입고)
               .build();
 
       incomingItemRepository.save(itemLog);
     }
   }
 
-  // 반품 등록
-  public void returnItems(IncomingInspectionDTO dto) {
+  //수정
+  public void modifyIncoming(IncomingInspectionDTO dto) {
+    validateIncomingQty(dto.getIncomingQty());
 
     Incoming incoming = incomingRepository.findById(dto.getIncomingId())
             .orElseThrow(() -> new IllegalArgumentException("해당 항목 없음"));
 
-    int returnedQty = dto.getIncomingReturnQty();
-    int incomingQty = incoming.getIncomingQty();
+    int newQty = dto.getIncomingQty();
+    int expectedQty = incoming.getDeliveryPartnerItem().getDeliveryPartnerItemQty();
 
-    if (returnedQty <= 0) {
+    // 기존 입고 수량
+    int oldQty = incoming.getIncomingQty();
+
+    // 새로 계산된 미입고 수량
+    int newMissingQty = Math.max(expectedQty - newQty, 0);
+
+    IncomingTotal total = incoming.getIncomingTotal();
+
+    // 기존 수량 제거하고 새 수량 반영
+    total.addToTotalAndMissingTotalQty(-oldQty, -Math.max(expectedQty - oldQty, 0)); // 기존 수량 제거
+    total.addToTotalAndMissingTotalQty(newQty, newMissingQty); // 새 수량 반영
+
+    total.markFirstIncoming();
+
+    // 입고 객체 업데이트
+    incoming.updateIncomingQtys(newQty);
+
+    incomingRepository.save(incoming);
+
+    // 상태 갱신
+    incomingTotalService.updateIncomingStatus(
+            incoming.getDeliveryPartnerItem()
+                    .getDeliveryPartner()
+                    .getDeliveryRequestItem()
+                    .getDrItemId()
+    );
+
+    // 로그 남기기
+    IncomingItem itemLog = IncomingItem.builder()
+            .incoming(incoming)
+            .modifyDate(LocalDateTime.now())
+            .incomingQty(newQty)
+            .incomingMissingQty(newMissingQty)
+            .incomingItemStatus(IncomingItemStatus.수정)
+            .build();
+
+    incomingItemRepository.save(itemLog);
+  }
+
+  // 반품 등록
+  public void returnIncoming(IncomingInspectionDTO dto) {
+
+    Incoming incoming = incomingRepository.findById(dto.getIncomingId())
+            .orElseThrow(() -> new IllegalArgumentException("해당 항목 없음"));
+
+    int returnQty = dto.getIncomingReturnQty();
+    int incomingQty = incoming.getIncomingQty();
+    int existingReturnQty = incoming.getIncomingReturnQty();
+    int newTotalReturnQty = existingReturnQty + returnQty;
+
+    if (returnQty <= 0) {
       throw new IllegalArgumentException("반품수량은 0보다 커야 합니다.");
     }
 
-    if (returnedQty > incomingQty) {
-      throw new IllegalArgumentException("반품수량은 입고 수량을 초과할 수 없습니다.");
+    if (newTotalReturnQty > incomingQty) {
+      throw new IllegalArgumentException("총 반품수량은 입고수량을 초과할 수 없습니다.");
     }
 
     // 반품된 수량만큼 업데이트
     IncomingTotal total = incoming.getIncomingTotal();
-    total.addToReturnTotalQty(returnedQty);
+    total.addToReturnTotalQty(returnQty);
 
-    incoming.updateIncomingReturnQty(returnedQty);
+    incoming.updateIncomingReturnQty(newTotalReturnQty);
 
     incomingRepository.save(incoming);
 
@@ -291,8 +342,9 @@ public class IncomingServiceImpl implements IncomingService {
     // 반품 기록 저장
     IncomingItem returnLog = IncomingItem.builder()
             .incoming(incoming)
-            .ModifyDate(LocalDateTime.now())
-            .incomingReturnQty(returnedQty)
+            .modifyDate(LocalDateTime.now())
+            .incomingReturnQty(returnQty)
+            .incomingItemStatus(IncomingItemStatus.반품)
             .build();
 
     incomingItemRepository.save(returnLog);
@@ -303,5 +355,44 @@ public class IncomingServiceImpl implements IncomingService {
       throw new IllegalArgumentException("입고 수량은 음수일 수 없습니다.");
     }
   }
-  
+
+  @Override
+  public PageResponseDTO<IncomingInspectionDTO> getListIncomingWithTotal(Long incomingTotalId,
+                                                                         PageRequestDTO pageRequestDTO) {
+
+    Pageable pageable = PageRequest.of(pageRequestDTO.getPage() <= 0? 0: pageRequestDTO.getPage() -1
+            , pageRequestDTO.getSize(),
+            Sort.by("incomingId").ascending());
+
+    Page<Incoming> result = incomingRepository.listIncoming(incomingTotalId,pageable);
+
+    List<IncomingInspectionDTO> dtoList =  result.getContent().stream()
+            .map(incoming -> IncomingInspectionDTO.builder()
+                    .incomingCode(incoming.getIncomingCode())
+                    .incomingTotalId(incoming.getIncomingTotal().getIncomingTotalId())
+                    .pCompany(incoming.getDeliveryPartnerItem().getDeliveryPartner()
+                            .getDeliveryRequestItem().getDeliveryRequest().getOrdering()
+                            .getContractMaterial().getContract().getPartner().getPCompany())
+                    .matId(incoming.getDeliveryPartnerItem().getDeliveryPartner()
+                            .getDeliveryRequestItem().getDeliveryRequest().getOrdering()
+                            .getContractMaterial().getMaterial().getMatId())
+                    .matName(incoming.getDeliveryPartnerItem().getDeliveryPartner()
+                            .getDeliveryRequestItem().getDeliveryRequest().getOrdering()
+                            .getContractMaterial().getMaterial().getMatName())
+                    .incomingQty(incoming.getIncomingQty())
+                    .incomingReturnQty(incoming.getIncomingReturnQty())
+                    .incomingMissingQty(incoming.getIncomingMissingQty())
+                    .incomingFirstDate(incoming.getIncomingTotal().getIncomingFirstDate())
+                    .cstorageId(incoming.getIncomingTotal().getDeliveryRequestItem()
+                            .getCompanyStorage().getCstorageId())
+                    .build())
+            .collect(Collectors.toList());
+
+    return PageResponseDTO.<IncomingInspectionDTO>withAll()
+            .pageRequestDTO(pageRequestDTO)
+            .dtoList(dtoList)
+            .total((int) result.getTotalElements())
+            .build();
+  }
+
 }

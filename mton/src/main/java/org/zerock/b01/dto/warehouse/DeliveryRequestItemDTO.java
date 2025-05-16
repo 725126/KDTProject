@@ -1,5 +1,6 @@
 package org.zerock.b01.dto.warehouse;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -26,6 +27,7 @@ public class DeliveryRequestItemDTO {
 
   private String cstorageId;
 
+  @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd HH:mm:ss")
   private LocalDateTime creDate;
 
   private LocalDateTime modDate;

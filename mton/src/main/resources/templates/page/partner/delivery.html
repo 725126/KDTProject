@@ -186,16 +186,24 @@
             return;
         }
 
-        const dtoList = selected.map(cb => {
+        const dtoList = [];
+
+        for (const cb of selected) {
             const row = cb.closest("tr");
             const deliveryPartnerId = row.getAttribute("data-id");
-            const remainingQty = parseInt(row.children[8].innerText);
+            const remainingQtyText = row.children[8].innerText.trim();
+            const remainingQty = parseInt(remainingQtyText);
 
-            return {
+            if (remainingQty <= 0) {
+                alert(`출고 가능 수량이 없습니다.`);
+                return;
+            }
+
+            dtoList.push({
                 deliveryPartnerId: deliveryPartnerId,
                 deliveryPartnerQty: remainingQty
-            };
-        });
+            });
+        }
 
         fetch('/api/delivery/full', {
             method: 'POST',

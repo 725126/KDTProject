@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}"/>
+    <meta name="_csrf_header" th:content="${_csrf.headerName}"/>
+    <title>자재ON - 납입지시 > 납입지시 등록</title>
+</head>
+<body>
+
+<th:block layout:fragment="delivery-instruction">
+    <div class="container py-5">
+        <h2 class="mb-4">납입지시 등록</h2>
+
+        <!-- 발주 정보 테이블 -->
+        <div class="card p-4 mb-5">
+            <table class="info-table table table-bordered table-hover text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>납입지시코드</th>
+                    <th>납입지시일자</th>
+                    <th>협력사</th>
+                    <th>자재명</th>
+                    <th>지시수량</th>
+                    <th>입고수량</th>
+
+                </tr>
+                </thead>
+                <tr>
+                    <td>[[${dto.drItemCode}]]</td>
+                    <td>[[${dto.drItemDueDate}]]</td>
+                    <td>[[${dto.pCompany}]]</td>
+                    <td>[[${dto.matName}]]</td>
+                    <td>[[${dto.drItemQty}]]</td>
+                    <td>[[${dto.incomingEffectiveQty}]]</td>
+                </tr>
+            </table>
+        </div>
+
+        <input type="hidden" id="incomingTotalId" name="incomingTotalId" th:value="${dto.incomingTotalId}">
+
+        <!-- 납입지시 입력 및 버튼 영역 -->
+        <div class="card p-4 mb-4">
+            <div class="input-group d-flex gap-3 align-items-end flex-wrap">
+                <div class="col-12 text-end">
+
+                    <button id="saveButton" class="btn btn-success rounded me-1" onclick="closeIncoming()">
+                        <i class="bi bi-save me-1"></i> 입고마감
+                    </button>
+
+                    <button class="btn btn-outline-dark rounded me-1" onclick="goBackToRequestPage()">
+                        <i class="bi bi-arrow-left-circle me-1"></i> 검수페이지로 돌아가기
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <div class="card p-4">
+            <table class="table table-bordered table-hover data-table text-center">
+                <thead class="table-light">
+                <tr>
+                    <th>입고코드</th>
+                    <th>협력사</th>
+                    <th>자재코드</th>
+                    <th>자재명</th>
+                    <th>입고수량</th>
+                    <th>반품수량</th>
+                    <th>미입고수량</th>
+                    <th>입고일</th>
+                    <th>창고</th>
+                </tr>
+                </thead>
+                <tbody id="inspection-body">
+                <tr th:each="close:${closeList}" th:data-id="${close.incomingId}">
+                    <td th:text="${close.incomingCode}"></td>
+                    <td th:text="${close.pCompany}"></td>
+                    <td th:text="${close.matId}"></td>
+                    <td th:text="${close.matName}"></td>
+                    <td th:text="${close.incomingQty}"></td>
+                    <td th:text="${close.incomingReturnQty}"></td>
+                    <td th:text="${close.incomingMissingQty}"></td>
+                    <td th:text="${close.incomingFirstDate != null ?
+                                    #temporals.format(close.incomingFirstDate,
+                                    'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
+                    <td th:text="${close.cstorageId}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+
+    </div>
+</th:block>
+<script layout:fragment="script" th:inline="javascript">
+
+    function goBackToRequestPage() {
+        window.location.href = '/internal/incoming/inspection';
+    }
+
+    function closeIncoming() {
+        const incomingTotalId = document.getElementById("incomingTotalId").value;
+
+        fetch("/internal/incoming/close", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify({ incomingTotalId: incomingTotalId })
+        }).then(response => {
+            if (response.ok) {
+                alert("입고가 마감되었습니다.");
+                location.href = '/internal/incoming/inspection';
+            } else {
+                alert("입고 마감 실패!");
+            }
+        });
+    }
+</script>
+</body>
+</html>

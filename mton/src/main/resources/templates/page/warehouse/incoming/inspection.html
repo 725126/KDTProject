@@ -134,8 +134,21 @@
                                     'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
                     <td th:text="${incomingInspection.cstorageId}"></td>
                     <td class="text-center">
-                        <span class="badge bg-warning text-dark" th:text="${incomingInspection.incomingStatus}"></span>
+  <span th:if="${incomingInspection.incomingStatus != '입고마감대기중'}"
+        th:text="${incomingInspection.incomingStatus}"
+        th:classappend="${incomingInspection.incomingStatus == '입고마감' ? ' badge bg-success' :
+                        incomingInspection.incomingStatus == '부분입고' ? ' badge bg-info text-dark' :
+                        incomingInspection.incomingStatus == '미입고' ? ' badge bg-warning text-dark' :
+                        ' badge bg-secondary'}">
+  </span>
+
+                        <a th:if="${incomingInspection.incomingStatus == '입고마감대기중'}"
+                           th:text="${incomingInspection.incomingStatus}"
+                           th:href="@{/internal/incoming/close(drItemId=${incomingInspection.drItemId})}"
+                           class="badge bg-primary text-white text-decoration-none">
+                        </a>
                     </td>
+
                 </tr>
                 </tbody>
             </table>
@@ -147,13 +160,13 @@
                 <i class="bi bi-box-arrow-in-down"></i>
                 <span>부분입고</span>
             </a>
-            <a class="nav-item nav-link" href="#" onclick="returnItems()">
-                <i class="bi bi-arrow-counterclockwise"></i>
-                <span>반품처리</span>
-            </a>
             <a class="nav-item nav-link" href="#" onclick="fullReceive()">
                 <i class="bi bi-check-circle"></i>
                 <span>입고</span>
+            </a>
+            <a class="nav-item nav-link" href="#" onclick="returnItems()">
+                <i class="bi bi-arrow-counterclockwise"></i>
+                <span>반품처리</span>
             </a>
             <a class="nav-item nav-link" href="#" onclick="finalizeReceive()">
                 <i class="bi bi-archive"></i>
@@ -178,7 +191,7 @@
         document.querySelectorAll(".rowCheck").forEach(cb => cb.checked = source.checked);
     }
 
-    // 부분입고 처리
+    //부분입고 처리
     function partialReceive() {
         const checkedRows = document.querySelectorAll(".rowCheck:checked");
 
@@ -191,21 +204,40 @@
         const incomingId = row.getAttribute("data-id");
 
         const remainingQtyText = row.children[10].innerText.trim();
+        const EstimatedQtyText = row.children[6].innerText.trim();
         const remainingQty = parseInt(remainingQtyText, 10);
+        const EstimatedQty = parseInt(EstimatedQtyText, 10);
 
-        const inputQty = prompt("입고할 수량을 입력하세요 (남은 수량: " + remainingQty + "):");
-        if (inputQty === null) {
-            return; // 취소
+        const isModifyMode = remainingQty === 0;
+
+        if (isModifyMode) {
+            const confirmed = confirm("기존 입고 수량을 수정하시겠습니까?");
+            if (!confirmed) return;
         }
+
+        // 수량 입력 요청 메시지
+        const promptMessage = isModifyMode
+            ? `수정할 수량을 입력하세요 (수정 가능 수량: ${EstimatedQty})`
+            : `입고할 수량을 입력하세요 (입고 가능 수량: ${remainingQty})`;
+
+
+        const inputQty = prompt(promptMessage);
+        if (inputQty === null) return;
 
         const qty = parseInt(inputQty.trim(), 10);
 
-        if (isNaN(qty) || qty <= 0 || qty > remainingQty) {
-            alert(`유효한 수량이 아닙니다.\n남은 입고 가능 수량: ${remainingQty}개 이하로 입력하세요.`);
+        if (isNaN(qty) || qty <= 0 || (!isModifyMode && qty > remainingQty)) {
+            alert(
+                isModifyMode
+                    ? "유효한 수량이 아닙니다. 0보다 큰 수를 입력하세요."
+                    : `유효한 수량이 아닙니다.\n남은 입고 가능 수량: ${remainingQty}개 이하로 입력하세요.`
+            );
             return;
         }
 
-        fetch('/api/inspection/partial', {
+        const url = isModifyMode ? '/api/inspection/modify' : '/api/inspection/partial';
+
+        fetch(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -215,17 +247,19 @@
                 incomingId: incomingId,
                 incomingQty: qty
             })
-        }).then(res => {
-            if (res.ok) {
-                alert("부분입고가 완료되었습니다.");
-                location.reload();
-            } else {
-                alert("입고 처리 중 오류가 발생했습니다.");
-            }
-        }).catch(err => {
-            console.error(err);
-            alert("서버 통신 중 오류가 발생했습니다.");
-        });
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert(isModifyMode ? "입고 수량이 수정되었습니다." : "부분입고가 완료되었습니다.");
+                    location.reload();
+                } else {
+                    alert("입고 처리 중 오류가 발생했습니다.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("서버 통신 중 오류가 발생했습니다.");
+            });
     }
 
     // 전체입고 처리
@@ -292,32 +326,35 @@
         const row = checkedRows[0].closest("tr");
         const incomingId = row.getAttribute("data-id");
 
-        const remainingQtyText = row.children[10].innerText.trim();
         const receivedQtyText = row.children[7].innerText.trim();
+        const returnedQtyText = row.children[8].innerText.trim();
 
-        const remainingQty = parseInt(remainingQtyText, 10);
         const receivedQty = parseInt(receivedQtyText, 10);
+        const returnedQty = parseInt(returnedQtyText, 10);
+
+        const remainingReturnableQty = receivedQty - returnedQty;
+
+        if (remainingReturnableQty <= 0) {
+            alert("더 이상 반품할 수 없습니다. (입고수량과 동일하게 반품됨)");
+            return;
+        }
 
 
-        const inputQty = prompt("반품할 수량을 입력하세요 (남은 수량: " + remainingQty + "):");
+        const inputQty = prompt("반품할 수량을 입력하세요 (반품 가능 수량: " + remainingReturnableQty + "):");
         if (inputQty === null) {
             return; // 사용자가 취소함
         }
 
         const returnQty = parseInt(inputQty.trim(), 10);
 
+
         if (isNaN(returnQty) || returnQty <= 0) {
             alert("반품수량은 0보다 커야 합니다.");
             return;
         }
 
-        if (returnQty > receivedQty) {
-            alert("반품수량은 입고수량을 초과할 수 없습니다.");
-            return;
-        }
-
-        if (returnQty > remainingQty) {
-            alert("유효하지 않은 수량입니다.\n남은 수량 이하로 숫자를 입력해주세요.");
+        if (returnQty > remainingReturnableQty) {
+            alert("반품수량은 남은 반품 가능 수량(" + remainingReturnableQty + ")을 초과할 수 없습니다.");
             return;
         }
 

@@ -27,7 +27,4 @@ public class CompanyStorage extends BaseEntity {
 
   @Column(length = 20)
   private String cstorageManager;
-
-  @OneToMany(mappedBy = "companyStorage", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-  private Set<CompanyStorageItem> storageDetails = new HashSet<>();
 }
