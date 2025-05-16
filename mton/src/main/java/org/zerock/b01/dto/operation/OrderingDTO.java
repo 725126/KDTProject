@@ -13,8 +13,8 @@ import java.time.LocalDate;
 @NoArgsConstructor
 public class OrderingDTO {
     private String orderId;
-    private String cmtId;
     private String pplanId;
+    private String cmtId;
     private int orderQty;
     private LocalDate orderDate;
     private LocalDate orderEnd;

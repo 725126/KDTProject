@@ -101,7 +101,7 @@
     function closeIncoming() {
         const incomingTotalId = document.getElementById("incomingTotalId").value;
 
-        fetch("/internal/incoming/close", {
+        fetch("/api/inspection/close", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",
