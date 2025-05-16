@@ -68,8 +68,8 @@
         <!-- 테이블 -->
         <div class="card p-4">
             <div class="text-end mt-3">
-                <button type="button" class="btn btn-success me-2" id="partialDeliveryBtn">부분출고</button>
-                <button type="button" class="btn btn-danger" id="fullDeliveryBtn">출고</button>
+                <button type="button" class="btn btn-success me-2" id="partialDeliveryBtn">부분출하</button>
+                <button type="button" class="btn btn-danger" id="fullDeliveryBtn">출하</button>
             </div>
 
             <br>
@@ -82,7 +82,7 @@
                     <th>발주코드</th>
                     <th>자재명</th>
                     <th>납품요청수량</th>
-                    <th>출고수량</th>
+                    <th>출하수량</th>
                     <th>반품수량</th>
                     <th>미입고수량</th>
                     <th>남은수량</th>
@@ -123,12 +123,12 @@
         document.querySelectorAll(".rowCheck").forEach(cb => cb.checked = source.checked);
     }
 
-    // 부분출고 버튼
+    // 부분출하 버튼
     document.getElementById("partialDeliveryBtn").addEventListener("click", function () {
         const checkedRows = document.querySelectorAll(".rowCheck:checked");
 
         if (checkedRows.length !== 1) {
-            alert("부분출고는 하나만 선택할 수 있습니다.");
+            alert("부분출하는 하나만 선택할 수 있습니다.");
             return;
         }
 
@@ -139,7 +139,7 @@
         const remainingQtyText = row.children[8].innerText.trim();
         const remainingQty = parseInt(remainingQtyText, 10);
 
-        const inputQty = prompt("출고할 수량을 입력하세요 (남은 수량: " + remainingQty + "):");
+        const inputQty = prompt("출하할 수량을 입력하세요 (남은 수량: " + remainingQty + "):");
         if (inputQty === null) {
             return; // 취소 누르면 중단
         }
@@ -149,7 +149,7 @@
 
         // 유효성 검사: 숫자, 양수, 남은 수량 초과 금지
         if (isNaN(qty) || qty <= 0 || qty > remainingQty) {
-            alert(`유효한 수량이 아닙니다.\n남은 출고 가능 수량: ${remainingQty}개 이하로 입력하세요.`);
+            alert(`유효한 수량이 아닙니다.\n남은 출하 가능 수량: ${remainingQty}개 이하로 입력하세요.`);
             return;
         }
 
@@ -166,10 +166,10 @@
             })
         }).then(res => {
             if (res.ok) {
-                alert("부분출고가 완료되었습니다.");
+                alert("부분출하가 완료되었습니다.");
                 location.reload();
             } else {
-                alert("출고 처리 중 오류 발생.");
+                alert("출하 처리 중 오류 발생.");
             }
         }).catch(err => {
             console.error(err);
@@ -177,12 +177,12 @@
         });
     });
 
-    // 전체출고 버튼
+    // 전체출하 버튼
     document.getElementById("fullDeliveryBtn").addEventListener("click", function () {
         const selected = Array.from(document.querySelectorAll(".rowCheck:checked"));
 
         if (selected.length === 0) {
-            alert("출고할 항목을 선택하세요.");
+            alert("출하할 항목을 선택하세요.");
             return;
         }
 
@@ -195,7 +195,7 @@
             const remainingQty = parseInt(remainingQtyText);
 
             if (remainingQty <= 0) {
-                alert(`출고 가능 수량이 없습니다.`);
+                alert(`출하 가능 수량이 없습니다.`);
                 return;
             }
 
@@ -214,10 +214,10 @@
             body: JSON.stringify(dtoList)
         }).then(res => {
             if (res.ok) {
-                alert("출고가 완료되었습니다.");
+                alert("출하가 완료되었습니다.");
                 location.reload();
             } else {
-                alert("출고 처리 중 오류 발생.");
+                alert("출하 처리 중 오류 발생.");
             }
         });
     });

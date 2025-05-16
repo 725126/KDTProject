@@ -21,13 +21,13 @@ public class DeliveryPartnerController {
   @PostMapping("/partial")
   public ResponseEntity<?> partialDelivery(@RequestBody DeliveryPartnerDTO dto) {
     deliveryPartnerService.partialDelivery(dto);
-    return ResponseEntity.ok("부분출고 완료");
+    return ResponseEntity.ok("부분출하 완료");
   }
 
   // 전체출고
   @PostMapping("/full")
   public ResponseEntity<?> fullDelivery(@RequestBody List<DeliveryPartnerDTO> dtoList) {
     deliveryPartnerService.fullDelivery(dtoList);
-    return ResponseEntity.ok("전체출고 완료");
+    return ResponseEntity.ok("전체출하 완료");
   }
 }
