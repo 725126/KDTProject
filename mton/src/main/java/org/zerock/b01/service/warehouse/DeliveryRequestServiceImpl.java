@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.zerock.b01.controller.operation.repository.OrderingRepository;
 import org.zerock.b01.domain.operation.Ordering;
 import org.zerock.b01.domain.warehouse.CompanyStorage;
 import org.zerock.b01.domain.warehouse.DeliveryRequest;
@@ -30,6 +31,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
   private final DeliveryRequestRepository deliveryRequestRepository;
   private final CompanyStorageRepository companyStorageRepository;
   private final DeliveryRequestItemRepository deliveryRequestItemRepository;
+  private final OrderingRepository orderingRepository;
 
   @Override
   public PageResponseDTO<DeliveryRequestDTO> listWithDeliveryRequest(PageRequestDTO pageRequestDTO) {
@@ -101,18 +103,6 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     return deliveryRequestDTO;
   }
 
-  @Override
-  public List<DeliveryRequestDTO> readDeliveryRequestAll() {
-
-    List<DeliveryRequest> result = deliveryRequestRepository.findAll();
-
-    List<DeliveryRequestDTO> deliveryRequestDTOList = result.stream()
-                    .map(this::entityToDto)
-                    .collect(Collectors.toList());
-
-    return deliveryRequestDTOList;
-  }
-
   public void updateDeliveryRequestStatus(Long drId) {
     DeliveryRequest dr = deliveryRequestRepository.findById(drId)
             .orElseThrow(() -> new RuntimeException("해당 납입지시 없음"));
@@ -127,4 +117,17 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     deliveryRequestRepository.save(dr);
   }
 
+  public void createDeliveryRequestFromOrdering(String orderId) {
+    Ordering ordering = orderingRepository.findById(orderId)
+            .orElseThrow(() -> new RuntimeException("발주정보가 존재하지 않습니다."));
+
+    //납입지시 생성
+    DeliveryRequest dr = DeliveryRequest.builder()
+            .drStatus(DeliveryStatus.진행중)
+            .drTotalQty(0)
+            .ordering(ordering)
+            .build();
+
+    deliveryRequestRepository.save(dr);
+  }
 }

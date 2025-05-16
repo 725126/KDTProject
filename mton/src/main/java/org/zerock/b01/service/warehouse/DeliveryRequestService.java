@@ -16,9 +16,9 @@ public interface DeliveryRequestService {
 
   DeliveryRequestDTO readDeliveryRequestOne(String orderId);
 
-  List<DeliveryRequestDTO> readDeliveryRequestAll();
+  void updateDeliveryRequestStatus(Long drId);
 
-  public void updateDeliveryRequestStatus(Long drId);
+  void createDeliveryRequestFromOrdering(String orderId);
 
   default DeliveryRequestDTO entityToDto(DeliveryRequest deliveryRequest) {
 

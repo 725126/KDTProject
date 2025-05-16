@@ -10,6 +10,7 @@ import org.zerock.b01.controller.operation.repository.ProcurementPlanRepository;
 import org.zerock.b01.domain.operation.Ordering;
 import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.dto.operation.OrderingDTO;
+import org.zerock.b01.service.warehouse.DeliveryRequestService;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -24,6 +25,7 @@ public class OrderingServiceImpl implements OrderingService {
     private final ContractMaterialRepository contractMaterialRepository;
     private final ProcurementPlanRepository procurementPlanRepository;
     private final OrderingRepository orderingRepository;
+    private final DeliveryRequestService deliveryRequestService;
 
     @Override
     public StatusTuple registerAll(List<OrderingDTO> list) {
@@ -70,6 +72,11 @@ public class OrderingServiceImpl implements OrderingService {
         }
 
         orderingRepository.saveAll(orders);
+
+        for (Ordering order : orders) {
+            deliveryRequestService.createDeliveryRequestFromOrdering(order.getOrderId());
+        }
+
         return new StatusTuple(true, "모든 발주를 등록했습니다.");
     }
 
