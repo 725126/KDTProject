@@ -2,6 +2,7 @@ package org.zerock.b01.service.user;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.zerock.b01.domain.user.Partner;
 import org.zerock.b01.domain.user.User;
 import org.zerock.b01.domain.user.UserLog;
 import org.zerock.b01.domain.user.UserStatus;
@@ -60,4 +61,6 @@ public interface UserService {
 //    List<UserLog> getAllLogsSortedByDateDesc();
 
     Page<UserLog> getPagedLogsSortedByDateDesc(Pageable pageable);
+
+    Partner findByPartner(User user);
 }

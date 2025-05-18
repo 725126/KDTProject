@@ -6,80 +6,147 @@
     <meta charset="UTF-8">
     <title>자재ON(협력업체 전용) - 계약 정보 열람 </title>
     <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
+    <style>
+        .search-icon {
+            position: absolute;
+            top: 50%;
+            left: 10px;
+            transform: translateY(-50%);
+            color: #6c757d;
+        }
+        .search-input {
+            padding-left: 2rem;
+        }
+
+        .container-xl {
+            min-width: 95%;
+            margin: 0 auto;
+        }
+
+        .ps-custom {
+            max-width: 60% !important;
+            padding-left: 1.8rem !important;
+        }
+    </style>
 </head>
 <body>
 
 <th:block layout:fragment="contract-view">
-    <div class="container py-5">
-        <h2 class="mb-4">계약 정보 열람</h2>
-        <div class="card p-4 mb-5">
-            <form class="row g-3 align-items-end">
-                <div class="col-md-6">
-                    <label class="form-label">계약일 지정</label>
-                    <div class="d-flex gap-1">
-                        <input type="date" class="form-control">
-                        <span class="pt-2">~</span>
-                        <input type="date" class="form-control">
+    <div class="container-xl py-5">
+        <div class="mb-4">
+            <h4 class="fw-semibold mb-3"><i class="bi bi-file-earmark-text"></i> 계약 정보 열람</h4>
+            <!-- 검색 + 필터 영역 (선택사항) -->
+            <div class="d-flex justify-content-between mb-3">
+                <div class="d-flex align-items-center gap-2 w-50">
+                    <!-- 드롭다운: 검색 기준 선택 -->
+                    <select class="form-select form-select w-auto" name="category" id="searchCategorySelect">
+                        <option value="" th:selected="${category == null}">검색 기준 선택</option>
+                        <option value="code" th:selected="${category == 'code'}">계약코드</option>
+                        <option value="material" th:selected="${category == 'material'}">자재명</option>
+                        <option value="price" th:selected="${category == 'price'}">단가(원)</option>
+                        <option value="qty" th:selected="${category == 'qty'}">수량</option>
+                        <option value="leadtime" th:selected="${category == 'leadtime'}">소요일(일)</option>
+                        <option value="startDate" th:selected="${category == 'startDate'}">계약일</option>
+                        <option value="endDate" th:selected="${category == 'endDate'}">만료일</option>
+                        <option value="explain" th:selected="${category == 'explain'}">비고</option>
+                    </select>
+
+                    <!-- 검색창 -->
+                    <div class="position-relative flex-grow-1">
+                        <i class="bi bi-search position-absolute top-50 start-0 translate-middle-y ms-2 text-muted"></i>
+                        <input type="text" class="form-control form-control ps-custom" name="keyword"
+                               placeholder="검색어 입력" th:value="${keyword}">
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <label class="form-label">만료일 지정</label>
-                    <div class="d-flex gap-1">
-                        <input type="date" class="form-control">
-                        <span class="pt-2">~</span>
-                        <input type="date" class="form-control">
-                    </div>
+
+                <div class="d-flex gap-2 align-items-center">
+                    <i class="bi bi-funnel text-secondary" title="보기 개수 / 정렬 필터"></i>
+                    <select class="form-select form-select w-auto" name="size" id="postCountSelect">
+                        <option value="10" th:selected="${selectedSize == 10}">10개씩 보기</option>
+                        <option value="20" th:selected="${selectedSize == 20}">20개씩 보기</option>
+                        <option value="30" th:selected="${selectedSize == 30}">30개씩 보기</option>
+                    </select>
+                    <select class="form-select form-select w-auto" name="sort" id="sortSelect">
+                        <option value="newest" th:selected="${selectedSort == 'newest'}">최신 순</option>
+                        <option value="oldest" th:selected="${selectedSort == 'oldest'}">오래된 순</option>
+                        <option value="materialAsc" th:selected="${selectedSort == 'materialAsc'}">자재명 순</option>
+                    </select>
                 </div>
-                <div class="col-md-4">
-                    <label for="filter-mat" class="form-label">자재 지정</label>
-                    <input type="text" id="filter-mat" class="form-control">
-                </div>
-                <div class="col-md-4">
-                    <label for="filter-mat-code" class="form-label">코드</label>
-                    <input type="text" id="filter-mat-code" class="form-control">
-                </div>
-                <div class="col-md-4">
-                    <label for="filter-date" class="form-label">소요일정</label>
-                    <input type="text" id="filter-date" class="form-control">
-                </div>
-                <div class="col-12 d-flex justify-content-end gap-2">
-                    <button type="button" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
-                </div>
-            </form>
+            </div>
         </div>
 
-        <h2 class="mb-4">계약 목록</h2>
-        <div class="card p-4">
-            <table class="table table-bordered table-hover text-center">
-                <thead class="table-light">
+        <!-- 📋 계약 정보 리스트 테이블 -->
+        <div class="table-responsive border rounded">
+            <table class="table table-hover text-center align-middle mb-0">
+                <thead class="table-light text-dark">
                 <tr>
-                    <th>계약코드</th>
-                    <th>계약자재코드</th>
-                    <th>계약자재</th>
-                    <th>단가</th>
-                    <th>소요일정</th>
-                    <th>계약일자</th>
-                    <th>만료일자</th>
-                    <th>상세</th>
+                    <th scope="col">계약코드</th>
+                    <th scope="col">계약자재</th>
+                    <th scope="col">단가(원)</th>
+                    <th scope="col">수량</th>
+                    <th scope="col">소요일(일)</th>
+                    <th scope="col">계약일</th>
+                    <th scope="col">만료일</th>
+                    <th scope="col">비고</th>
+                    <th scope="col">계약서</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>CN001A01</td>
-                    <td>PM001A01</td>
-                    <td>가이던스 FV 그립 핸들</td>
-                    <td>100,000</td>
-                    <td>3</td>
-                    <td>2025-04-20</td>
-                    <td>2025-05-20</td>
-                    <td class="text-center">
-                        <button type="button" class="btn btn-outline-primary btn-sm">상세</button>
+                <tr th:each="contract : ${contracts}">
+                    <td th:text="${contract.contractCode}">CT001</td>
+                    <td th:text="${contract.materialName}">모터</td>
+                    <td th:text="${#numbers.formatInteger(contract.price, 3, 'COMMA')}">120,000</td>
+                    <td th:text="${contract.qty}">50</td>
+                    <td th:text="${contract.leadTime}">3</td>
+                    <td th:text="${contract.startDate}">2025-04-20</td>
+                    <td th:text="${contract.endDate}">2025-05-20</td>
+                    <td th:text="${contract.explain}">합의내용</td>
+                    <td>
+                        <a th:if="${contract.fileId != null}" th:href="@{/files/view/{id}(id=${contract.fileId})}" target="_blank"
+                           class="btn btn-sm btn-outline-primary">
+                            <i class="bi bi-file-earmark-text"></i> 보기
+                        </a>
+                        <span th:if="${contract.fileId == null}" class="text-muted small">없음</span>
                     </td>
                 </tr>
                 </tbody>
             </table>
         </div>
+
+        <!-- 페이지네이션 -->
+        <th:block th:replace="fragment/pagination :: paginationFragment"></th:block>
     </div>
+
+    <script>
+        // 보기 개수 / 정렬 변경 시 자동 적용
+        document.getElementById("postCountSelect").addEventListener("change", applyFilters);
+        document.getElementById("sortSelect").addEventListener("change", applyFilters);
+
+        // 검색창에서 Enter 눌렀을 때만 필터 적용
+        document.querySelector('input[name="keyword"]').addEventListener("keypress", function (e) {
+            if (e.key === 'Enter') applyFilters();
+        });
+
+        function applyFilters() {
+            const category = document.getElementById("searchCategorySelect").value;
+            const keyword = document.querySelector('input[name="keyword"]').value.trim();
+            const size = document.getElementById("postCountSelect").value;
+            const sort = document.getElementById("sortSelect").value;
+
+            let url = `/external/contract/view?page=0`;
+
+            if (category) url += `&category=${encodeURIComponent(category)}`;
+            if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+            if (size) url += `&size=${size}`;
+            if (sort) url += `&sort=${sort}`;
+
+            location.href = url;
+        }
+    </script>
+
+
+
+
 </th:block>
 
 </body>

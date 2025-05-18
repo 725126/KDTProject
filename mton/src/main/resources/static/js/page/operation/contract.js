@@ -140,6 +140,10 @@ document.getElementById('materialFile').addEventListener('change', function (e) 
             const pId = row[1] !== undefined && row[1] !== '' ? row[1] : lastPartnerId;
             if (!conCode || !pId) return;
 
+            // 전체 row 값 중 유의미한 값이 하나라도 있는지 검사
+            const isEmptyRow = row.every(cell => cell === undefined || cell === null || cell.toString().trim() === '');
+            if (isEmptyRow) return;
+
             lastContractCode = conCode;
             lastPartnerId = pId;
             if (contractCode === null) contractCode = conCode;
@@ -154,7 +158,7 @@ document.getElementById('materialFile').addEventListener('change', function (e) 
             const tr = document.createElement('tr');
             for (let j = 0; j < 7; j++) {
                 const td = document.createElement('td');
-                td.textContent = row[j] !== undefined ? row[j] : '';
+                td.textContent = (row[j] !== undefined && row[j] !== null && row[j].toString().trim() !== '') ? row[j] : '-';
                 tr.appendChild(td);
             }
             tbody.appendChild(tr);
@@ -190,10 +194,14 @@ document.getElementById('previewMaterialIconBtn').addEventListener('click', func
     const tbody = document.getElementById('previewBody');
     tbody.innerHTML = '';
     previewDataRows.forEach(row => {
+        // 전체 row 값 중 유의미한 값이 하나라도 있는지 검사
+        const isEmptyRow = row.every(cell => cell === undefined || cell === null || cell.toString().trim() === '');
+        if (isEmptyRow) return;
+
         const tr = document.createElement('tr');
         for (let j = 0; j < 7; j++) {
             const td = document.createElement('td');
-            td.textContent = row[j] !== undefined ? row[j] : '';
+            td.textContent = (row[j] !== undefined && row[j] !== null && row[j].toString().trim() !== '') ? row[j] : '-';
             tr.appendChild(td);
         }
         tbody.appendChild(tr);

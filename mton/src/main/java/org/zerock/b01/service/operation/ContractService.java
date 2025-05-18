@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.util.StringUtils;
 import org.zerock.b01.controller.operation.repository.ContractFileRepository;
 import org.zerock.b01.controller.operation.repository.ContractMaterialRepository;
 import org.zerock.b01.controller.operation.repository.ContractRepository;
@@ -69,6 +70,55 @@ public class ContractService {
                     .build();
         });
     }
+
+    public Page<ContractMaterialViewDTO> getContractsByPartner(Long partnerId, String keyword, Pageable pageable) {
+        Page<ContractMaterial> materials = contractMaterialRepository.searchByPartner(partnerId, keyword, pageable);
+
+        return materials.map(cm -> {
+            Contract c = cm.getContract();
+            Optional<ContractFile> file = contractFileRepository.findByContract(c);
+
+            return ContractMaterialViewDTO.builder()
+                    .contractCode(c.getConId())
+                    .partnerName(c.getPartner().getPCompany())
+                    .materialName(cm.getMaterial() != null ? cm.getMaterial().getMatName() : "(삭제됨)")
+                    .price(cm.getCmtPrice())
+                    .qty(cm.getCmtQty())
+                    .leadTime(cm.getCmtReq())
+                    .startDate(c.getConDate())
+                    .endDate(c.getConEnd())
+                    .explain(cm.getCmtExplains())
+                    .fileId(file.map(ContractFile::getFileId).orElse(null))
+                    .build();
+        });
+    }
+
+    public Page<ContractMaterialViewDTO> getContractsByPartnerFiltered(Long partnerId, String keyword, String category, Pageable pageable) {
+        if (!StringUtils.hasText(keyword)) keyword = null;
+        if (!StringUtils.hasText(category)) category = null;
+
+        Page<ContractMaterial> page = contractMaterialRepository.searchByPartnerWithFilter(partnerId, keyword, category, pageable);
+
+        return page.map(cm -> {
+            Contract c = cm.getContract();
+            Optional<ContractFile> file = contractFileRepository.findByContract(c);
+
+            return ContractMaterialViewDTO.builder()
+                    .contractCode(c.getConId())
+                    .partnerName(c.getPartner().getPCompany())
+                    .materialName(cm.getMaterial() != null ? cm.getMaterial().getMatName() : "(삭제됨)")
+                    .price(cm.getCmtPrice())
+                    .qty(cm.getCmtQty())
+                    .leadTime(cm.getCmtReq())
+                    .startDate(c.getConDate())
+                    .endDate(c.getConEnd())
+                    .explain(cm.getCmtExplains())
+                    .fileId(file.map(ContractFile::getFileId).orElse(null))
+                    .build();
+        });
+    }
+
+
 
 
 }

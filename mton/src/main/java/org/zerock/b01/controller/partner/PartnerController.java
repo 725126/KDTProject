@@ -2,14 +2,23 @@ package org.zerock.b01.controller.partner;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.zerock.b01.controller.operation.service.ContractMaterialService;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
+import org.zerock.b01.dto.operation.ContractMaterialViewDTO;
 import org.zerock.b01.dto.partner.ContractMaterialDTO;
 import org.zerock.b01.dto.warehouse.DeliveryPartnerDTO;
+import org.zerock.b01.security.CustomUserDetails;
+import org.zerock.b01.service.operation.ContractService;
+import org.zerock.b01.service.user.UserService;
 import org.zerock.b01.service.warehouse.DeliveryPartnerService;
 
 import java.util.List;
@@ -22,9 +31,43 @@ public class PartnerController {
     private final ContractMaterialService contractMaterialService;
 
     private final DeliveryPartnerService deliveryPartnerService;
+
+    private final ContractService contractService;
+
+    private final UserService userService;
+
     // 계약 정보 열람
     @GetMapping("/contract/view")
-    public String contractViewGet() {
+    public String contractViewGet(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                  @RequestParam(defaultValue = "0") int page,
+                                  @RequestParam(defaultValue = "10") int size,
+                                  @RequestParam(required = false) String keyword,
+                                  @RequestParam(required = false) String category,
+                                  @RequestParam(defaultValue = "newest") String sort,
+                                  Model model) {
+
+        // 연관 partner 정보
+        Long partnerId = userService.findByPartner(userDetails.getUser()).getPartnerId();
+
+        Sort sorting = switch (sort) {
+            case "oldest" -> Sort.by("contract.conDate").ascending();
+            case "companyAsc" -> Sort.by("contract.partner.pCompany").ascending();
+            case "materialAsc" -> Sort.by("material.matName").ascending();
+            default -> Sort.by("contract.conDate").descending(); // newest
+        };
+
+        Pageable pageable = PageRequest.of(page, size, sorting);
+
+        Page<ContractMaterialViewDTO> contracts = contractService.getContractsByPartnerFiltered(partnerId, keyword, category, pageable);
+
+        model.addAttribute("contracts", contracts.getContent());
+        model.addAttribute("currentPage", contracts.getNumber() + 1);
+        model.addAttribute("totalPages", contracts.getTotalPages());
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("category", category);
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("selectedSize", size);
+
         return "page/partner/contract-view";
     }
 
