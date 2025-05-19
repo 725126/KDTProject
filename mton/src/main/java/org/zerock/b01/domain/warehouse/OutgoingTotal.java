@@ -5,21 +5,19 @@ import lombok.*;
 import org.zerock.b01.domain.operation.Material;
 import org.zerock.b01.domain.operation.ProductionPlan;
 
+import java.time.LocalDateTime;
+
 @Entity
 @Getter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 @ToString
-public class OutgoingItem {
+public class OutgoingTotal {
 
   @Id
   @GeneratedValue(strategy = GenerationType.IDENTITY)
-  private Long outgoingItemId;
-
-  @ManyToOne
-  @JoinColumn(name = "outgoing_id", nullable = false)
-  private Outgoing outgoing;
+  private Long outgoingTotalId;
 
   @ManyToOne
   @JoinColumn(name = "mat_id", nullable = false)
@@ -29,12 +27,12 @@ public class OutgoingItem {
   @JoinColumn(name = "prdplan_id", nullable = false)
   private ProductionPlan productionPlan;
 
-  @ManyToOne
-  @JoinColumn(name = "cstorage_id", nullable = false)
-  private CompanyStorage companyStorage;
+  private LocalDateTime outgoingFirstDate;
+
+  private LocalDateTime outgoingCompletedAt;
 
   @Column(nullable = false)
-  private int outgoingQty = 0;
+  private int outgoingTotalQty = 0;
 
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
