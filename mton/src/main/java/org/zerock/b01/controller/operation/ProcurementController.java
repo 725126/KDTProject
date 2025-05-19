@@ -54,7 +54,7 @@ public class ProcurementController {
         model.addAttribute("prdplans", productionPlanRepository.findAll().stream().filter(x ->
                 LocalDate.now().isBefore(x.getPrdplanEnd()) || LocalDate.now().isEqual(x.getPrdplanEnd())
         ).collect(Collectors.toList()));
-        return "/page/operation/procurement/procure";
+        return "page/operation/procurement/procure";
     }
 
     // 계약 정보
@@ -82,7 +82,7 @@ public class ProcurementController {
         model.addAttribute("selectedSize", size);
 
 
-        return "/page/operation/procurement/contract";
+        return "page/operation/procurement/contract";
     }
 
     // 자재 발주
@@ -92,13 +92,13 @@ public class ProcurementController {
         model.addAttribute("pplans", procurementPlanRepository.findAll().stream().filter(x ->
                 x.getPplanStat().equals("진행중")
         ).collect(Collectors.toList()));
-        return "/page/operation/procurement/order";
+        return "page/operation/procurement/order";
     }
 
     // 진척 검수
     @GetMapping("/inspect")
     public String inspectGet() {
-        return "/page/operation/procurement/inspect";
+        return "page/operation/procurement/inspect";
     }
 
     @ResponseBody
