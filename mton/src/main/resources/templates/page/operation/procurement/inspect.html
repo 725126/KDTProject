@@ -43,14 +43,14 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>IS001A01</td>
-                    <td>PO001-123</td>
-                    <td>가이던스 FV 그립 핸들</td>
-                    <td>200</td>
-                    <td>180</td>
-                    <td>2025-04-20</td>
-                    <td>2025-05-20</td>
+                <tr th:each="ins: ${inspections}">
+                    <td>[[${ins.getInsId()}]]</td>
+                    <td>[[${ins.getOrdering().getOrderId()}]]</td>
+                    <td>자재</td>
+                    <td>[[${ins.getInsQty()}]]</td>
+                    <td>[[${ins.getInsTotal()}]]</td>
+                    <td>[[${ins.getInsStart()}]]</td>
+                    <td>[[${ins.getInsEnd()}]]</td>
                     <td class="text-center"><span class="badge bg-warning text-dark">진행중</span></td>
                 </tr>
                 </tbody>

@@ -27,4 +27,10 @@ public class Inspection {
 
     @Column(nullable = false)
     private int insQty;
+
+    @Column(nullable = false)
+    private int insTotal;
+
+    @Column(nullable = false)
+    private String insStat;
 }
