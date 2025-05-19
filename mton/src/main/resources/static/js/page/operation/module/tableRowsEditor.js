@@ -574,7 +574,7 @@ function initEmptyOrderingTable(table, isFile = false) {
 
     const makeMin = (row) => {
         const dates = row.querySelectorAll("input[type='date']");
-        console.log(dates);
+
         dates[0].addEventListener("change", function () {
             dates[1].min = dates[0].value;
             dates[1].value = dates[1].value < dates[0].value ? dates[0].value : dates[1].value;

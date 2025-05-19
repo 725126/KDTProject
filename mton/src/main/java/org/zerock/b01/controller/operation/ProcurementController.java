@@ -40,6 +40,7 @@ public class ProcurementController {
     private final OrderingRepository orderingRepository;
     private final ProductionPlanRepository productionPlanRepository;
     private final PbomRepository pbomRepository;
+    private final ContractMaterialRepository contractMaterialRepository;
 
     private final ProcurementPlanService procurementPlanService;
     private final OrderingService orderingService;
@@ -314,12 +315,61 @@ public class ProcurementController {
     @ResponseBody
     @PostMapping("/calc/order")
     public List<CalcOrderingDTO> calcOrder(@RequestBody String id) {
+        List<CalcOrderingDTO> calcOrderingDTOList = new ArrayList<>();
         Optional<ProcurementPlan> temp = procurementPlanRepository.findById(id);
 
         if (temp.isEmpty()) {
             return null;
         }
 
-        return null;
+        Material material = temp.get().getMaterial();
+        var cmts = contractMaterialRepository.findAllByMatId(material.getMatId());
+
+        var ord = cmts.stream().filter(cmt -> LocalDate.now()
+                .plusDays(cmt.getCmtReq()).isBefore(temp.get().getPplanEnd().plusDays(1)))
+                .map(cmt -> CalcOrderingDTO.builder()
+                        .pplanId(temp.get().getPplanId())
+                        .cmtId(cmt.getCmtId())
+                        .ppmatQty(temp.get().getPpmatQty())
+                        .cmtReq(cmt.getCmtReq())
+                        .pplanEnd(temp.get().getPplanEnd())
+                        .build()
+        ).collect(Collectors.toList());
+
+        if (!ord.isEmpty()) {
+            calcOrderingDTOList.add(ord.get(0));
+        }
+
+        return calcOrderingDTOList;
+    }
+
+    @ResponseBody
+    @PostMapping("/calc/order/all")
+    public List<CalcOrderingDTO> calcOrderAll(@RequestBody List<String> ids) {
+        List<CalcOrderingDTO> calcOrderingDTOList = new ArrayList<>();
+        for (String id : ids) {
+            Optional<ProcurementPlan> temp = procurementPlanRepository.findById(id);
+            if (temp.isEmpty()) {
+                return null;
+            }
+            Material material = temp.get().getMaterial();
+
+            var cmts = contractMaterialRepository.findAllByMatId(material.getMatId());
+            var ords = cmts.stream().filter(cmt -> LocalDate.now()
+                            .plusDays(cmt.getCmtReq()).isBefore(temp.get().getPplanEnd().plusDays(1)))
+                    .map(cmt -> CalcOrderingDTO.builder()
+                            .pplanId(temp.get().getPplanId())
+                            .cmtId(cmt.getCmtId())
+                            .ppmatQty(temp.get().getPpmatQty())
+                            .cmtReq(cmt.getCmtReq())
+                            .pplanEnd(temp.get().getPplanEnd())
+                            .build()
+                    ).collect(Collectors.toList());
+
+            if (!ords.isEmpty()) {
+                calcOrderingDTOList.add(ords.get(0));
+            }
+        }
+        return calcOrderingDTOList;
     }
 }
