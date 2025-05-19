@@ -45,7 +45,7 @@ public class InspectionServiceImpl implements InspectionService {
                     .insEnd(ord.getOrderEnd())
                     .insQty(0)
                     .insTotal(ord.getOrderQty())
-                    .insStat("진행중")
+                    .insStat("대기중")
                     .build();
         }).collect(Collectors.toList());
 
