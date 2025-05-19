@@ -259,6 +259,10 @@ let bomList = [];
             } else {
                 alert("계획에 사용 가능한 계약자재들이 없습니다. 먼저 계약자재를 등록해주세요.");
             }
+
+            if(ordIds.length !== orderInputTable.rows.length - 1) {
+                alert("일부 계획에 해당하는 계약자재들이 없어 발주를 생성하지 못했습니다. 빠진 내용을 확인해주세요.");
+            }
         });
     });
 })();
