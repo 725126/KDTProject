@@ -7,6 +7,8 @@ const phoneNewInput = document.getElementById('uPhone');
 const companyNewInput = document.getElementById('pCompany');
 const addressNewInput = document.getElementById('address');
 
+const roleSelect = document.getElementById("userRole");
+
 // 버튼
 const submitBtn = document.getElementById('accountEditBtn');
 
@@ -16,7 +18,8 @@ const originalValues = {
     email: emailNewInput?.value.trim() || "",
     phone: phoneNewInput ? normalizePhone(phoneNewInput.value.trim()) : "",
     company: companyNewInput?.value.trim() || "",
-    address: addressNewInput?.value.trim() || ""
+    address: addressNewInput?.value.trim() || "",
+    userRole: roleSelect?.value || ""
 };
 
 // 폰 번호 마스킹 제거
@@ -31,7 +34,8 @@ function checkIfFormChanged() {
         emailNewInput?.value.trim() !== originalValues.email ||
         normalizePhone(phoneNewInput?.value.trim()) !== originalValues.phone ||
         companyNewInput?.value.trim() !== originalValues.company ||
-        addressNewInput?.value.trim() !== originalValues.address;
+        addressNewInput?.value.trim() !== originalValues.address ||
+        (roleSelect?.value || "") !== originalValues.userRole;
 
     submitBtn.disabled = !isChanged;
 }
@@ -46,6 +50,16 @@ function checkIfFormChanged() {
         input.addEventListener('keyup', checkIfFormChanged);
     }
 });
+
+[nameNewInput, emailNewInput, phoneNewInput, companyNewInput, addressNewInput].forEach(input => {
+    if (input) {
+        input.addEventListener("input", checkIfFormChanged);
+    }
+});
+
+if (roleSelect) {
+    roleSelect.addEventListener("change", checkIfFormChanged);
+}
 
 // 비밀번호
 const passwordChangeForm = document.getElementById('passwordChangeForm');
