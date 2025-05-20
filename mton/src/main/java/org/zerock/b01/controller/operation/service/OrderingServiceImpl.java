@@ -13,6 +13,7 @@ import org.zerock.b01.dto.operation.OrderingDTO;
 import org.zerock.b01.service.warehouse.DeliveryRequestService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -135,6 +136,22 @@ public class OrderingServiceImpl implements OrderingService {
 
             orderingRepository.saveAll(orders);
             return new StatusTuple(true, "모든 발주 수정사항을 반영하였습니다.");
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
+    }
+
+    @Override
+    public StatusTuple updateStat(HashMap<String, String> hashMap) {
+        try {
+            List<Ordering> orderings = orderingRepository.findAllById(hashMap.keySet());
+
+            orderings.forEach(ord -> {
+                ord.changeOrderStat(hashMap.get(ord.getOrderId()));
+            });
+
+            orderingRepository.saveAll(orderings);
+            return new StatusTuple(true, "상태 전환 성공");
         } catch (Exception e) {
             return new StatusTuple(false, e.getMessage());
         }

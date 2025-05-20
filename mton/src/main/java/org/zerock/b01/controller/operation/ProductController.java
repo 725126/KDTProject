@@ -327,14 +327,22 @@ public class ProductController {
     @PostMapping("/delete/mat")
     public StatusTuple deleteMatTable(@RequestBody ArrayList<String> arrayList) {
         log.info("deleting ID: " + arrayList.toString());
-        return materialService.deleteAll(arrayList);
+        try {
+            return materialService.deleteAll(arrayList);
+        } catch (Exception e) {
+            return new StatusTuple(false, "연관된 생산계획을 먼저 삭제해야 합니다.");
+        }
     }
 
     @ResponseBody
     @PostMapping("/delete/prd")
     public StatusTuple deletePrdTable(@RequestBody ArrayList<String> arrayList) {
         log.info("deleting ID: " + arrayList.toString());
-        return productService.deleteAll(arrayList);
+        try {
+            return productService.deleteAll(arrayList);
+        } catch (Exception e) {
+            return new StatusTuple(false, "연관된 생산계획을 먼저 삭제해야 합니다.");
+        }
     }
 
     @ResponseBody
@@ -348,6 +356,11 @@ public class ProductController {
     @PostMapping("/delete/prdplan")
     public StatusTuple deletePrdPlanTable(@RequestBody ArrayList<String> arrayList) {
         log.info("deleting ID: " + arrayList.toString());
-        return productionPlanService.deleteAll(arrayList);
+
+        try {
+            return productionPlanService.deleteAll(arrayList);
+        } catch (Exception e) {
+            return new StatusTuple(false,"연관된 조달계획을 먼저 삭제해야 합니다.");
+        }
     }
 }
