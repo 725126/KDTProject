@@ -40,6 +40,7 @@ public class Ordering {
 
     public void markAsCompleted() {
         this.orderStat = "완료";
+    }
 
     public void changeOrderStat(String stat) {
         this.orderStat = stat;
