@@ -347,6 +347,10 @@ public class ProcurementController {
         Material material = temp.get().getMaterial();
         var cmts = contractMaterialRepository.findAllByMatId(material.getMatId());
 
+        if (cmts.isEmpty()) {
+            return null;
+        }
+
         var ord = cmts.stream().filter(cmt -> LocalDate.now()
                 .plusDays(cmt.getCmtReq()).isBefore(temp.get().getPplanEnd().plusDays(1)))
                 .map(cmt -> CalcOrderingDTO.builder()

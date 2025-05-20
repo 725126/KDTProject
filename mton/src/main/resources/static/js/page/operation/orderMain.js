@@ -95,7 +95,7 @@ let bomList = [];
         }
         insertValues.shift();
 
-        const viewValues = Array.from(orderViewTable.rows).map((row) => {
+        const viewValues = Array.from(orderViewTable.rows).filter(x => x.cells[6].innerText === "발주중" || x.cells[6].innerText === "진행중").map((row) => {
             if (row.cells.length < 7) {
                 return {
                     pplanId: "",
@@ -231,11 +231,17 @@ let bomList = [];
         const result = jsonFetcher(dest, ordId);
         result.then(res => {
             bomList = res;
+
+            if (res === null) {
+                alert("계획에 사용 가능한 계약자재들이 없습니다. 먼저 계약자재를 등록해주세요.");
+                return;
+            }
+
             const flag = automaticOrder(res, orderInputTable);
             if (flag) {
                 tableRowsEditor.addOrderTableUtilBtn(orderInputTable);
             } else {
-                alert("이 계획에 사용 가능한 계약자재가 없습니다. 먼저 계약자재를 등록해주세요.");
+                alert("계약자재는 있지만, 납기일에 맞출 수 없습니다.");
             }
         });
     });
@@ -253,15 +259,21 @@ let bomList = [];
         result.then(res => {
             console.log(res);
             bomList = res;
+
+            if (res === null) {
+                alert("계획에 사용 가능한 계약자재들이 없습니다. 먼저 계약자재를 등록해주세요.");
+                return;
+            }
+
             const flag = automaticOrder(res, orderInputTable);
             if (flag) {
                 tableRowsEditor.addOrderTableUtilBtn(orderInputTable);
             } else {
-                alert("계획에 사용 가능한 계약자재들이 없습니다. 먼저 계약자재를 등록해주세요.");
+                alert("계약자재는 있지만, 납기일에 맞출 수 있는 경우가 없습니다.");
             }
 
             if(ordIds.length !== orderInputTable.rows.length - 1) {
-                alert("일부 계획에 해당하는 계약자재들이 없어 발주를 생성하지 못했습니다. 빠진 내용을 확인해주세요.");
+                alert("일부 계획에 맞출 수 있는 계약자재들이 없어 발주를 생성하지 못했습니다. 빠진 내용을 확인해주세요.");
             }
         });
     });
@@ -322,7 +334,7 @@ function automaticOrder(jData, table, append = false) {
             orderEnd: endDay < ordEnd ? endDay.toISOString().substring(0, 10)
                 : Math.floor((endDay - ordEnd) / (60 * 60 * 24 * 1000)) === 0 ? endDay.toISOString().substring(0, 10)
                     : "기한초과(" + Math.floor((endDay - ordEnd) / (60 * 60 * 24 * 1000)) + "일)",
-            orderStat: "진행중",
+            orderStat: "발주중",
         }
         newContent.push(row);
     }

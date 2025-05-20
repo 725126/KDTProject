@@ -72,4 +72,8 @@ public class Inspection {
             System.out.println("Inspection ChangeQty Error");
         }
     }
+
+    public void changeStat(String stat) {
+        this.insStat = stat;
+    }
 }

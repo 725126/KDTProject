@@ -56,7 +56,7 @@ public class PartnerController {
         log.info(customUserDetails.getUserId());
 
         List<Ordering> orderings = orderingRepository.findOrderingByUserId(customUserDetails.getUserId());
-        List<Inspection> inspections = inspectionRepository.findByOrderIds(orderings.stream().map(Ordering::getOrderId).collect(Collectors.toList()));
+        List<Inspection> inspections = inspectionRepository.findByOrderIds(orderings.stream().map(Ordering::getOrderId).collect(Collectors.toList())).stream().filter(x -> !x.getInsStat().equals("대기중")).collect(Collectors.toList());
 
         model.addAttribute("orders", orderings);
         model.addAttribute("inspections", inspections);

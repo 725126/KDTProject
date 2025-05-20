@@ -5,8 +5,10 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
 import org.zerock.b01.controller.operation.repository.ContractMaterialRepository;
+import org.zerock.b01.controller.operation.repository.InspectionRepository;
 import org.zerock.b01.controller.operation.repository.OrderingRepository;
 import org.zerock.b01.controller.operation.repository.ProcurementPlanRepository;
+import org.zerock.b01.domain.operation.Inspection;
 import org.zerock.b01.domain.operation.Ordering;
 import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.dto.operation.OrderingDTO;
@@ -27,6 +29,7 @@ public class OrderingServiceImpl implements OrderingService {
     private final ProcurementPlanRepository procurementPlanRepository;
     private final OrderingRepository orderingRepository;
     private final DeliveryRequestService deliveryRequestService;
+    private final InspectionRepository inspectionRepository;
 
     @Override
     public StatusTuple registerAll(List<OrderingDTO> list) {
@@ -150,6 +153,23 @@ public class OrderingServiceImpl implements OrderingService {
                 ord.changeOrderStat(hashMap.get(ord.getOrderId()));
             });
 
+            List<String> progressing = orderings.stream().filter(ord -> ord.getOrderStat().equals("진행중")).map(ord -> ord.getOrderId()).collect(Collectors.toList());
+            List<Inspection> progIns = inspectionRepository.findByOrderIds(progressing).stream().filter(ins -> ins.getInsStat().equals("대기중")).collect(Collectors.toList());
+            progIns.forEach(ins -> ins.changeStat("진행중"));
+            log.info("progIns: " + progIns);
+            log.info("progressing: " + progressing);
+
+            List<String> completed = orderings.stream().filter(ord -> ord.getOrderStat().equals("완료")).map(ord -> ord.getOrderId()).collect(Collectors.toList());
+            List<Inspection> completeIns = inspectionRepository.findByOrderIds(completed);
+            completeIns.forEach(ins -> ins.changeQty(ins.getInsTotal()));
+
+            List<String> canceled = orderings.stream().filter(ord -> ord.getOrderStat().equals("취소")).map(ord -> ord.getOrderId()).collect(Collectors.toList());
+            List<Inspection> canceledIns = inspectionRepository.findByOrderIds(canceled);
+            canceledIns.forEach(ins -> ins.changeStat("취소"));
+
+            inspectionRepository.saveAll(progIns);
+            inspectionRepository.saveAll(completeIns);
+            inspectionRepository.saveAll(canceledIns);
             orderingRepository.saveAll(orderings);
             return new StatusTuple(true, "상태 전환 성공");
         } catch (Exception e) {

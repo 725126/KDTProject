@@ -568,7 +568,7 @@ function initEmptyOrderingTable(table, isFile = false) {
     }
 
     const makeStatSelect = (row) => {
-        makeSelectForRawCell(row.cells[6], ["진행중", "완료"]);
+        makeSelectForRawCell(row.cells[6], ["발주중"]);
         return row.cells[6];
     }
 
@@ -944,7 +944,7 @@ function viewOrderingTable(init = false) {
             makeTableCellDBSelect(orderEditTable, 1, pplanDBData, dbElementNames.pplanId);
             makeTableCellDatePicker(orderEditTable, 4);
             makeTableCellDatePicker(orderEditTable, 5);
-            makeTableCellSelect(orderEditTable, 6, "진행중", "완료");
+            makeTableCellSelect(orderEditTable, 6, "발주중", "취소");
 
             for (const row of orderEditTable.rows) {
                 const dates = row.querySelectorAll("input[type='date']");

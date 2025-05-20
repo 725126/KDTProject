@@ -13,6 +13,7 @@
 <body>
 
 <th:block layout:fragment="contmat">
+    <div class="tutorial" id="tutorial-box">튜토리얼 메시지</div>
     <div class="container py-5">
         <h2 class="mb-4">
             발주 내역
@@ -43,7 +44,7 @@
                         <button type="button" class="btn btn-outline-secondary btn-sm pe-none">일반</button>
                     </td>
                     <td class="text-center">
-                        <button type="button" class="btn btn-primary btn-sm stat-btn">[[${ord.getOrderStat()}]]</button>
+                        <button type="button" class="btn btn-sm stat-btn" th:classappend="${ord.getOrderStat().equals('진행중') ? 'btn-primary' : 'btn-warning'}">[[${ord.getOrderStat()}]]</button>
                     </td>
                 </tr>
                 </tbody>
@@ -60,6 +61,7 @@
                     </div>
                     <div>
                         <button type="submit" id="qty-submit">선택</button>
+                        <button type="button" id="qty-submit-all">일괄적용</button>
                         <button id="qty-cancel" type="reset">닫기</button>
                     </div>
                 </form>
@@ -91,7 +93,7 @@
                     <td>[[${ins.getInsTotal()}]]</td>
                     <td>[[${ins.getInsStart()}]]</td>
                     <td>[[${ins.getInsEnd()}]]</td>
-                    <td class="text-center"><span class="badge bg-success">[[${ins.getInsStat()}]]</span></td>
+                    <td class="text-center"><span class="badge" th:classappend="${ins.getInsStat().equals('진행중') ? 'bg-primary' : 'bg-success'}">[[${ins.getInsStat()}]]</span></td>
                 </tr>
                 </tbody>
             </table>
