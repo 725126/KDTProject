@@ -22,8 +22,8 @@ public class Outgoing {
   private OutgoingTotal outgoingTotal;
 
   @ManyToOne
-  @JoinColumn(name = "cstorage_id", nullable = false)
-  private CompanyStorage companyStorage;
+  @JoinColumn(name = "inventory_id", nullable = false)
+  private Inventory inventory;
 
   @Column(nullable = false)
   private int outgoingQty = 0;

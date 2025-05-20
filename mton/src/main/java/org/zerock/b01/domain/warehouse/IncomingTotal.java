@@ -59,8 +59,7 @@ public class IncomingTotal {
 
   public void updateEffectiveQty() {
     this.incomingEffectiveQty = this.incomingTotalQty
-            - this.incomingReturnTotalQty
-            - this.incomingMissingTotalQty;
+            - this.incomingReturnTotalQty;
   }
 
 

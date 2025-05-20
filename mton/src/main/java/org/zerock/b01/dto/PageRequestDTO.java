@@ -21,7 +21,7 @@ public class PageRequestDTO {
     private int page = 1;
 
     @Builder.Default
-    private int size = 9;
+    private int size = 15;
 
     @Builder.Default
     private int code = 1;
@@ -50,6 +50,8 @@ public class PageRequestDTO {
 
     private String matId;
 
+    private String prdplanId;
+
     private String incomingStatus;
 
     private LocalDate drItemDueDateStart;
@@ -76,7 +78,13 @@ public class PageRequestDTO {
 
     private LocalDate incomingCompletedAtEnd;
 
+    private LocalDate prdplanEndStart;
+
+    private LocalDate prdplanEndEnd;
+
     private String incomingItemStatus;
+
+    private String outgoingStatus;
 
     public String[] getTypes() {
         if (type == null || type.isEmpty()) {

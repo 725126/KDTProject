@@ -14,39 +14,48 @@
         <h1 class="mb-4">출고 조회</h1>
 
         <div class="card p-4 mb-4">
-            <form id="searchForm">
+            <form action="/internal/outgoing/status" method="get">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-4">
                         <label class="form-label">출고예정일</label>
                         <div class="d-flex gap-1">
-                            <input type="date" class="form-control" id="shipmentDateStart">
+                            <input type="date" class="form-control" name="prdplanEndStart"
+                                   th:value="${pageRequestDTO.prdplanEndStart != null ?
+                                   #temporals.format(pageRequestDTO.prdplanEndStart, 'yyyy-MM-dd') : ''}">
                             <span class="pt-2">~</span>
-                            <input type="date" class="form-control" id="shipmentDateEnd">
+                            <input type="date" class="form-control" name="prdplanEndEnd"
+                                   th:value="${pageRequestDTO.prdplanEndEnd != null ?
+                                   #temporals.format(pageRequestDTO.prdplanEndEnd, 'yyyy-MM-dd') : ''}">
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <label for="shipmentCode" class="form-label">출고코드</label>
-                        <input type="text" class="form-control" id="shipmentCode">
+                        <label for="prdplanId" class="form-label">생산계획코드</label>
+                        <input type="text" class="form-control" id="prdplanId" name="prdplanId"
+                               th:value="${pageRequestDTO.prdplanId}">
                     </div>
                     <div class="col-md-2">
-                        <label for="orderCode" class="form-label">생산계획코드</label>
-                        <input type="text" class="form-control" id="orderCode">
+                        <label for="matId" class="form-label">자재코드</label>
+                        <input type="text" class="form-control" id="matId" name="matId"
+                               th:value="${pageRequestDTO.matId}">
                     </div>
                     <div class="col-md-2">
-                        <label for="materialCode" class="form-label">자재코드</label>
-                        <input type="text" class="form-control" id="materialCode">
+                        <label for="matName" class="form-label">자재명</label>
+                        <input type="text" class="form-control" id="matName" name="matName"
+                               th:value="${pageRequestDTO.matName}">
                     </div>
                     <div class="col-md-2">
-                        <label for="productName" class="form-label">자재명</label>
-                        <input type="text" class="form-control" id="productName">
-                    </div>
-                    <div class="col-md-2">
-                        <label for="status" class="form-label">상태</label>
-                        <input type="text" class="form-control" id="status">
+                        <label class="form-label" for="outgoingStatus">진행상태</label>
+                        <select class="form-select" id="outgoingStatus" name="outgoingStatus">
+                            <option value="" th:selected="${pageRequestDTO.outgoingStatus == null}">전체</option>
+                            <option value="출고대기" th:selected="${pageRequestDTO.outgoingStatus == '출고대기'}">출고대기</option>
+                            <option value="부분출고" th:selected="${pageRequestDTO.outgoingStatus == '부분출고'}">부분출고</option>
+                            <option value="출고마감대기중" th:selected="${pageRequestDTO.outgoingStatus == '출고마감대기중'}">출고마감대기중</option>
+                            <option value="출고마감" th:selected="${pageRequestDTO.outgoingStatus == '출고마감'}">출고마감</option>
+                        </select>
                     </div>
                     <div class="col-12 d-flex justify-content-end gap-2">
-                        <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary clearBtn"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                     </div>
                 </div>
             </form>
@@ -56,9 +65,7 @@
             <table class="table table-bordered table-hover data-table text-center" id="resultTable">
                 <thead class="table-light">
                 <tr>
-                    <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"/></th>
                     <th>출고예정일</th>
-                    <th>출고코드</th>
                     <th>생산계획코드</th>
                     <th>자재코드</th>
                     <th>자재명</th>
@@ -68,36 +75,39 @@
                     <th>출고일</th>
                     <th>출고마감일</th>
                     <th>상태</th>
+                    <th>출고</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td><input type="checkbox" class="row-checkbox"/></td>
-                    <td>2025-04-10</td>
-                    <td>SHP001</td>
-                    <td>ORD001</td>
-                    <td>P001</td>
-                    <td>배터리</td>
-                    <td>3</td>
-                    <td>0</td>
-                    <td>3</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td><span class="badge bg-info">출고대기</span></td>
-                </tr>
-                <tr>
-                    <td><input type="checkbox" class="row-checkbox"/></td>
-                    <td>2025-04-11</td>
-                    <td>SHP002</td>
-                    <td>ORD002</td>
-                    <td>P002</td>
-                    <td>핸들</td>
-                    <td>2</td>
-                    <td>0</td>
-                    <td>2</td>
-                    <td>-</td>
-                    <td>-</td>
-                    <td><span class="badge bg-info">출고대기</span></td>
+                <tr th:each="outgoingTotal:${outgoingTotalList}" th:data-id="${outgoingTotal.outgoingTotalId}">
+                    <td th:text="${outgoingTotal.prdplanEnd}"></td>
+                    <td th:text="${outgoingTotal.prdplanId}"></td>
+                    <td th:text="${outgoingTotal.matId}"></td>
+                    <td th:text="${outgoingTotal.matName}"></td>
+                    <td th:text="${outgoingTotal.estimatedOutgoingQty}"></td>
+                    <td th:text="${outgoingTotal.outgoingTotalQty}"></td>
+                    <td th:text="${outgoingTotal.prdplanEnd}"></td>
+                    <td th:text="${outgoingTotal.outgoingFirstDate != null ?
+                        #temporals.format(outgoingTotal.outgoingFirstDate,
+                    'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
+                    <td th:text="${outgoingTotal.outgoingCompletedAt != null ?
+                        #temporals.format(outgoingTotal.outgoingCompletedAt,
+                    'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
+                    <td class="text-center">
+                        <span th:if="${outgoingTotal.outgoingStatus != '출고마감대기중'}"
+                              th:text="${outgoingTotal.outgoingStatus}"
+                              th:classappend="${outgoingTotal.outgoingStatus == '출고마감' ? ' badge bg-success' :
+                              outgoingTotal.outgoingStatus == '부분출고' ? ' badge bg-info text-dark' :
+                              outgoingTotal.outgoingStatus == '출고대기' ? ' badge bg-warning text-dark' :
+                              ' badge bg-secondary'}">
+
+                        </span>
+                    </td>
+                    <td class="text-center">
+                        <button class="btn btn-sm btn-outline-primary"
+                                th:attr="data-outgoing_total_id=${outgoingTotal.outgoingTotalId}"
+                                onclick="goToOutgoing(this)">출고</button>
+                    </td>
                 </tr>
                 </tbody>
             </table>
@@ -120,6 +130,23 @@
     </div>
 
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/internal/outgoing/status'
+    }, false)
+
+    function goToOutgoing(button) {
+        var outgoingTotalId = button.getAttribute('data-outgoing_total_id'); // data-order-id 값을 가져옵니다.
+
+        console.log(outgoingTotalId)
+
+        window.location.href = '/internal/outgoing/instruction?outgoingTotalId=' + encodeURIComponent(outgoingTotalId);
+    }
+</script>
 
 </body>
 </html>
