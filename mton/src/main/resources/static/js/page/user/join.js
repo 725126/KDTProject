@@ -15,44 +15,6 @@ const joinForm = document.getElementById('joinForm');
 
 // 회원가입 버튼 클릭 시 입력 값 체크
 joinForm.addEventListener('submit', function(event) {
-    // 아이디 검증 함수 호출
-    if (!submitFormValidateEmail(event)) {
-        return;
-    }
-
-    // 비밀번호 검증 함수 호출
-    if (!submitFormValidatePassword(event)) {
-        return;
-    }
-
-    console.log(submitFormValidateName(event));
-
-    // 이름 검증 함수 호출
-    if (!submitFormValidateName(event)) {
-        return;
-    }
-
-    // 연락처 검증 함수 호출
-    if (!submitFormValidatePhone(event)) {
-        return;
-    }
-
-    // 사업자등록번호 검증 함수 호출
-    if (!submitFormValidateBusinessNo(event)) {
-        return;
-    }
-
-    const joinPath = window.location.pathname;
-
-    if (joinPath === "/join/partner") {
-        addressInput();
-    }
-
-    // 여기까지 아무것도 걸리지 않으면 submit 정상 진행
-
-});
-
-function addressInput() {
     // 주소 조합
     const postcode = document.getElementById('postcode').value.trim();
     const address = document.getElementById('address').value.trim();
@@ -71,6 +33,33 @@ function addressInput() {
 
     document.getElementById('pAddr').value = fullAddress;
     console.log(fullAddress);
-}
+
+    // 아이디 검증 함수 호출
+    if (!submitFormValidateEmail(event)) {
+        return;
+    }
+
+    // 비밀번호 검증 함수 호출
+    if (!submitFormValidatePassword(event)) {
+        return;
+    }
+
+    if (submitFormValidateName(event)) {
+        return;
+    }
+
+    // 연락처 검증 함수 호출
+    if (!submitFormValidatePhone(event)) {
+        return;
+    }
+
+    // 사업자등록번호 검증 함수 호출
+    if (!submitFormValidateBusinessNo(event)) {
+        return;
+    }
+
+    // 여기까지 아무것도 걸리지 않으면 submit 정상 진행
+
+});
 
 

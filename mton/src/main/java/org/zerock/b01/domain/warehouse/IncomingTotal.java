@@ -41,9 +41,6 @@ public class IncomingTotal {
   @Column(nullable = false)
   private IncomingStatus incomingStatus;
 
-  @Column(nullable = false)
-  private boolean transactionCreated = false; // 거래 명세 발행 여부
-
   // 상태를 업데이트하는 메서드 추가
   public void updateIncomingStatus(IncomingStatus newStatus) {
     this.incomingStatus = newStatus;
@@ -76,10 +73,6 @@ public class IncomingTotal {
   public void addToReturnTotalQty(int returnQty) {
     this.incomingReturnTotalQty += returnQty;
     updateEffectiveQty();
-  }
-
-  public void markTransactionCreated() {
-    this.transactionCreated = true;
   }
 
 }

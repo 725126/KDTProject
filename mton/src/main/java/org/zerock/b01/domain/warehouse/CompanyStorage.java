@@ -15,6 +15,7 @@ import java.util.Set;
 @AllArgsConstructor
 @ToString
 public class CompanyStorage extends BaseEntity {
+
   @Id
   private String cstorageId;
 
@@ -26,5 +27,4 @@ public class CompanyStorage extends BaseEntity {
 
   @Column(length = 20)
   private String cstorageManager;
-
 }
