@@ -5,6 +5,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.zerock.b01.controller.operation.repository.OrderingRepository;
+import org.zerock.b01.domain.operation.Ordering;
 import org.zerock.b01.domain.warehouse.*;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
@@ -26,8 +28,8 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
 
   private final IncomingTotalRepository incomingTotalRepository;
   private final DeliveryRequestItemRepository deliveryRequestItemRepository;
-//  private final DeliveryPartnerRepository deliveryPartnerRepository;
-//  private final DeliveryPartnerService deliveryPartnerService;
+  private final OrderingRepository orderingRepository;
+  private final TransactionItemService transactionItemService;
 
   public void updateIncomingStatus(Long drItemId) {
     DeliveryRequestItem item = deliveryRequestItemRepository.findById(drItemId)
@@ -36,16 +38,13 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
     IncomingTotal incomingTotal = incomingTotalRepository.findByDeliveryRequestItem(item)
             .orElseThrow(() -> new IllegalStateException("해당 납입지시 항목에 대한 입고정보가 없습니다."));
 
-    int deliveredQty = incomingTotal.getIncomingTotalQty();
-    int returnQty = incomingTotal.getIncomingReturnTotalQty();
-    int missingQty = incomingTotal.getIncomingMissingTotalQty();
-    int totalQty = deliveredQty - returnQty - missingQty;
-    int expectedQty = item.getDrItemQty();
+    int effectiveQty = incomingTotal.getIncomingEffectiveQty();  // 유효 입고 수량
+    int expectedQty = item.getDrItemQty(); // 납입지시 수량
 
     IncomingStatus newStatus;
-    if (deliveredQty == 0) {
+    if (effectiveQty == 0) {
       newStatus = IncomingStatus.미입고;
-    } else if (totalQty < expectedQty) {
+    } else if (effectiveQty < expectedQty) {
       newStatus = IncomingStatus.부분입고;
     } else {
       newStatus = IncomingStatus.입고마감대기중;
@@ -70,6 +69,27 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
     incomingTotal.markAsCompleted();
     incomingTotalRepository.save(incomingTotal);
 
+    String orderId = incomingTotal.getDeliveryRequestItem()
+            .getDeliveryRequest()
+            .getOrdering()
+            .getOrderId();
+
+    updateOrderIngStatusIfAllIncomingClosed(orderId);
+
+  }
+
+  public void updateOrderIngStatusIfAllIncomingClosed(String orderId) {
+    boolean hasOpenIncoming = incomingTotalRepository.existsByOrderIdAndStatusNot(orderId, IncomingStatus.입고마감);
+
+    if (!hasOpenIncoming) {
+      Ordering ordering = orderingRepository.findById(orderId)
+              .orElseThrow(() -> new IllegalArgumentException("해당 발주 항목이 존재하지 않습니다."));
+
+      ordering.markAsCompleted();
+      orderingRepository.save(ordering);
+
+      transactionItemService.createTransactionItemsForOrdering(ordering);
+    }
   }
 
   @Override

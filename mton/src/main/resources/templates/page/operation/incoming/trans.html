@@ -12,17 +12,30 @@
     <div class="container py-5">
         <h2 class="mb-4">거래 명세 발행</h2>
         <div class="card p-4 mb-3">
-            <form id="contract-form" class="row g-3">
+            <form action="/internal/incoming/trans" method="get">
                 <div class="col-md-3">
-                    <label for="contract-code" class="form-label">계약</label>
-                    <input type="text" class="form-control" id="contract-code">
+                    <label for="orderId" class="form-label">발주코드</label>
+                    <input type="text" class="form-control" id="orderId" name="orderId"
+                           th:value="${pageRequestDTO.orderId}">
                 </div>
                 <div class="col-md-3">
-                    <label for="supplier-name" class="form-label">업체명</label>
-                    <input type="text" class="form-control" id="supplier-name">
+                    <label for="pCompany" class="form-label">자재코드</label>
+                    <input type="text" class="form-control" id="pCompany" name="pCompany"
+                           th:value="${pageRequestDTO.pCompany}">
+                </div>
+                <div class="col-md-3">
+                    <label for="matId" class="form-label">자재코드</label>
+                    <input type="text" class="form-control" id="matId" name="matId"
+                           th:value="${pageRequestDTO.matId}">
+                </div>
+                <div class="col-md-3">
+                    <label for="matName" class="form-label">자재명</label>
+                    <input type="text" class="form-control" id="matName" name="matName"
+                           th:value="${pageRequestDTO.matName}">
                 </div>
                 <div class="col-12 text-end">
                     <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
+                    <button type="button" class="btn btn-outline-secondary clearBtn" ><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                 </div>
             </form>
         </div>
@@ -31,16 +44,26 @@
             <table class="table table-bordered table-hover data-table text-center">
                 <thead class="table-light">
                 <tr>
-                    <th scope="col">자재명</th>
-                    <th scope="col">납입량</th>
-                    <th scope="col">날짜</th>
+                    <th>발주코드</th>
+                    <th>협력사</th>
+                    <th>자재코드</th>
+                    <th>자재명</th>
+                    <th>납입량</th>
+                    <th>단가</th>
+                    <th>총금액</th>
+                    <th>날짜</th>
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>가이던스 FV 그립 핸들</td>
-                    <td>200</td>
-                    <td>2025-04-20</td>
+                <tr th:each="Transation:${TransationList}">
+                    <td th:text="${Transation.orderId}"></td>
+                    <td th:text="${Transation.pCompany}"></td>
+                    <td th:text="${Transation.matId}"></td>
+                    <td th:text="${Transation.matName}"></td>
+                    <td th:text="${Transation.titemQty}"></td>
+                    <td th:text="${Transation.titemPrice}"></td>
+                    <td th:text="${Transation.amount}"></td>
+                    <td th:text="${Transation.incomingLastCompletedAt}"></td>
                 </tr>
                 </tbody>
             </table>
@@ -72,6 +95,14 @@
         </div>
     </div>
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/internal/incoming/trans'
+    }, false)
+</script>
 
 </body>
 </html>

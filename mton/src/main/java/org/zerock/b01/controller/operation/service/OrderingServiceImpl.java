@@ -73,6 +73,7 @@ public class OrderingServiceImpl implements OrderingService {
 
         orderingRepository.saveAll(orders);
 
+        //납입지시 테이블 자동 등록 추가
         for (Ordering order : orders) {
             deliveryRequestService.createDeliveryRequestFromOrdering(order.getOrderId());
         }
@@ -98,8 +99,11 @@ public class OrderingServiceImpl implements OrderingService {
     @Override
     public StatusTuple deleteAll(ArrayList<String> arrayList) {
         try {
+            //제한사항 추가
+            deliveryRequestService.deleteByOrderIds(arrayList);
+
             orderingRepository.deleteAllById(arrayList);
-            return new StatusTuple(true, "발주 수정에 성공했습니다.");
+            return new StatusTuple(true, "발주 삭제에 성공했습니다.");
         } catch (Exception e) {
             return new StatusTuple(false, e.getMessage());
         }
@@ -108,6 +112,10 @@ public class OrderingServiceImpl implements OrderingService {
     @Override
     public StatusTuple updateAll(List<OrderingDTO> list) {
         try {
+
+            //제한사항 추가
+            deliveryRequestService.validateOrderingUpdate(list);
+
             var orders = list.stream().map(ord -> Ordering.builder()
                     .orderId(ord.getOrderId())
                     .contractMaterial(contractMaterialRepository.findById(ord.getCmtId()).get())

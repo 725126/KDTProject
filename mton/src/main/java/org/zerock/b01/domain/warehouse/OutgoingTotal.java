@@ -23,13 +23,16 @@ public class OutgoingTotal {
   @JoinColumn(name = "mat_id", nullable = false)
   private Material material;
 
-  @ManyToOne
+  @ManyToOne(cascade = CascadeType.PERSIST)
   @JoinColumn(name = "prdplan_id", nullable = false)
   private ProductionPlan productionPlan;
 
   private LocalDateTime outgoingFirstDate;
 
   private LocalDateTime outgoingCompletedAt;
+
+  @Column(nullable = false)
+  private int estimatedOutgoingQty;
 
   @Column(nullable = false)
   private int outgoingTotalQty = 0;

@@ -36,4 +36,8 @@ public class Ordering {
     @Column(name = "order_stat", nullable = false)
     @Check(constraints = "order_stat IN ('진행중', '완료')")
     private String orderStat;
+
+    public void markAsCompleted() {
+        this.orderStat = "완료";
+    }
 }
