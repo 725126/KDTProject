@@ -116,7 +116,6 @@ public class PartnerController {
         for (HashMap<String, String> map : list) {
             hashMap.put(map.get("insId"), map.get("insQty"));
         }
-//        return inspectionService.updateQty(hashMap);
-        return null;
+        return inspectionService.updateQty(hashMap);
     }
 }
