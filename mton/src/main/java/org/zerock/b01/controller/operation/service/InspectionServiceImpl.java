@@ -8,8 +8,10 @@ import org.zerock.b01.controller.operation.repository.InspectionRepository;
 import org.zerock.b01.controller.operation.repository.OrderingRepository;
 import org.zerock.b01.domain.operation.ContractMaterial;
 import org.zerock.b01.domain.operation.Inspection;
+import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.dto.operation.OrderingDTO;
 
+import java.util.HashMap;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
@@ -50,5 +52,21 @@ public class InspectionServiceImpl implements InspectionService {
         }).collect(Collectors.toList());
 
         inspectionRepository.saveAll(inspectionList);
+    }
+
+    @Override
+    public StatusTuple updateQty(HashMap<String, String> hashMap) {
+        try {
+            List<Inspection> inspections = inspectionRepository.findAllById(hashMap.keySet());
+
+            inspections.forEach(ins -> {
+                ins.changeQty(hashMap.get(ins.getInsId()));
+            });
+
+            inspectionRepository.saveAll(inspections);
+            return new StatusTuple(true, "QTY 전환 성공");
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
     }
 }

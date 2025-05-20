@@ -44,6 +44,18 @@ let current
         e.stopPropagation();
 
         if (currentStatBtn !== null) {
+            if (qtySelect.value === "완료") {
+                // 장납기 자재인지 검출해야함
+                const list = Array.from(insTable.rows).filter(x =>
+                    x.cells[1].innerText === currentStatBtn.parentElement.parentElement.cells[0].innerText
+                    && x.cells[6].querySelector("span").innerText === "진행중"
+                );
+                if (list.length > 0) {
+                    alert("아직 진척 검수가 끝나지 않았습니다. 진척도를 눌러 확인하세요.");
+                    return;
+                }
+            }
+
             currentStatBtn.innerText = qtySelect.value;
             currentStatBtn.classList.remove("btn-primary", "btn-danger", "btn-success", "btn-warning");
 
@@ -118,11 +130,25 @@ let current
         const jData = Array.from(dataTable.rows).filter(row => row.rowIndex > 0).map(row => {
             return {
                 insId: row.cells[0].innerText,
-                intQty: row.cells[2].innerText,
+                insQty: row.cells[2].innerText,
             }
         });
         console.log(jData);
 
-        const result = fetch("/external/update/inspect")
+        const result = fetch("/external/update/inspect", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify(jData)
+        }).then(res => res.json()).then(data => {
+            console.log(data);
+            if (data.success === true) {
+                location.reload();
+            }
+        }).catch(error => {
+            console.log(error);
+        });
     });
 })();
