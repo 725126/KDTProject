@@ -27,4 +27,8 @@ public class ProductionPlan {
 
     @Column(nullable = false)
     private LocalDate prdplanEnd;
+
+    @Column(nullable = false)
+    @Builder.Default
+    private String prdplanStat = "진행중";
 }

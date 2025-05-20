@@ -36,7 +36,6 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RequestMapping("/internal/procurement")
 public class ProcurementController {
-    private final ModelMapper modelMapper;
     private final ProcurementPlanRepository procurementPlanRepository;
     private final OrderingRepository orderingRepository;
     private final ProductionPlanRepository productionPlanRepository;
@@ -55,7 +54,7 @@ public class ProcurementController {
     public String procureGet(Model model) {
         model.addAttribute("pplanTH", ProcurementPlanTableHead.values());
         model.addAttribute("prdplans", productionPlanRepository.findAll().stream().filter(x ->
-                LocalDate.now().isBefore(x.getPrdplanEnd()) || LocalDate.now().isEqual(x.getPrdplanEnd())
+                x.getPrdplanStat().equals("진행중") && (LocalDate.now().isBefore(x.getPrdplanEnd()) || LocalDate.now().isEqual(x.getPrdplanEnd()))
         ).collect(Collectors.toList()));
         return "page/operation/procurement/procure";
     }

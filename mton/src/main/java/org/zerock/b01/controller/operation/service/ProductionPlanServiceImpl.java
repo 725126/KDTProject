@@ -90,9 +90,8 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
             LocalDate end = plan.getPrdplanEnd();
             LocalDate now = LocalDate.now();
 
-            if (end.isBefore(now)) { status = "기한초과"; }
-            else if (end.isEqual(now)) { status = "만기일"; }
-            else { status = "진행중"; }
+            if (end.isBefore(now) && plan.getPrdplanStat().equals("진행중")) { status = "기한초과"; }
+            else { status = plan.getPrdplanStat(); }
 
             return ProductionPlanDTO.builder()
                     .prdplanId(plan.getPrdplanId())
