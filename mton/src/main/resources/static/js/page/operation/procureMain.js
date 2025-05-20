@@ -80,6 +80,7 @@ let pbomList = [];
 
         const currentTable = document.querySelector("div[style='display: block;'] table");
 
+        // 조달량 체크 >>
         const insertValues = Array.from(pplanInputTable.rows).map((row) => {
             if (row.cells.length < 4) {
                 return {
@@ -276,6 +277,7 @@ async function jsonFetcher(dest, jData) {
     });
 }
 
+// 여러 항목에 대한 json 페치
 async function jsonFetcherList(dest, jDatas) {
     return await fetch(dest, {
         method: "POST",
@@ -293,6 +295,7 @@ async function jsonFetcherList(dest, jDatas) {
     });
 }
 
+// 자동생성 로직
 function automaticPplan(jData, table, append = false) {
     const newContent = [];
 

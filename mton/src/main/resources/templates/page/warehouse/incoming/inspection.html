@@ -116,7 +116,8 @@
                 </tr>
                 </thead>
                 <tbody id="inspection-body">
-                <tr th:each="incomingInspection:${incomingInspectionList}" th:data-id="${incomingInspection.incomingId}">
+                <tr th:each="incomingInspection:${incomingInspectionList}"
+                        th:data-id="${incomingInspection.incomingId}">
                     <td><input type="checkbox" class="rowCheck"></td>
                     <td th:text="${incomingInspection.deliveryPartnerItemDate}"></td>
                     <td th:text="${incomingInspection.incomingCode}"></td>
@@ -134,13 +135,14 @@
                                     'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
                     <td th:text="${incomingInspection.cstorageId}"></td>
                     <td class="text-center">
-  <span th:if="${incomingInspection.incomingStatus != '입고마감대기중'}"
-        th:text="${incomingInspection.incomingStatus}"
-        th:classappend="${incomingInspection.incomingStatus == '입고마감' ? ' badge bg-success' :
-                        incomingInspection.incomingStatus == '부분입고' ? ' badge bg-info text-dark' :
-                        incomingInspection.incomingStatus == '미입고' ? ' badge bg-warning text-dark' :
-                        ' badge bg-secondary'}">
-  </span>
+                        <span th:if="${incomingInspection.incomingStatus != '입고마감대기중'}"
+                              th:text="${incomingInspection.incomingStatus}"
+                              th:classappend="${incomingInspection.incomingStatus == '입고마감' ? ' badge bg-success' :
+                              incomingInspection.incomingStatus == '부분입고' ? ' badge bg-info text-dark' :
+                              incomingInspection.incomingStatus == '미입고' ? ' badge bg-warning text-dark' :
+                              ' badge bg-secondary'}">
+
+                        </span>
 
                         <a th:if="${incomingInspection.incomingStatus == '입고마감대기중'}"
                            th:text="${incomingInspection.incomingStatus}"

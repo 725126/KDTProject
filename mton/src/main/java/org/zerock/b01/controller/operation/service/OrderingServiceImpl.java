@@ -13,6 +13,7 @@ import org.zerock.b01.dto.operation.OrderingDTO;
 import org.zerock.b01.service.warehouse.DeliveryRequestService;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -73,6 +74,7 @@ public class OrderingServiceImpl implements OrderingService {
 
         orderingRepository.saveAll(orders);
 
+        //납입지시 테이블 자동 등록 추가
         for (Ordering order : orders) {
             deliveryRequestService.createDeliveryRequestFromOrdering(order.getOrderId());
         }
@@ -98,8 +100,11 @@ public class OrderingServiceImpl implements OrderingService {
     @Override
     public StatusTuple deleteAll(ArrayList<String> arrayList) {
         try {
+            //제한사항 추가
+            deliveryRequestService.deleteByOrderIds(arrayList);
+
             orderingRepository.deleteAllById(arrayList);
-            return new StatusTuple(true, "발주 수정에 성공했습니다.");
+            return new StatusTuple(true, "발주 삭제에 성공했습니다.");
         } catch (Exception e) {
             return new StatusTuple(false, e.getMessage());
         }
@@ -108,6 +113,10 @@ public class OrderingServiceImpl implements OrderingService {
     @Override
     public StatusTuple updateAll(List<OrderingDTO> list) {
         try {
+
+            //제한사항 추가
+            deliveryRequestService.validateOrderingUpdate(list);
+
             var orders = list.stream().map(ord -> Ordering.builder()
                     .orderId(ord.getOrderId())
                     .contractMaterial(contractMaterialRepository.findById(ord.getCmtId()).get())
@@ -127,6 +136,22 @@ public class OrderingServiceImpl implements OrderingService {
 
             orderingRepository.saveAll(orders);
             return new StatusTuple(true, "모든 발주 수정사항을 반영하였습니다.");
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
+    }
+
+    @Override
+    public StatusTuple updateStat(HashMap<String, String> hashMap) {
+        try {
+            List<Ordering> orderings = orderingRepository.findAllById(hashMap.keySet());
+
+            orderings.forEach(ord -> {
+                ord.changeOrderStat(hashMap.get(ord.getOrderId()));
+            });
+
+            orderingRepository.saveAll(orderings);
+            return new StatusTuple(true, "상태 전환 성공");
         } catch (Exception e) {
             return new StatusTuple(false, e.getMessage());
         }

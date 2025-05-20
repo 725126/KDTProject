@@ -4,6 +4,7 @@ import org.zerock.b01.domain.warehouse.CompanyStorage;
 import org.zerock.b01.domain.warehouse.DeliveryRequest;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
+import org.zerock.b01.dto.operation.OrderingDTO;
 import org.zerock.b01.dto.warehouse.DeliveryRequestDTO;
 
 import java.util.List;
@@ -19,6 +20,10 @@ public interface DeliveryRequestService {
   void updateDeliveryRequestStatus(Long drId);
 
   void createDeliveryRequestFromOrdering(String orderId);
+
+  void deleteByOrderIds(List<String> orderIds);
+
+  void validateOrderingUpdate(List<OrderingDTO> list);
 
   default DeliveryRequestDTO entityToDto(DeliveryRequest deliveryRequest) {
 

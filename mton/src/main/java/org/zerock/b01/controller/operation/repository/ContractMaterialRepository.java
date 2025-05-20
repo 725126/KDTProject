@@ -65,4 +65,7 @@ public interface ContractMaterialRepository extends JpaRepository<ContractMateri
     // 마지막 계약자재코드 찾기 (자동 생성용)
     @Query("SELECT c.cmtId FROM ContractMaterial c WHERE c.cmtId LIKE ?1% ORDER BY c.cmtId DESC LIMIT 1")
     String findLastOrderIdByPrefix(String prefix);
+
+    @Query(value = "SELECT c FROM ContractMaterial c WHERE c.material.matId = :matId ORDER BY c.cmtPrice")
+    List<ContractMaterial> findAllByMatId(@Param("matId") String matId);
 }

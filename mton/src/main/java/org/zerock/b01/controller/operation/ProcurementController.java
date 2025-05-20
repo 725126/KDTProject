@@ -12,6 +12,7 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.zerock.b01.controller.operation.repository.*;
 import org.zerock.b01.controller.operation.service.ContractMaterialService;
+import org.zerock.b01.controller.operation.service.InspectionService;
 import org.zerock.b01.controller.operation.service.OrderingService;
 import org.zerock.b01.controller.operation.service.ProcurementPlanService;
 import org.zerock.b01.domain.operation.*;
@@ -40,12 +41,14 @@ public class ProcurementController {
     private final OrderingRepository orderingRepository;
     private final ProductionPlanRepository productionPlanRepository;
     private final PbomRepository pbomRepository;
+    private final ContractMaterialRepository contractMaterialRepository;
+    private final InspectionRepository inspectionRepository;
 
     private final ProcurementPlanService procurementPlanService;
     private final OrderingService orderingService;
     private final ContractMaterialService contractMaterialService;
-
     private final ContractService contractService;
+    private final InspectionService inspectionService;
 
     //조달 계획
     @GetMapping("/procure")
@@ -97,7 +100,8 @@ public class ProcurementController {
 
     // 진척 검수
     @GetMapping("/inspect")
-    public String inspectGet() {
+    public String inspectGet(Model model) {
+        model.addAttribute("inspections", inspectionRepository.findAll());
         return "page/operation/procurement/inspect";
     }
 
@@ -178,7 +182,26 @@ public class ProcurementController {
         }).collect(Collectors.toList());
 
         log.info(orderingDTOList.toString());
-        return orderingService.registerAll(orderingDTOList);
+
+        StatusTuple result = orderingService.registerAll(orderingDTOList);
+
+        // 장납기 자재들 검출
+        var longReqs = orderingDTOList.stream().filter(x -> {
+            Optional<ContractMaterial> cmat = contractMaterialRepository.findById(x.getCmtId());
+            if (cmat.isPresent()) {
+                return cmat.get().getCmtReq() >= 10;
+            }
+            return false;
+        }).collect(Collectors.toList());
+
+        log.info("longReqs: " + longReqs.toString());
+
+        // 진척검수를 생성해야 하는가?
+        if (!longReqs.isEmpty()) {
+            inspectionService.registerByCmt(longReqs);
+        }
+
+        return result;
     }
 
     @ResponseBody
@@ -314,12 +337,61 @@ public class ProcurementController {
     @ResponseBody
     @PostMapping("/calc/order")
     public List<CalcOrderingDTO> calcOrder(@RequestBody String id) {
+        List<CalcOrderingDTO> calcOrderingDTOList = new ArrayList<>();
         Optional<ProcurementPlan> temp = procurementPlanRepository.findById(id);
 
         if (temp.isEmpty()) {
             return null;
         }
 
-        return null;
+        Material material = temp.get().getMaterial();
+        var cmts = contractMaterialRepository.findAllByMatId(material.getMatId());
+
+        var ord = cmts.stream().filter(cmt -> LocalDate.now()
+                .plusDays(cmt.getCmtReq()).isBefore(temp.get().getPplanEnd().plusDays(1)))
+                .map(cmt -> CalcOrderingDTO.builder()
+                        .pplanId(temp.get().getPplanId())
+                        .cmtId(cmt.getCmtId())
+                        .ppmatQty(temp.get().getPpmatQty())
+                        .cmtReq(cmt.getCmtReq())
+                        .pplanEnd(temp.get().getPplanEnd())
+                        .build()
+        ).collect(Collectors.toList());
+
+        if (!ord.isEmpty()) {
+            calcOrderingDTOList.add(ord.get(0));
+        }
+
+        return calcOrderingDTOList;
+    }
+
+    @ResponseBody
+    @PostMapping("/calc/order/all")
+    public List<CalcOrderingDTO> calcOrderAll(@RequestBody List<String> ids) {
+        List<CalcOrderingDTO> calcOrderingDTOList = new ArrayList<>();
+        for (String id : ids) {
+            Optional<ProcurementPlan> temp = procurementPlanRepository.findById(id);
+            if (temp.isEmpty()) {
+                return null;
+            }
+            Material material = temp.get().getMaterial();
+
+            var cmts = contractMaterialRepository.findAllByMatId(material.getMatId());
+            var ords = cmts.stream().filter(cmt -> LocalDate.now()
+                            .plusDays(cmt.getCmtReq()).isBefore(temp.get().getPplanEnd().plusDays(1)))
+                    .map(cmt -> CalcOrderingDTO.builder()
+                            .pplanId(temp.get().getPplanId())
+                            .cmtId(cmt.getCmtId())
+                            .ppmatQty(temp.get().getPpmatQty())
+                            .cmtReq(cmt.getCmtReq())
+                            .pplanEnd(temp.get().getPplanEnd())
+                            .build()
+                    ).collect(Collectors.toList());
+
+            if (!ords.isEmpty()) {
+                calcOrderingDTOList.add(ords.get(0));
+            }
+        }
+        return calcOrderingDTOList;
     }
 }

@@ -103,24 +103,25 @@
         </div>
     </div>
 
-    <script>
-
-        document.querySelector(".clearBtn").addEventListener("click", function (e) {
-            e.preventDefault()
-            e.stopPropagation()
-
-            self.location = '/internal/delivery/request'
-        }, false)
-
-        function goToInstruction(button) {
-            var orderId = button.getAttribute('data-order-id'); // data-order-id 값을 가져옵니다.
-
-            console.log(orderId)
-
-            window.location.href = '/internal/delivery/instruction?orderId=' + encodeURIComponent(orderId);
-        }
-    </script>
 </th:block>
+
+<script layout:fragment="script" th:inline="javascript">
+
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/internal/delivery/request'
+    }, false)
+
+    function goToInstruction(button) {
+        var orderId = button.getAttribute('data-order-id'); // data-order-id 값을 가져옵니다.
+
+        console.log(orderId)
+
+        window.location.href = '/internal/delivery/instruction?orderId=' + encodeURIComponent(orderId);
+    }
+</script>
 
 </body>
 </html>

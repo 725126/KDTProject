@@ -10,7 +10,14 @@ import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.zerock.b01.controller.operation.repository.InspectionRepository;
+import org.zerock.b01.controller.operation.repository.OrderingRepository;
 import org.zerock.b01.controller.operation.service.ContractMaterialService;
+import org.zerock.b01.controller.operation.service.InspectionService;
+import org.zerock.b01.controller.operation.service.OrderingService;
+import org.zerock.b01.domain.operation.Inspection;
+import org.zerock.b01.domain.operation.Ordering;
+import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.operation.ContractMaterialViewDTO;
@@ -21,7 +28,9 @@ import org.zerock.b01.service.operation.ContractService;
 import org.zerock.b01.service.user.UserService;
 import org.zerock.b01.service.warehouse.DeliveryPartnerService;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @Log4j2
@@ -29,12 +38,16 @@ import java.util.List;
 @RequestMapping("/external")
 public class PartnerController {
     private final ContractMaterialService contractMaterialService;
+    private final OrderingRepository orderingRepository;
+    private final InspectionRepository inspectionRepository;
 
     private final DeliveryPartnerService deliveryPartnerService;
 
     private final ContractService contractService;
 
     private final UserService userService;
+    private final OrderingService orderingService;
+    private final InspectionService inspectionService;
 
     // 계약 정보 열람
     @GetMapping("/contract/view")
@@ -79,7 +92,14 @@ public class PartnerController {
 
     // 진척 검수 수행
     @GetMapping("/inspect")
-    public String inspectGet() {
+    public String inspectGet(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+        log.info(customUserDetails.getUserId());
+
+        List<Ordering> orderings = orderingRepository.findOrderingByUserId(customUserDetails.getUserId());
+        List<Inspection> inspections = inspectionRepository.findByOrderIds(orderings.stream().map(Ordering::getOrderId).collect(Collectors.toList()));
+
+        model.addAttribute("orders", orderings);
+        model.addAttribute("inspections", inspections);
         return "page/partner/inspect";
     }
 
@@ -115,5 +135,27 @@ public class PartnerController {
     public List<ContractMaterialDTO> viewContmat(@RequestBody String str) {
         log.info("view contmat: " + str);
         return contractMaterialService.viewAll();
+    }
+
+    @ResponseBody
+    @PostMapping("/update/order")
+    public StatusTuple updateOrderStat(@RequestBody List<HashMap<String, String>> list) {
+        log.info("update order: " + list);
+        HashMap<String, String> hashMap = new HashMap<>();
+        for (HashMap<String, String> map : list) {
+            hashMap.put(map.get("orderId"), map.get("orderStat"));
+        }
+        return orderingService.updateStat(hashMap);
+    }
+
+    @ResponseBody
+    @PostMapping("/update/inspect")
+    public StatusTuple updateInspect(@RequestBody List<HashMap<String, String>> list) {
+        log.info("update inspect: " + list);
+        HashMap<String, String> hashMap = new HashMap<>();
+        for (HashMap<String, String> map : list) {
+            hashMap.put(map.get("insId"), map.get("insQty"));
+        }
+        return inspectionService.updateQty(hashMap);
     }
 }

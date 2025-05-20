@@ -7,6 +7,7 @@ import org.zerock.b01.domain.warehouse.IncomingTotal;
 import org.zerock.b01.repository.search.warehouse.DeliveryPartnerSearch;
 import org.zerock.b01.repository.search.warehouse.DeliveryPartnerSearchImpl;
 
+import java.util.List;
 import java.util.Optional;
 
 public interface DeliveryPartnerRepository extends JpaRepository<DeliveryPartner,Long>, DeliveryPartnerSearch {
@@ -14,5 +15,7 @@ public interface DeliveryPartnerRepository extends JpaRepository<DeliveryPartner
   Optional<DeliveryPartner> findByDeliveryRequestItem(DeliveryRequestItem deliveryRequestItem);
 
   Optional<DeliveryPartner> findByIncomingTotal(IncomingTotal incomingTotal);
+
+  List<DeliveryPartner> findAllByDeliveryRequestItem(DeliveryRequestItem deliveryRequestItem);
 
 }

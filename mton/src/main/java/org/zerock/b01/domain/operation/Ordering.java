@@ -34,6 +34,15 @@ public class Ordering {
     private int orderQty;
 
     @Column(name = "order_stat", nullable = false)
-    @Check(constraints = "order_stat IN ('진행중', '완료')")
+    @Check(constraints = "order_stat IN ('진행중', '완료', '취소', '발주중')")
     private String orderStat;
+
+
+    public void markAsCompleted() {
+        this.orderStat = "완료";
+    }
+
+    public void changeOrderStat(String stat) {
+        this.orderStat = stat;
+    }
 }

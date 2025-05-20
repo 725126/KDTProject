@@ -9,8 +9,19 @@
     position: relative;
 }
 
+.table-card {
+    overflow-y: scroll;
+    scrollbar-width: thin;
+    max-height: calc(100vh - 300px);
+    position: relative;
+}
+
 .max-height-pplan {
     max-height: calc(100vh - 440px) !important;
+}
+
+.max-height-ins {
+    max-height: calc(100vh - 650px) !important;
 }
 
 .transparent-file {

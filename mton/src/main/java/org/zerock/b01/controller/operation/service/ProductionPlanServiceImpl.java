@@ -9,6 +9,8 @@ import org.zerock.b01.controller.operation.repository.ProductionPlanRepository;
 import org.zerock.b01.domain.operation.ProductionPlan;
 import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.dto.operation.ProductionPlanDTO;
+import org.zerock.b01.service.warehouse.IncomingTotalService;
+import org.zerock.b01.service.warehouse.OutgoingTotalService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -23,6 +25,7 @@ import java.util.stream.Collectors;
 public class ProductionPlanServiceImpl implements ProductionPlanService {
     private final ProductionPlanRepository productionPlanRepository;
     private final ProductRepository productRepository;
+    private final OutgoingTotalService outgoingTotalService;
 
     @Override
     public StatusTuple registerAll(List<ProductionPlanDTO> list) {
@@ -69,6 +72,11 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
 
             log.info(prdPlans);
             productionPlanRepository.saveAll(prdPlans);
+
+            for (ProductionPlan plan : prdPlans) {
+                outgoingTotalService.createOutgoingTotalListByPrdPlan(plan);
+            }
+
             return new StatusTuple(true, "모든 Prdplan이 등록되었습니다.");
         } catch (Exception e) {
             return new StatusTuple(false, e.getMessage());

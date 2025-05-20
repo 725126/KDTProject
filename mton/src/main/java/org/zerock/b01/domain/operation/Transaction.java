@@ -13,6 +13,7 @@ import java.time.LocalDate;
 @AllArgsConstructor
 @ToString
 public class Transaction {
+
     @Id
     private String tranId;
 
@@ -22,4 +23,7 @@ public class Transaction {
 
     @Column(nullable = false)
     private LocalDate tranDate;
+
+    @Column(nullable = false)
+    private int totalAmount;
 }
