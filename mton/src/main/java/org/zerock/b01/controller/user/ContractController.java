@@ -163,29 +163,29 @@ public class ContractController {
         return ResponseEntity.ok(company);
     }
 
-    // 컨트롤러 (inline 보기용 PDF/Image)
-    @GetMapping("/view/{fileId}")
-    public ResponseEntity<Resource> viewContractFile(@PathVariable Long fileId) throws IOException {
-        ContractFile contractFile = contractFileRepository.findById(fileId)
-                .orElseThrow(() -> new IllegalArgumentException("파일 정보 없음"));
-
-        Path path = Paths.get(contractFile.getFilePath());
-        Resource resource = new UrlResource(path.toUri());
-
-        if (!resource.exists()) {
-            throw new FileNotFoundException("파일을 찾을 수 없습니다.");
-        }
-
-        // 파일 확장자 추출
-        String filename = contractFile.getOriginalFileName().toLowerCase();
-        MediaType contentType = filename.endsWith(".pdf") ? MediaType.APPLICATION_PDF :
-                (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) ? MediaType.IMAGE_JPEG :
-                        MediaType.APPLICATION_OCTET_STREAM;
-
-        return ResponseEntity.ok()
-                .contentType(contentType)
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + URLEncoder.encode(contractFile.getOriginalFileName(), StandardCharsets.UTF_8) + "\"")
-                .body(resource);
-    }
+//    // 컨트롤러 (inline 보기용 PDF/Image)
+//    @GetMapping("/view/{fileId}")
+//    public ResponseEntity<Resource> viewContractFile(@PathVariable Long fileId) throws IOException {
+//        ContractFile contractFile = contractFileRepository.findById(fileId)
+//                .orElseThrow(() -> new IllegalArgumentException("파일 정보 없음"));
+//
+//        Path path = Paths.get(contractFile.getFilePath());
+//        Resource resource = new UrlResource(path.toUri());
+//
+//        if (!resource.exists()) {
+//            throw new FileNotFoundException("파일을 찾을 수 없습니다.");
+//        }
+//
+//        // 파일 확장자 추출
+//        String filename = contractFile.getOriginalFileName().toLowerCase();
+//        MediaType contentType = filename.endsWith(".pdf") ? MediaType.APPLICATION_PDF :
+//                (filename.endsWith(".jpg") || filename.endsWith(".jpeg")) ? MediaType.IMAGE_JPEG :
+//                        MediaType.APPLICATION_OCTET_STREAM;
+//
+//        return ResponseEntity.ok()
+//                .contentType(contentType)
+//                .header(HttpHeaders.CONTENT_DISPOSITION, "inline; filename=\"" + URLEncoder.encode(contractFile.getOriginalFileName(), StandardCharsets.UTF_8) + "\"")
+//                .body(resource);
+//    }
 
 }

@@ -21,6 +21,11 @@ public class IncomingItem {
   @JoinColumn(name = "incoming_id",nullable = false)
   private Incoming incoming;
 
+  // [거래명세 구현] 외래키 추가
+  @ManyToOne(fetch = FetchType.LAZY)
+  @JoinColumn(name = "cstorage_item_id", nullable = false)
+  private CompanyStorageItem cstorageItem;
+
   @Column(nullable = false)
   private LocalDateTime modifyDate;
 

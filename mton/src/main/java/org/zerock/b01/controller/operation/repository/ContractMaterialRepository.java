@@ -5,9 +5,12 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.zerock.b01.domain.operation.Contract;
 import org.zerock.b01.domain.operation.ContractMaterial;
+import org.zerock.b01.domain.operation.Material;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface ContractMaterialRepository extends JpaRepository<ContractMaterial, String> {
 
@@ -65,4 +68,8 @@ public interface ContractMaterialRepository extends JpaRepository<ContractMateri
     // 마지막 계약자재코드 찾기 (자동 생성용)
     @Query("SELECT c.cmtId FROM ContractMaterial c WHERE c.cmtId LIKE ?1% ORDER BY c.cmtId DESC LIMIT 1")
     String findLastOrderIdByPrefix(String prefix);
+
+
+    Optional<ContractMaterial> findByContractAndMaterial(Contract contract, Material material);
+
 }

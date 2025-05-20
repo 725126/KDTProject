@@ -76,6 +76,7 @@ function submitFormValidateName(event) {
     if (!isNameValid) {
         event.preventDefault();
         nameInput.focus();
+
         return false;
     }
 

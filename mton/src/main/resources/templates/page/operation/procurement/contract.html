@@ -323,7 +323,7 @@
                             <td th:text="${row.explain}"></td>
                             <td>
                                 <a th:if="${row.fileId != null}"
-                                   th:href="@{/internal/procurement/contract/view/{id}(id=${row.fileId})}"
+                                   th:href="@{/contract/file/view/{id}(id=${row.fileId})}"
                                    target="_blank"
                                    class="btn btn-sm btn-outline-primary">
                                     <i class="bi bi-file-earmark-text"></i> 보기
