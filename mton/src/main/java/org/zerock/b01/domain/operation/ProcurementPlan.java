@@ -34,6 +34,10 @@ public class ProcurementPlan {
     private LocalDate pplanEnd;
 
     @Column(name = "pplan_stat", nullable = false)
-    @Check(constraints = "pplan_stat IN ('진행중', '완료')")
+    @Check(constraints = "pplan_stat IN ('진행중', '완료', '취소')")
     private String pplanStat;
+
+    public void changeStat(String stat) {
+        this.pplanStat = stat;
+    }
 }

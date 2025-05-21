@@ -46,6 +46,7 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
     const editUploadBtn = document.getElementById("edit-upload");
     const viewRefreshBtn = document.getElementById("view-refresh");
     const viewDownloadBtn = document.getElementById("view-download");
+    const viewUpdateBtn = document.getElementById("view-update");
 
     insertFileBtn.addEventListener("change", function (e) {
         const currentTable = document.querySelector("div[style='display: block;'] table");
@@ -94,6 +95,25 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
         excelParser.tableToFile(editedTable, currentTable.id + ".xlsx");
     });
 
+    viewUpdateBtn.addEventListener("click", function (e) {
+        e.preventDefault();
+        e.stopPropagation();
+
+        // 일단 상태가 취소로 마킹된 녀석들을 다 불러옴
+        const canceledPrdPlanIds = Array.from(prdplanViewTable.rows).filter(row => row.cells[6].innerText === "취소" && row.cells[6].classList.contains("text-danger")).map(row => row.cells[0].innerText);
+
+        fetch("/internal/product/cancel/prdplan", {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json",
+                "X-CSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify(canceledPrdPlanIds)
+        }).then(res => res.json()).then(data => {
+            console.log(data);
+        });
+    });
+
     editRefreshBtn.addEventListener("click", function (e) {
         e.preventDefault();
         e.stopPropagation();
@@ -123,6 +143,7 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
     tutorialMessage.bindTutorialMessage(viewDownloadBtn, tmessage.viewDownloadBtnTutorial)
     tutorialMessage.bindTutorialMessage(editRefreshBtn, tmessage.editRefreshBtnTutorial);
     tutorialMessage.bindTutorialMessage(editUploadBtn, tmessage.editUploadBtnTutorial);
+    tutorialMessage.bindTutorialMessage(viewUpdateBtn, "계획 취소를 반영합니다. 이 작업은 위험할 수 있습니다.");
 })();
 
 (function () {

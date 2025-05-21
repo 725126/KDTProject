@@ -889,6 +889,26 @@ function viewPrdPlanTable(init = false) {
 
             makeTableCellDBSelectWithLabel(prdplanEditTable, 1, prdDBData, dbElementNames.prodId, dbElementNames.prodName);
             makeTableCellDatePicker(prdplanEditTable, 3);
+
+            const prdplanStatCells = Array.from(prdplanViewTable.rows).map(row => row.cells[6]).filter(cell => cell.innerText === "진행중");
+
+            // 생산계획 취소용 클릭 이벤트 등록
+            for (const cell of prdplanStatCells) {
+                cell.style.cursor = "pointer";
+                tutorialMessage.bindTutorialMessage(cell, "이곳을 눌러 취소할 계획을 선택합니다. 오른쪽 패널에서 제출 버튼을 눌러 반영합니다.");
+                cell.addEventListener("click", function (e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    if (cell.innerText === "진행중") {
+                        cell.innerText = "취소";
+                        cell.classList.add("text-danger");
+                    } else {
+                        cell.innerText = "진행중";
+                        cell.classList.remove("text-danger");
+                    }
+                });
+            }
         } else {
             makeUniCellMessage(prdplanViewTable, "등록된 내용이 없습니다.");
             makeUniCellMessage(prdplanEditTable, "수정할 내용이 없습니다.");

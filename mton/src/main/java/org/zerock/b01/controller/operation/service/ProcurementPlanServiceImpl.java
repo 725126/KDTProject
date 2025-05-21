@@ -89,10 +89,8 @@ public class ProcurementPlanServiceImpl implements ProcurementPlanService {
             LocalDate end = plan.getPplanEnd();
             LocalDate now = LocalDate.now();
 
-            if (!plan.getPplanStat().equals("완료")) {
-                if (end.isBefore(now)) { status = "기한초과"; }
-                else if (end.isEqual(now)) { status = "만기일"; }
-                else { status = "진행중"; }
+            if (!plan.getPplanStat().equals("완료") && end.isBefore(now)) {
+                status = "기한초과";
             } else {
                 status = plan.getPplanStat();
             }

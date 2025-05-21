@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/ex-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <title>자재ON(협력업체 전용) - 발주 변동사항</title>
+    <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
+    <link rel="stylesheet" th:href="@{/css/page/operation/pbom.css}">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+</head>
+<body>
+
+<th:block layout:fragment="contmat">
+    <div class="tutorial" id="tutorial-box">튜토리얼 메시지</div>
+    <div class="container py-5">
+        <h2 class="mb-4">
+            발주 변동
+            <button type="button" id="ord-submit" class="btn btn-secondary btn-sm">제출</button>
+        </h2>
+        <div class="card p-4 mb-5 max-height-ins" id="table-card">
+            <table id="ord-table" class="table table-bordered table-hover text-center table-excel">
+                <thead class="table-light">
+                <tr>
+                    <th>발주코드</th>
+                    <th>자재명</th>
+                    <th>소요량</th>
+                    <th>납기일</th>
+                    <th>진척도</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ord: ${orders}">
+                    <td>[[${ord.getOrderId()}]]</td>
+                    <td>[[${ord.getContractMaterial().getMaterial().getMatName()}]]</td>
+                    <td>[[${ord.getOrderQty()}]]</td>
+                    <td>[[${ord.getOrderEnd()}]]</td>
+                    <td class="text-center" th:if="${ord.getContractMaterial().getCmtReq() >= 10}">
+                        <button type="button" class="btn btn-outline-primary btn-sm qty-btn">장납기</button>
+                    </td>
+                    <td class="text-center" th:unless="${ord.getContractMaterial().getCmtReq() >= 10}">
+                        <button type="button" class="btn btn-outline-secondary btn-sm pe-none">일반</button>
+                    </td>
+                    <td class="text-center">
+                        <button type="button" class="btn btn-sm stat-btn" th:classappend="${ord.getOrderStat().equals('진행중') ? 'btn-primary' : 'btn-warning'}">[[${ord.getOrderStat()}]]</button>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+            <dialog id="qty-dialog">
+                <form method="dialog">
+                    <div>
+                        <label for="qty-select"></label>
+                        <select id="qty-select">
+                            <option>진행중</option>
+                            <option>완료</option>
+                            <option>취소</option>
+                        </select>
+                    </div>
+                    <div>
+                        <button type="submit" id="qty-submit">선택</button>
+                        <button type="button" id="qty-submit-all">일괄적용</button>
+                        <button id="qty-cancel" type="reset">닫기</button>
+                    </div>
+                </form>
+            </dialog>
+        </div>
+
+        <h2 class="mb-4">
+            진척도
+            <button type="button" id="ins-submit" class="btn btn-secondary btn-sm" style="display: none">제출</button>
+        </h2>
+        <div class="card p-4 table-card max-height-ins">
+            <table class="table table-bordered table-hover text-center table-excel" id="ins-table">
+                <thead class="table-light">
+                <tr>
+                    <th>검수코드</th>
+                    <th>발주코드</th>
+                    <th>제작 진척</th>
+                    <th>소요량</th>
+                    <th>검수일</th>
+                    <th>검수 종료일</th>
+                    <th>진척 상황</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="ins: ${inspections}">
+                    <td>[[${ins.getInsId()}]]</td>
+                    <td>[[${ins.getOrdering().getOrderId()}]]</td>
+                    <td>[[${ins.getInsQty()}]]</td>
+                    <td>[[${ins.getInsTotal()}]]</td>
+                    <td>[[${ins.getInsStart()}]]</td>
+                    <td>[[${ins.getInsEnd()}]]</td>
+                    <td class="text-center"><span class="badge" th:classappend="${ins.getInsStat().equals('진행중') ? 'bg-primary' : 'bg-success'}">[[${ins.getInsStat()}]]</span></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+    <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+    <script th:src="@{/js/page/operation/pInspectMain.js}" type="module"></script>
+</th:block>
+
+</body>
+</html>

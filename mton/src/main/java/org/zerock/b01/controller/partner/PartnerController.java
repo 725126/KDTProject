@@ -53,14 +53,22 @@ public class PartnerController {
     // 진척 검수 수행
     @GetMapping("/inspect")
     public String inspectGet(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
-        log.info(customUserDetails.getUserId());
-
         List<Ordering> orderings = orderingRepository.findOrderingByUserId(customUserDetails.getUserId());
         List<Inspection> inspections = inspectionRepository.findByOrderIds(orderings.stream().map(Ordering::getOrderId).collect(Collectors.toList())).stream().filter(x -> !x.getInsStat().equals("대기중")).collect(Collectors.toList());
 
         model.addAttribute("orders", orderings);
         model.addAttribute("inspections", inspections);
         return "page/partner/inspect";
+    }
+
+    @GetMapping("/inspect/alert")
+    public String inspectAlertGet(@AuthenticationPrincipal CustomUserDetails customUserDetails, Model model) {
+        List<Ordering> orderings = orderingRepository.findCancelOrderingByUserId(customUserDetails.getUserId());
+        List<Inspection> inspections = inspectionRepository.findByOrderIds(orderings.stream().map(Ordering::getOrderId).collect(Collectors.toList()));
+
+        model.addAttribute("orders", orderings);
+        model.addAttribute("inspections", inspections);
+        return "page/partner/inspectalert";
     }
 
     // 자재 재고 관리

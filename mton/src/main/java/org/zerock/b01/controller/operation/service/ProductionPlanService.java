@@ -11,4 +11,5 @@ public interface ProductionPlanService {
     List<ProductionPlanDTO> viewAll();
     StatusTuple deleteAll(ArrayList<String> arrayList);
     StatusTuple updateAll(List<ProductionPlanDTO> list);
+    StatusTuple cancelAll(ArrayList<String> arrayList);
 }

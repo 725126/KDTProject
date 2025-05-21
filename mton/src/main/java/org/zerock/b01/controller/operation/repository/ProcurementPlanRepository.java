@@ -13,4 +13,7 @@ public interface ProcurementPlanRepository extends JpaRepository<ProcurementPlan
 
     @Query(value = "SELECT p FROM ProcurementPlan p WHERE p.prdplan.prdplanId = :prdplanId AND p.material.matId = :matId")
     List<ProcurementPlan> findDuplicatedPPlan(@Param("prdplanId") String prdplanId, @Param("matId") String matId);
+
+    @Query(value = "SELECT p FROM ProcurementPlan p WHERE p.prdplan.prdplanId IN :prdplanIds")
+    List<ProcurementPlan> findPPlanByPrdplanIds(@Param("prdplanIds") List<String> prdplanIds);
 }

@@ -31,4 +31,8 @@ public class ProductionPlan {
     @Column(nullable = false)
     @Builder.Default
     private String prdplanStat = "진행중";
+
+    public void changeStat(String stat) {
+        this.prdplanStat = stat;
+    }
 }

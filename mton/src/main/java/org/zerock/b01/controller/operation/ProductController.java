@@ -363,4 +363,16 @@ public class ProductController {
             return new StatusTuple(false,"연관된 조달계획을 먼저 삭제해야 합니다.");
         }
     }
+
+    @ResponseBody
+    @PostMapping("/cancel/prdplan")
+    public StatusTuple cancelPrdPlanTable(@RequestBody ArrayList<String> arrayList) {
+        log.info("cancel ID: " + arrayList.toString());
+
+        try {
+            return productionPlanService.cancelAll(arrayList);
+        } catch (Exception e) {
+            return new StatusTuple(false, e.getMessage());
+        }
+    }
 }
