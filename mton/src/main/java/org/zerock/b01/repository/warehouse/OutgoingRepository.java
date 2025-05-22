@@ -7,6 +7,7 @@ import org.springframework.data.repository.query.Param;
 import org.zerock.b01.domain.warehouse.Outgoing;
 import org.zerock.b01.repository.search.warehouse.OutgoingSearch;
 
+import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,4 +24,11 @@ public interface OutgoingRepository extends JpaRepository<Outgoing, Long>, Outgo
           "FROM Outgoing o " +
           "WHERE o.inventory.inventoryId = :inventoryId ")
   Optional<Integer> sumUnclosedOutgoingQtyByInventoryId(@Param("inventoryId") Long inventoryId);
+
+  @Query("SELECT FUNCTION('DAYOFWEEK', o.outgoingDate) as dow, SUM(o.outgoingQty) " +
+          "FROM Outgoing o " +
+          "WHERE o.outgoingDate BETWEEN :start AND :end " +
+          "GROUP BY FUNCTION('DAYOFWEEK', o.outgoingDate)")
+  List<Object[]> getWeeklyOutgoingSummary(@Param("start") LocalDateTime start, @Param("end") LocalDateTime end);
+
 }

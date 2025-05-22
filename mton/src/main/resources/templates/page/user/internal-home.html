@@ -89,7 +89,7 @@
                 <i class="bi bi-cash-coin kpi-icon"></i>
                 <div>
                     <div class="kpi-title">이번달 발주 총액</div>
-                    <div class="kpi-value">₩152,000,000</div>
+                    <div class="kpi-value" th:text="${#numbers.formatInteger(orderTotal, 3, 'COMMA')} + ' 원'">0원</div>
                 </div>
             </div>
         </div>
@@ -99,7 +99,7 @@
                 <i class="bi bi-graph-up-arrow kpi-icon"></i>
                 <div>
                     <div class="kpi-title">월 발주 진행률</div>
-                    <div class="kpi-value">76%</div>
+                    <div class="kpi-value" th:text="${orderProgressRate} + '%'">0%</div>
                 </div>
             </div>
         </div>

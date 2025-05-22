@@ -2,6 +2,7 @@ package org.zerock.b01.repository.warehouse;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
+import org.zerock.b01.domain.warehouse.OutgoingStatus;
 import org.zerock.b01.domain.warehouse.OutgoingTotal;
 import org.zerock.b01.repository.search.warehouse.OutgoingTotalSearch;
 
@@ -16,4 +17,5 @@ public interface OutgoingTotalRepository extends JpaRepository<OutgoingTotal, Lo
           "WHERE ot.outgoingStatus != '출고마감' ")
   List<Object[]> sumUnclosedEstimatedOutgoingQtyByMaterial();
 
+  List<OutgoingTotal> findByOutgoingStatus(OutgoingStatus status);
 }

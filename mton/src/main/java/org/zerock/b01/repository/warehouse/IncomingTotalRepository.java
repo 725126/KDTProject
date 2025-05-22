@@ -46,4 +46,6 @@ public interface IncomingTotalRepository extends JpaRepository<IncomingTotal, Lo
           "JOIN o.contractMaterial cm " +
           "WHERE it.incomingStatus != '입고마감' ")
   List<Object[]> sumUnclosedIncomingQtyByMaterial();
+
+  List<IncomingTotal> findByIncomingStatus(IncomingStatus status);
 }

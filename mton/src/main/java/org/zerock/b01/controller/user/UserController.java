@@ -71,7 +71,8 @@ public class UserController {
             // 로그인 안 되어 있으면 시작 페이지로
             return "redirect:/intro";
         }
-
+        model.addAttribute("orderTotal", dashboardService.getCurrentMonthOrderTotal());
+        model.addAttribute("orderProgressRate", String.format("%.1f", dashboardService.getCurrentMonthOrderProgressRate()));
         model.addAttribute("todayIncomingCount", dashboardService.getTodayIncomingCount());
         model.addAttribute("todayPlannedCount", dashboardService.getTodayPlannedCount());
 
