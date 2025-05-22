@@ -183,7 +183,11 @@ public class PartnerController {
 
     // 협력사 납품 지시 요청
     @GetMapping("/delivery")
-    public String listDeliveryRequestItems(PageRequestDTO pageRequestDTO, Model model) {
+    public String listDeliveryRequestItems(@AuthenticationPrincipal CustomUserDetails userDetails,
+            PageRequestDTO pageRequestDTO, Model model) {
+
+        // 연관 partner 정보
+        Long partnerId = userService.findByPartner(userDetails.getUser()).getPartnerId();
 
         // 전체 납입지시 상세 항목 페이징 조회
         PageResponseDTO<DeliveryPartnerDTO> drPartnerList =
