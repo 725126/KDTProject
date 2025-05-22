@@ -1,6 +1,7 @@
 package org.zerock.b01.repository.search.warehouse;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -184,6 +185,13 @@ public class IncomingSearchImpl extends QuerydslRepositorySupport implements Inc
 
     // 🔹 조건 적용 및 페이징
     query.where(builder);
+    query.orderBy(
+            new CaseBuilder()
+                    .when(incomingTotal.incomingStatus.eq(IncomingStatus.입고마감)).then(1)
+                    .otherwise(0)
+                    .asc(),
+            incoming.incomingId.asc()
+    );
     this.getQuerydsl().applyPagination(pageable, query);
 
     List<Incoming> result = query.fetch();

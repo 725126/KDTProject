@@ -90,14 +90,6 @@ public class OutgoingController {
         PageResponseDTO<OutgoingTotalDTO> allResults =
                 outgoingTotalService.listWithOutgoingTotal(pageRequestDTO);
 
-//        List<OutgoingTotalDTO> filteredList = allResults.getDtoList().stream()
-//                .filter(dto -> "출고마감".equals(dto.getOutgoingStatus()))
-//                .toList();
-//
-//        model.addAttribute("outgoingTotalList", filteredList);
-//        model.addAttribute("pageRequestDTO", pageRequestDTO);
-//        model.addAttribute("totalCount", filteredList.size());
-
         model.addAttribute("outgoingTotalList", allResults.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
 

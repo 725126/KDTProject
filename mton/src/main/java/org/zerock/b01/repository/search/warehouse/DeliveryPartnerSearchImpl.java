@@ -1,6 +1,7 @@
 package org.zerock.b01.repository.search.warehouse;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
@@ -10,9 +11,7 @@ import org.zerock.b01.domain.operation.QContractMaterial;
 import org.zerock.b01.domain.operation.QMaterial;
 import org.zerock.b01.domain.operation.QOrdering;
 import org.zerock.b01.domain.user.QPartner;
-import org.zerock.b01.domain.warehouse.DeliveryPartner;
-import org.zerock.b01.domain.warehouse.QDeliveryPartner;
-import org.zerock.b01.domain.warehouse.QDeliveryRequestItem;
+import org.zerock.b01.domain.warehouse.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -72,6 +71,13 @@ public class DeliveryPartnerSearchImpl extends QuerydslRepositorySupport impleme
 
     // 🔹 조건 적용 및 페이징
     query.where(builder);
+    query.orderBy(
+            new CaseBuilder()
+                    .when(deliveryPartner.deliveryPartnerStatus.eq(DeliveryPartnerStatus.완료)).then(1)
+                    .otherwise(0)
+                    .asc(),
+            deliveryPartner.deliveryPartnerId.asc()
+    );
     this.getQuerydsl().applyPagination(pageable, query);
 
     List<DeliveryPartner> result = query.fetch();

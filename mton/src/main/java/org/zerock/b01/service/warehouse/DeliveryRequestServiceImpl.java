@@ -40,6 +40,8 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
 
     // 검색 조건을 받아옵니다.
     String orderId = pageRequestDTO.getOrderId();
+    String pCompany = pageRequestDTO.getPCompany();
+    String matId = pageRequestDTO.getMatId();
     String matName = pageRequestDTO.getMatName();
     LocalDate orderDateStart = pageRequestDTO.getOrderDateStart();
     LocalDate orderDateEnd = pageRequestDTO.getOrderDateEnd();
@@ -51,7 +53,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
 
     // 검색 조건과 페이지 정보를 이용하여 데이터를 조회합니다.
     Page<DeliveryRequest> result = deliveryRequestRepository
-            .searchDeliveryRequestAll(orderId, matName, orderDateStart, orderDateEnd,
+            .searchDeliveryRequestAll(orderId, pCompany, matId, matName, orderDateStart, orderDateEnd,
                                                   orderEndStart, orderEndEnd, pageable);
 
     // 조회된 데이터(DeliveryRequest)를 DeliveryRequestDTO로 변환합니다.
@@ -68,6 +70,8 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
       DeliveryRequestDTO dto = DeliveryRequestDTO.builder()
               .drId(dr.getDrId())
               .orderId(ordering.getOrderId())
+              .pCompany(ordering.getContractMaterial().getContract().getPartner().getPCompany())
+              .matId(ordering.getContractMaterial().getMaterial().getMatId())
               .matName(ordering.getContractMaterial().getMaterial().getMatName())
               .orderDate(ordering.getOrderDate())
               .orderEnd(ordering.getOrderEnd())
@@ -82,19 +86,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     // PageResponseDTO로 변환하여 반환합니다.
     return PageResponseDTO.<DeliveryRequestDTO>withAll()
             .pageRequestDTO(pageRequestDTO)
-            .dtoList(
-                    dtoList.stream()
-                            .sorted((a, b) -> {
-                              if (a.getDrStatus().equals("완료") && !b.getDrStatus().equals("완료")) {
-                                return 1;
-                              } else if (!a.getDrStatus().equals("완료") && b.getDrStatus().equals("완료")) {
-                                return -1;
-                              } else {
-                                return 0;
-                              }
-                            })
-                            .collect(Collectors.toList())
-            )
+            .dtoList(dtoList)
             .total((int) result.getTotalElements())
             .build();
   }

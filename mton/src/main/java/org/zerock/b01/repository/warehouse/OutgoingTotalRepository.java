@@ -16,7 +16,8 @@ public interface OutgoingTotalRepository extends JpaRepository<OutgoingTotal, Lo
 
   @Query("SELECT ot.material.matId, SUM(ot.estimatedOutgoingQty) " +
           "FROM OutgoingTotal ot " +
-          "WHERE ot.outgoingStatus != '출고마감' ")
+          "WHERE ot.outgoingStatus != '출고마감' " +
+          "GROUP BY ot.material.matId")
   List<Object[]> sumUnclosedEstimatedOutgoingQtyByMaterial();
 
   List<OutgoingTotal> findByOutgoingStatus(OutgoingStatus status);

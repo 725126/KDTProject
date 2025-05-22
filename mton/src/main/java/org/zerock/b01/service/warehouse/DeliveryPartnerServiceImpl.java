@@ -73,20 +73,6 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
 
       dtoList.add(dto);
     }
-
-    dtoList.sort((a, b) -> {
-      boolean aZero = a.getRemainingQty() == 0;
-      boolean bZero = b.getRemainingQty() == 0;
-
-      if (aZero == bZero) {
-        return 0; // 순서 유지
-      } else if (aZero) {
-        return 1; // a가 0이면 뒤로
-      } else {
-        return -1; // b가 0이면 뒤로
-      }
-    });
-
     // PageResponseDTO로 변환하여 반환합니다.
     return PageResponseDTO.<DeliveryPartnerDTO>withAll()
             .pageRequestDTO(pageRequestDTO)
