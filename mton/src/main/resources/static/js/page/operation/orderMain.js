@@ -95,7 +95,7 @@ let bomList = [];
         }
         insertValues.shift();
 
-        const viewValues = Array.from(orderViewTable.rows).filter(x => x.cells[6].innerText === "발주중" || x.cells[6].innerText === "진행중").map((row) => {
+        const viewValues = Array.from(orderViewTable.rows).filter(x => x.cells[x.cells.length - 1].innerText === "발주중" || x.cells[x.cells.length - 1].innerText === "진행중").map((row) => {
             if (row.cells.length < 7) {
                 return {
                     pplanId: "",
@@ -239,7 +239,8 @@ let bomList = [];
 
             const flag = automaticOrder(res, orderInputTable);
             if (flag) {
-                tableRowsEditor.addOrderTableUtilBtn(orderInputTable);
+                console.log("Done");
+                // tableRowsEditor.addOrderTableUtilBtn(orderInputTable);
             } else {
                 alert("계약자재는 있지만, 납기일에 맞출 수 없습니다.");
             }
@@ -267,7 +268,7 @@ let bomList = [];
 
             const flag = automaticOrder(res, orderInputTable);
             if (flag) {
-                tableRowsEditor.addOrderTableUtilBtn(orderInputTable);
+                console.log("Done");
             } else {
                 alert("계약자재는 있지만, 납기일에 맞출 수 있는 경우가 없습니다.");
             }
