@@ -31,12 +31,15 @@ public class Incoming {
   private String incomingCode;
 
   @Column(nullable = false)
+  @Builder.Default
   private int incomingQty = 0;
 
   @Column(nullable = false)
+  @Builder.Default
   private int incomingReturnQty = 0;
 
   @Column(nullable = false)
+  @Builder.Default
   private int incomingMissingQty  = 0;
 
   public Incoming updateIncomingQtys(int qty) {

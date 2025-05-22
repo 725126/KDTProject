@@ -26,6 +26,7 @@ public class Outgoing {
   private Inventory inventory;
 
   @Column(nullable = false)
+  @Builder.Default
   private int outgoingQty = 0;
 
   @Column(nullable = false)

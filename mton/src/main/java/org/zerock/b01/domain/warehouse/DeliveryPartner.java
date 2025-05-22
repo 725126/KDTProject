@@ -25,6 +25,7 @@ public class DeliveryPartner extends BaseEntity {
   private IncomingTotal incomingTotal;
 
   @Column(nullable = false)
+  @Builder.Default
   private int deliveryPartnerQty = 0;
 
   @Enumerated(EnumType.STRING)

@@ -26,15 +26,19 @@ public class IncomingTotal {
   private LocalDateTime incomingCompletedAt;
 
   @Column(nullable = false)
+  @Builder.Default
   private int incomingEffectiveQty = 0 ;
 
   @Column(nullable = false)
+  @Builder.Default
   private int incomingTotalQty = 0 ;
 
   @Column(nullable = false)
+  @Builder.Default
   private int incomingReturnTotalQty = 0 ;
 
   @Column(nullable = false)
+  @Builder.Default
   private int incomingMissingTotalQty = 0 ;
 
   @Enumerated(EnumType.STRING)

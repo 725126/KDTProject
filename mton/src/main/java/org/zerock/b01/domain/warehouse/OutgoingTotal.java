@@ -35,6 +35,7 @@ public class OutgoingTotal {
   private int estimatedOutgoingQty;
 
   @Column(nullable = false)
+  @Builder.Default
   private int outgoingTotalQty = 0;
 
   @Enumerated(EnumType.STRING)
