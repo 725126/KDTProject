@@ -4,16 +4,24 @@ import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;
+import org.zerock.b01.controller.operation.repository.ContractRepository;
+import org.zerock.b01.controller.operation.repository.InspectionRepository;
 import org.zerock.b01.controller.operation.repository.OrderingRepository;
 import org.zerock.b01.controller.operation.repository.ProductionPlanRepository;
+import org.zerock.b01.domain.operation.Contract;
+import org.zerock.b01.domain.operation.Inspection;
 import org.zerock.b01.domain.operation.Ordering;
+import org.zerock.b01.domain.user.Partner;
+import org.zerock.b01.domain.user.User;
 import org.zerock.b01.domain.warehouse.*;
+import org.zerock.b01.repository.user.PartnerRepository;
 import org.zerock.b01.repository.warehouse.*;
 
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.*;
+import java.util.stream.IntStream;
 
 @Service
 @RequiredArgsConstructor
@@ -30,6 +38,10 @@ public class DashboardServiceImpl implements DashboardService {
   private final DeliveryRequestItemRepository deliveryRequestItemRepository;
   private final IncomingTotalRepository incomingTotalRepository;
   private final OutgoingTotalRepository outgoingTotalRepository;
+  private final PartnerRepository partnerRepository;
+  private final ContractRepository contractRepository;
+  private final InspectionRepository inspectionRepository;
+  private final TransactionRepository transactionRepository;
 
   @Override
   public Long getTodayIncomingCount() {
@@ -131,20 +143,20 @@ public class DashboardServiceImpl implements DashboardService {
     List<Map<String, Object>> events = new ArrayList<>();
 
     // 🔹 예시: 발주일
-    List<Ordering> orders = orderingRepository.findAll(); // or 기간 필터
-    for (Ordering o : orders) {
-      events.add(Map.of(
-              "title", "발주 - " + o.getContractMaterial().getMaterial().getMatName(),
-              "start", o.getOrderDate().toString(),
-              "backgroundColor", "#27496D",
-              "borderColor", "#27496D",
-              "extendedProps", Map.of(
-                      "type", "발주일",
-                      "item", o.getContractMaterial().getMaterial().getMatName(),
-                      "remarks", "발주 수량: " + o.getOrderQty()
-              )
-      ));
-    }
+//    List<Ordering> orders = orderingRepository.findAll(); // or 기간 필터
+//    for (Ordering o : orders) {
+//      events.add(Map.of(
+//              "title", "발주 - " + o.getContractMaterial().getMaterial().getMatName(),
+//              "start", o.getOrderDate().toString(),
+//              "backgroundColor", "#27496D",
+//              "borderColor", "#27496D",
+//              "extendedProps", Map.of(
+//                      "type", "발주일",
+//                      "item", o.getContractMaterial().getMaterial().getMatName(),
+//                      "remarks", "발주 수량: " + o.getOrderQty()
+//              )
+//      ));
+//    }
 
     // 🔹 예시: 입고 예정일
     List<DeliveryRequestItem> dueList = deliveryRequestItemRepository.findAll();
@@ -206,5 +218,176 @@ public class DashboardServiceImpl implements DashboardService {
     return events;
   }
 
+  // [협력업체] 계약 진행
+  public int getOngoingContractCountForPartner(User user) {
+    Partner partner = partnerRepository.findByUser(user)
+            .orElseThrow(() -> new IllegalStateException("협력업체 정보 없음"));
+
+    return contractRepository.countOngoingContracts(partner, LocalDate.now());
+  }
+
+  // [협력업체] 납기 준수율
+  @Override
+  public int getOnTimeRate(User user) {
+    Partner partner = partnerRepository.findByUser(user)
+            .orElseThrow(() -> new IllegalStateException("협력업체 정보 없음"));
+
+    long total = incomingTotalRepository.countCompletedIncomingByPartner(partner);
+    if (total == 0) return 0;
+
+    long onTime = incomingTotalRepository.countOnTimeIncomingByPartner(partner);
+    return (int) Math.round((double) onTime / total * 100);
+  }
+
+  // [협력업체] 검수 완료율
+  @Override
+   public int getInspectionCompletionRate(User user) {
+    Partner partner = partnerRepository.findByUser(user)
+            .orElseThrow(() -> new IllegalStateException("협력업체 정보 없음"));
+
+    long total = inspectionRepository.countAllInspections(partner);
+    if (total == 0) return 0;
+
+    long done = inspectionRepository.countCompletedInspections(partner);
+    return (int) Math.round((double) done / total * 100);
+  }
+
+  // [협력업체] 월 거래 금액
+  public long getCurrentMonthTransactionAmount(User user) {
+    Partner partner = partnerRepository.findByUser(user)
+            .orElseThrow(() -> new IllegalStateException("협력사 정보 없음"));
+
+    LocalDate now = LocalDate.now();
+    Long total = transactionRepository.getMonthlyTransactionTotal(partner, now.getYear(), now.getMonthValue());
+
+    return total != null ? total : 0L;
+  }
+
+  // [협력업체] 납품 완료 vs 지연 추이
+  public Map<String, Object> getDeliveryTrendChart(User user) {
+    Partner partner = partnerRepository.findByUser(user)
+            .orElseThrow(() -> new IllegalStateException("협력사 정보 없음"));
+
+    int year = LocalDate.now().getYear();
+    List<Object[]> rawData = incomingTotalRepository.getMonthlyOnTimeAndDelayedCount(partner, year);
+
+    Map<Integer, Integer> onTimeMap = new HashMap<>();
+    Map<Integer, Integer> delayedMap = new HashMap<>();
+
+    for (Object[] row : rawData) {
+      int month = ((Number) row[0]).intValue();     // 1 ~ 12
+      int onTime = ((Number) row[1]).intValue();
+      int delayed = ((Number) row[2]).intValue();
+      onTimeMap.put(month, onTime);
+      delayedMap.put(month, delayed);
+    }
+
+    List<Integer> onTimeList = new ArrayList<>();
+    List<Integer> delayedList = new ArrayList<>();
+
+    for (int m = 1; m <= LocalDate.now().getMonthValue(); m++) {
+      onTimeList.add(onTimeMap.getOrDefault(m, 0));
+      delayedList.add(delayedMap.getOrDefault(m, 0));
+    }
+
+    return Map.of(
+            "labels", IntStream.rangeClosed(1, LocalDate.now().getMonthValue())
+                    .mapToObj(i -> i + "월")
+                    .toList(),
+            "onTime", onTimeList,
+            "delayed", delayedList
+    );
+  }
+
+  // [협력업체] 월별 납기 준수율
+  @Override
+  public Map<String, Object> getMonthlyOnTimeRate(User user) {
+    Partner partner = partnerRepository.findByUser(user)
+            .orElseThrow(() -> new IllegalStateException("협력사 정보 없음"));
+
+    int year = LocalDate.now().getYear();
+    List<Object[]> rawData = incomingTotalRepository.getMonthlyOnTimeRateData(partner, year);
+
+    Map<Integer, Integer> totalMap = new HashMap<>();
+    Map<Integer, Integer> onTimeMap = new HashMap<>();
+
+    for (Object[] row : rawData) {
+      int month = ((Number) row[0]).intValue();
+      int total = ((Number) row[1]).intValue();
+      int onTime = ((Number) row[2]).intValue();
+      totalMap.put(month, total);
+      onTimeMap.put(month, onTime);
+    }
+
+    List<String> labels = new ArrayList<>();
+    List<Integer> rates = new ArrayList<>();
+
+    for (int m = 1; m <= LocalDate.now().getMonthValue(); m++) {
+      labels.add(m + "월");
+      int total = totalMap.getOrDefault(m, 0);
+      int onTime = onTimeMap.getOrDefault(m, 0);
+      int rate = (total == 0) ? 0 : (int) Math.round((double) onTime / total * 100);
+      rates.add(rate);
+    }
+
+    Map<String, Object> result = new HashMap<>();
+    result.put("labels", labels);
+    result.put("rates", rates);
+    return result;
+  }
+
+  // [협력업체] 일정 캘린더
+  @Override
+  public List<Map<String, Object>> getPartnerCalendarEvents(User user) {
+    Partner partner = partnerRepository.findByUser(user)
+            .orElseThrow(() -> new IllegalStateException("협력업체 정보 없음"));
+
+    List<Map<String, Object>> events = new ArrayList<>();
+    LocalDate today = LocalDate.now();
+    LocalDate sevenDaysLater = today.plusDays(7);
+
+    // 1. 계약 종료 임박
+    contractRepository.findExpiringContracts(partner, today, sevenDaysLater)
+            .forEach(c -> events.add(Map.of(
+                    "title", "계약 종료 임박",
+                    "start", c.getConEnd().toString(),
+                    "backgroundColor", "#FFC107",
+                    "borderColor", "#FFC107",
+                    "extendedProps", Map.of(
+                            "type", "계약",
+                            "item", c.getConId(),
+                            "remarks", "계약 종료일: " + c.getConEnd()
+                    )
+            )));
+
+    // 2. 납기 예정
+    deliveryRequestItemRepository.findDueItemsByPartner(partner)
+            .forEach(d -> events.add(Map.of(
+                    "title", "납기 예정 - " + d.getDrItemCode(),
+                    "start", d.getDrItemDueDate().toString(),
+                    "backgroundColor", "#17A2B8",
+                    "borderColor", "#17A2B8",
+                    "extendedProps", Map.of(
+                            "type", "납품 일정",
+                            "item", d.getDrItemCode(),
+                            "remarks", "납기일: " + d.getDrItemDueDate()
+                    )
+            )));
+
+    // 3. 입고 완료
+    incomingTotalRepository.findCompletedIncomingByPartner(partner)
+            .forEach(i -> events.add(Map.of(
+                    "title", "입고 완료",
+                    "start", i.getIncomingCompletedAt().toLocalDate().toString(),
+                    "backgroundColor", "#28A745",
+                    "borderColor", "#28A745",
+                    "extendedProps", Map.of(
+                            "type", "입고",
+                            "item", i.getDeliveryRequestItem().getDrItemCode(),
+                            "remarks", "입고 수량: " + i.getIncomingEffectiveQty()
+                    )
+            )));
+    return events;
+  }
 
 }

@@ -16,18 +16,18 @@
                 <i class="bi bi-file-earmark-text kpi-icon"></i>
                 <div>
                     <div class="kpi-title">계약 진행</div>
-                    <div class="kpi-value">5건</div>
+                    <div class="kpi-value" th:text="${ongoingContracts} + '건'">0건</div>
                 </div>
             </div>
         </div>
 
-        <!-- 견적 승인률 -->
+        <!-- 납기 준수율 -->
         <div class="col-md-3">
             <div class="kpi-card">
-                <i class="bi bi-pie-chart kpi-icon"></i>
+                <i class="bi bi-clock-history kpi-icon"></i>
                 <div>
-                    <div class="kpi-title">견적 승인률</div>
-                    <div class="kpi-value">83%</div>
+                    <div class="kpi-title">납기 준수율</div>
+                    <div class="kpi-value" th:text="${onTimeRate} + '%'">0%</div>
                 </div>
             </div>
         </div>
@@ -38,7 +38,7 @@
                 <i class="bi bi-check2-circle kpi-icon"></i>
                 <div>
                     <div class="kpi-title">검수 완료율</div>
-                    <div class="kpi-value">91%</div>
+                    <div class="kpi-value" th:text="${inspectionRate} + '%'">0%</div>
                 </div>
             </div>
         </div>
@@ -49,7 +49,7 @@
                 <i class="bi bi-currency-dollar kpi-icon"></i>
                 <div>
                     <div class="kpi-title">월 거래 금액</div>
-                    <div class="kpi-value">₩12,540,000</div>
+                    <div class="kpi-value" th:text="${#numbers.formatInteger(monthlyAmount, 3, 'COMMA')} + '원'">0원</div>
                 </div>
             </div>
         </div>
@@ -80,10 +80,10 @@
                         <div class="card p-3">
                             <div class="section-title">
                                 <h5 class="fw-bold ms-2 mt-2">
-                                    <i class="bi bi-clipboard-check"></i> 월별 견적 승인률
+                                    <i class="bi bi-clipboard-check"></i> 월별 납기 준수율
                                 </h5>
                             </div>
-                            <canvas id="approvalChart"></canvas>
+                            <canvas id="onTimeRateChart"></canvas>
                         </div>
                     </div>
                 </div>

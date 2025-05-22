@@ -16,6 +16,13 @@ public interface TransactionRepository extends JpaRepository<Transaction, String
 
     Long countByTranIdStartingWith(String prefix);
 
-
-
+    @Query("""
+    SELECT SUM(t.totalAmount) FROM Transaction t
+    WHERE t.partner = :partner
+    AND FUNCTION('YEAR', t.tranDate) = :year
+    AND FUNCTION('MONTH', t.tranDate) = :month
+    """)
+    Long getMonthlyTransactionTotal(@Param("partner") Partner partner,
+                                    @Param("year") int year,
+                                    @Param("month") int month);
 }

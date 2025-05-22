@@ -4,6 +4,7 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.zerock.b01.domain.operation.Ordering;
+import org.zerock.b01.domain.user.Partner;
 import org.zerock.b01.domain.warehouse.DeliveryRequestItem;
 import org.zerock.b01.domain.warehouse.IncomingStatus;
 import org.zerock.b01.domain.warehouse.IncomingTotal;
@@ -48,4 +49,60 @@ public interface IncomingTotalRepository extends JpaRepository<IncomingTotal, Lo
   List<Object[]> sumUnclosedIncomingQtyByMaterial();
 
   List<IncomingTotal> findByIncomingStatus(IncomingStatus status);
+
+  // 전체 입고완료 건수
+  @Query("""
+    SELECT COUNT(it) 
+    FROM IncomingTotal it 
+    WHERE it.incomingStatus = '입고마감'
+    AND it.deliveryRequestItem.deliveryRequest.ordering.contractMaterial.contract.partner = :partner
+    """)
+  long countCompletedIncomingByPartner(@Param("partner") Partner partner);
+
+  // 납기 준수 입고완료 건수
+  @Query("""
+    SELECT COUNT(it) 
+    FROM IncomingTotal it 
+    WHERE it.incomingStatus = '입고마감'
+    AND it.incomingCompletedAt IS NOT NULL
+    AND it.deliveryRequestItem.drItemDueDate >= FUNCTION('DATE', it.incomingCompletedAt)
+    AND it.deliveryRequestItem.deliveryRequest.ordering.contractMaterial.contract.partner = :partner
+    """)
+  long countOnTimeIncomingByPartner(@Param("partner") Partner partner);
+
+  @Query("""
+    SELECT 
+        FUNCTION('MONTH', it.incomingCompletedAt),
+        SUM(CASE WHEN it.deliveryRequestItem.drItemDueDate >= FUNCTION('DATE', it.incomingCompletedAt) THEN 1 ELSE 0 END),
+        SUM(CASE WHEN it.deliveryRequestItem.drItemDueDate < FUNCTION('DATE', it.incomingCompletedAt) THEN 1 ELSE 0 END)
+    FROM IncomingTotal it
+    WHERE it.incomingStatus = '입고마감'
+    AND FUNCTION('YEAR', it.incomingCompletedAt) = :year
+    AND it.deliveryRequestItem.deliveryRequest.ordering.contractMaterial.contract.partner = :partner
+    GROUP BY FUNCTION('MONTH', it.incomingCompletedAt)
+    ORDER BY FUNCTION('MONTH', it.incomingCompletedAt)
+""")
+  List<Object[]> getMonthlyOnTimeAndDelayedCount(@Param("partner") Partner partner, @Param("year") int year);
+
+  @Query("""
+    SELECT 
+        FUNCTION('MONTH', it.incomingCompletedAt),
+        COUNT(it),
+        SUM(CASE WHEN it.deliveryRequestItem.drItemDueDate >= FUNCTION('DATE', it.incomingCompletedAt) THEN 1 ELSE 0 END)
+    FROM IncomingTotal it
+    WHERE it.incomingStatus = '입고마감'
+    AND FUNCTION('YEAR', it.incomingCompletedAt) = :year
+    AND it.deliveryRequestItem.deliveryRequest.ordering.contractMaterial.contract.partner = :partner
+    GROUP BY FUNCTION('MONTH', it.incomingCompletedAt)
+    ORDER BY FUNCTION('MONTH', it.incomingCompletedAt)
+""")
+  List<Object[]> getMonthlyOnTimeRateData(@Param("partner") Partner partner, @Param("year") int year);
+
+  @Query("""
+    SELECT i FROM IncomingTotal i
+    WHERE i.incomingStatus = '입고마감'
+    AND i.deliveryRequestItem.deliveryRequest.ordering.contractMaterial.contract.partner = :partner
+""")
+  List<IncomingTotal> findCompletedIncomingByPartner(@Param("partner") Partner partner);
+
 }
