@@ -88,6 +88,9 @@ dependencies {
     // Thymeleaf에서 Spring Security 기능 (인증/권한 정보)을 템플릿에서 사용할 수 있게 해주는 추가 모듈
     implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
+    // PDF 생성 및 조작을 위한 iText 라이브러리 (v5 버전), 문서 작성, 폰트 삽입, 테이블, 이미지 등 PDF 요소 구성 가능
+    implementation 'com.itextpdf:itextpdf:5.5.13.3'
+
 }
 
 tasks.named('test') {

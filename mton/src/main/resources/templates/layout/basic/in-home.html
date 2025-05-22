@@ -29,7 +29,7 @@
         </div>
 
         <!-- 알림 없앤다면 me-2 지우기 -->
-        <div class="dropdown me-2">
+        <div class="dropdown">
             <button class="btn no-bootstrap-style d-flex align-items-center" type="button" data-bs-toggle="dropdown"
                     aria-expanded="false">
                 <span class="profile-icon rounded-circle p-2"
@@ -75,51 +75,51 @@
             </ul>
         </div>
 
-        <div class="dropdown">
-            <button class="btn btn-light notification-bell" data-bs-toggle="dropdown" aria-expanded="false">
-                <i class="fas fa-bell fa-lg"></i>
-                <span class="notification-count">3</span>
-            </button>
-            <ul class="dropdown-menu dropdown-menu-end w-360">
-                <li class="dropdown-header d-flex justify-content-between align-items-center">
-                    <span class="fw-bold text-primary">알림 내역</span>
-                    <button class="btn btn-sm btn-link text-secondary">모두 읽음</button>
-                </li>
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
+<!--        <div class="dropdown">-->
+<!--            <button class="btn btn-light notification-bell" data-bs-toggle="dropdown" aria-expanded="false">-->
+<!--                <i class="fas fa-bell fa-lg"></i>-->
+<!--                <span class="notification-count">3</span>-->
+<!--            </button>-->
+<!--            <ul class="dropdown-menu dropdown-menu-end w-360">-->
+<!--                <li class="dropdown-header d-flex justify-content-between align-items-center">-->
+<!--                    <span class="fw-bold text-primary">알림 내역</span>-->
+<!--                    <button class="btn btn-sm btn-link text-secondary">모두 읽음</button>-->
+<!--                </li>-->
+<!--                <li>-->
+<!--                    <hr class="dropdown-divider">-->
+<!--                </li>-->
 
-                <li class="px-3 py-2 notification-item unread priority-high">
-                    <div>
-                        <i class="fas fa-exclamation-circle text-danger notification-icon"></i>
-                        <span>재고 임계치 경고: B456 부품</span>
-                    </div>
-                    <div class="text-muted small">10분 전</div>
-                </li>
+<!--                <li class="px-3 py-2 notification-item unread priority-high">-->
+<!--                    <div>-->
+<!--                        <i class="fas fa-exclamation-circle text-danger notification-icon"></i>-->
+<!--                        <span>재고 임계치 경고: B456 부품</span>-->
+<!--                    </div>-->
+<!--                    <div class="text-muted small">10분 전</div>-->
+<!--                </li>-->
 
-                <li class="px-3 py-2 notification-item unread priority-medium">
-                    <div>
-                        <i class="fas fa-truck text-warning notification-icon"></i>
-                        <span>입고 지연: 자재 A123 예정 미도착</span>
-                    </div>
-                    <div class="text-muted small">30분 전</div>
-                </li>
+<!--                <li class="px-3 py-2 notification-item unread priority-medium">-->
+<!--                    <div>-->
+<!--                        <i class="fas fa-truck text-warning notification-icon"></i>-->
+<!--                        <span>입고 지연: 자재 A123 예정 미도착</span>-->
+<!--                    </div>-->
+<!--                    <div class="text-muted small">30분 전</div>-->
+<!--                </li>-->
 
-                <li class="px-3 py-2 notification-item priority-low">
-                    <div>
-                        <i class="fas fa-file-signature text-info notification-icon"></i>
-                        <span>발주서 PO-20250407 승인 완료</span>
-                    </div>
-                    <div class="text-muted small">1시간 전</div>
-                </li>
+<!--                <li class="px-3 py-2 notification-item priority-low">-->
+<!--                    <div>-->
+<!--                        <i class="fas fa-file-signature text-info notification-icon"></i>-->
+<!--                        <span>발주서 PO-20250407 승인 완료</span>-->
+<!--                    </div>-->
+<!--                    <div class="text-muted small">1시간 전</div>-->
+<!--                </li>-->
 
-                <li>
-                    <hr class="dropdown-divider">
-                </li>
-                <li><a class="dropdown-item text-center text-primary" href="#" data-bs-toggle="modal"
-                       data-bs-target="#allNotificationModal">전체 알림 보기</a></li>
-            </ul>
-        </div>
+<!--                <li>-->
+<!--                    <hr class="dropdown-divider">-->
+<!--                </li>-->
+<!--                <li><a class="dropdown-item text-center text-primary" href="#" data-bs-toggle="modal"-->
+<!--                       data-bs-target="#allNotificationModal">전체 알림 보기</a></li>-->
+<!--            </ul>-->
+<!--        </div>-->
 
 
     </div>
@@ -150,7 +150,7 @@
             </a>
 
             <div class="collapse" id="productionSubmenu">
-                <ul class="nav flex-column ms-4">
+                <ul class="nav flex-column ms-4 submenu">
                     <li><a class="nav-link" href="/internal/product/pbom">품목등록</a></li>
                     <li><a class="nav-link" href="/internal/product/prdplan">생산계획</a></li>
                 </ul>
@@ -167,7 +167,7 @@
             </a>
 
             <div class="collapse" id="purchaseSubmenu">
-                <ul class="nav flex-column ms-4">
+                <ul class="nav flex-column ms-4 submenu">
                     <li><a class="nav-link" href="/internal/procurement/procure">조달계획</a></li>
                     <li><a class="nav-link" href="/internal/procurement/contract">계약 정보</a></li>
                     <li><a class="nav-link" href="/internal/procurement/order">자재 발주</a></li>
@@ -185,7 +185,7 @@
                 <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
             <div class="collapse" id="deliverySubmenu">
-                <ul class="nav flex-column ms-4">
+                <ul class="nav flex-column ms-4 submenu">
                     <li><a class="nav-link" href="/internal/delivery/request">납입지시 요청</a></li>
                     <li><a class="nav-link" href="/internal/delivery/status">납입지시 조회</a></li>
                 </ul>
@@ -201,8 +201,9 @@
                 <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
             <div class="collapse" id="inSubmenu">
-                <ul class="nav flex-column ms-4">
-                    <li><a class="nav-link" href="/internal/incoming/trans">거래 명세</a></li>
+                <ul class="nav flex-column ms-4 submenu">
+                    <li><a class="nav-link" href="/internal/incoming/trans">거래 명세 발행</a></li>
+                    <li><a class="nav-link" href="/internal/incoming/trans-list">거래 명세 확인</a></li>
                     <li><a class="nav-link" href="/internal/incoming/planned">입고 예정</a></li>
                     <li><a class="nav-link" href="/internal/incoming/inspection">입고 검수</a></li>
                     <li><a class="nav-link" href="/internal/incoming/history">입고 이력</a></li>
@@ -219,7 +220,7 @@
                 <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
             <div class="collapse" id="outSubmenu">
-                <ul class="nav flex-column ms-4">
+                <ul class="nav flex-column ms-4 submenu">
                     <li><a class="nav-link" href="/internal/outgoing/status">출고 조회</a></li>
                     <li><a class="nav-link" href="/internal/outgoing/history">출고 이력</a></li>
                     <li><a class="nav-link" href="/internal/outgoing/result">출고 처리 결과 조회</a></li>
@@ -236,7 +237,7 @@
                 <i class="bi bi-chevron-down toggle-arrow ms-auto"></i>
             </a>
             <div class="collapse" id="stockSubmenu">
-                <ul class="nav flex-column ms-4">
+                <ul class="nav flex-column ms-4 submenu">
                     <li><a class="nav-link" href="/internal/inventory/status">재고 조회</a></li>
                     <li><a class="nav-link" href="/internal/inventory/history">재고 이력</a></li>
                     <li><a class="nav-link" href="/internal/inventory/price">재고 금액</a></li>
@@ -273,6 +274,7 @@
 
     <!-- 입고 -->
     <div layout:fragment="incoming-trans"></div>
+    <div layout:fragment="incoming-trans-list"></div>
 
     <div layout:fragment="incoming-planned"></div>
     <div layout:fragment="incoming-inspection"></div>

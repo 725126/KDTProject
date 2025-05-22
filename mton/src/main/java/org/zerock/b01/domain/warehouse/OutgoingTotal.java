@@ -23,7 +23,7 @@ public class OutgoingTotal {
   @JoinColumn(name = "mat_id", nullable = false)
   private Material material;
 
-  @ManyToOne(cascade = CascadeType.PERSIST)
+  @ManyToOne
   @JoinColumn(name = "prdplan_id", nullable = false)
   private ProductionPlan productionPlan;
 

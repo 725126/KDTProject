@@ -6,6 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
+import org.springframework.http.ContentDisposition;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -15,19 +19,23 @@ import org.zerock.b01.controller.operation.repository.OrderingRepository;
 import org.zerock.b01.controller.operation.service.ContractMaterialService;
 import org.zerock.b01.controller.operation.service.InspectionService;
 import org.zerock.b01.controller.operation.service.OrderingService;
-import org.zerock.b01.domain.operation.Inspection;
-import org.zerock.b01.domain.operation.Ordering;
-import org.zerock.b01.domain.operation.StatusTuple;
+import org.zerock.b01.domain.operation.*;
+import org.zerock.b01.domain.user.Partner;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.operation.ContractMaterialViewDTO;
 import org.zerock.b01.dto.partner.ContractMaterialDTO;
 import org.zerock.b01.dto.warehouse.DeliveryPartnerDTO;
+import org.zerock.b01.repository.user.PartnerRepository;
+import org.zerock.b01.repository.warehouse.TransactionItemRepository;
+import org.zerock.b01.repository.warehouse.TransactionRepository;
 import org.zerock.b01.security.CustomUserDetails;
 import org.zerock.b01.service.operation.ContractService;
 import org.zerock.b01.service.user.UserService;
 import org.zerock.b01.service.warehouse.DeliveryPartnerService;
+import org.zerock.b01.service.warehouse.TransactionItemService;
 
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -48,6 +56,9 @@ public class PartnerController {
     private final UserService userService;
     private final OrderingService orderingService;
     private final InspectionService inspectionService;
+    private final TransactionItemService transactionItemService;
+
+    private final PartnerRepository partnerRepository;
 
     // 계약 정보 열람
     @GetMapping("/contract/view")
@@ -109,9 +120,40 @@ public class PartnerController {
         return "page/partner/mat-inventory";
     }
 
-    // 거래 명세 활용
+    // 거래 명세 확인
     @GetMapping("/trans")
-    public String transGet() {
+    public String transGet(
+            @AuthenticationPrincipal CustomUserDetails userDetails,
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(required = false) String keyword,
+            @RequestParam(required = false) List<String> category,
+            @RequestParam(defaultValue = "newest") String sort,
+            Model model) {
+
+        Partner partner = partnerRepository.findByUser(userDetails.getUser())
+                .orElseThrow(() -> new IllegalStateException("협력업체 정보 없음"));
+
+        Pageable pageable = switch (sort) {
+            case "oldest" -> PageRequest.of(page, size, Sort.by("tranDate").ascending());
+            case "tranIdAsc" -> PageRequest.of(page, size, Sort.by("tranId").ascending());
+            case "totalAmountDes" -> PageRequest.of(page, size, Sort.by("totalAmount").descending());
+            default -> PageRequest.of(page, size, Sort.by("tranDate").descending());
+        };
+
+        Page<Transaction> transactionPage = transactionItemService.searchPartnerTransactions(
+                partner, keyword, category, pageable);
+
+        log.info(transactionPage);
+
+        model.addAttribute("transactionList", transactionPage.getContent());
+        model.addAttribute("currentPage", page + 1);
+        model.addAttribute("totalPages", transactionPage.getTotalPages());
+        model.addAttribute("selectedSort", sort);
+        model.addAttribute("selectedSize", size);
+        model.addAttribute("keyword", keyword);
+        model.addAttribute("selectedCategory", category);
+
         return "page/partner/trans";
     }
 

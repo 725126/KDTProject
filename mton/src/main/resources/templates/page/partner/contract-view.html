@@ -102,7 +102,7 @@
                     <td th:text="${contract.endDate}">2025-05-20</td>
                     <td th:text="${contract.explain}">합의내용</td>
                     <td>
-                        <a th:if="${contract.fileId != null}" th:href="@{/files/view/{id}(id=${contract.fileId})}" target="_blank"
+                        <a th:if="${contract.fileId != null}" th:href="@{/contract/file/view/{id}(id=${contract.fileId})}" target="_blank"
                            class="btn btn-sm btn-outline-primary">
                             <i class="bi bi-file-earmark-text"></i> 보기
                         </a>

@@ -10,12 +10,12 @@ document.addEventListener('DOMContentLoaded', function () {
             right: 'dayGridMonth,timeGridWeek,listWeek'
         },
         locale: 'ko',
-        height: 425,
+        height: 684,
 
         events: [
             {
                 title: '입고 예정 - 배터리',
-                start: '2025-04-10',
+                start: '2025-05-27',
                 backgroundColor: '#00909E',
                 extendedProps: {
                     type: '입고 예정',
@@ -24,8 +24,28 @@ document.addEventListener('DOMContentLoaded', function () {
                 }
             },
             {
+                title: '입고 예정22 - 배터리',
+                start: '2025-05-27',
+                backgroundColor: '#00909E',
+                extendedProps: {
+                    type: '입고 예정',
+                    item: '배터리 셀 21700',
+                    remarks: '중국 협력사 출하 대기 중'
+                }
+            },
+            {
+                title: '입고 예정99 - 배터리',
+                start: '2025-05-27',
+                backgroundColor: '#00909E',
+                extendedProps: {
+                    type: '입고 예정',
+                    item: ['배터리 셀 21700', '1234', '45697'],
+                    remarks: '중국 협력사 출하 대기 중'
+                }
+            },
+            {
                 title: '발주일 - 킥보드 부품',
-                start: '2025-04-08',
+                start: '2025-05-30',
                 backgroundColor: '#27496D',
                 borderColor: '#27496D',
                 extendedProps: {

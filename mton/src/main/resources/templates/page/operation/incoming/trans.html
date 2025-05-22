@@ -5,57 +5,138 @@
 <head>
     <meta charset="UTF-8">
     <title>자재ON - 입고 > 거래 명세</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <link rel="stylesheet" th:href="@{/css/component/tooltip-custom.css}">
+    <link rel="stylesheet" th:href="@{/css/component/search-input.css}">
 </head>
 <body>
 
 <th:block layout:fragment="incoming-trans">
-    <div class="container py-5">
-        <h2 class="mb-4">거래 명세 발행</h2>
-        <div class="card p-4 mb-3">
-            <form action="/internal/incoming/trans" method="get">
-                <div class="col-md-3">
-                    <label for="orderId" class="form-label">발주코드</label>
-                    <input type="text" class="form-control" id="orderId" name="orderId"
-                           th:value="${pageRequestDTO.orderId}">
+    <div class="container-xl mt-5">
+        <h4 class="fw-semibold mb-3">거래 명세 발행</h4>
+
+        <!-- 거래 명세서 발행 테이블 + 필터 UI 통합 -->
+        <!-- 검색 + 필터 영역 -->
+        <div class="d-flex justify-content-between mb-3">
+            <div class="position-relative w-25">
+                <div id="toastAlert" class="toast align-items-center text-bg-warning border-0 position-absolute top-0 start-0 z-3"
+                     role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 9999;">
+                    <div class="d-flex">
+                        <div class="toast-body">
+                            📌 검색 기준을 최소 1개 이상 선택해주세요.
+                        </div>
+                        <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                                data-bs-dismiss="toast" aria-label="Close"></button>
+                    </div>
                 </div>
-                <div class="col-md-3">
-                    <label for="pCompany" class="form-label">자재코드</label>
-                    <input type="text" class="form-control" id="pCompany" name="pCompany"
-                           th:value="${pageRequestDTO.pCompany}">
-                </div>
-                <div class="col-md-3">
-                    <label for="matId" class="form-label">자재코드</label>
-                    <input type="text" class="form-control" id="matId" name="matId"
-                           th:value="${pageRequestDTO.matId}">
-                </div>
-                <div class="col-md-3">
-                    <label for="matName" class="form-label">자재명</label>
-                    <input type="text" class="form-control" id="matName" name="matName"
-                           th:value="${pageRequestDTO.matName}">
-                </div>
-                <div class="col-12 text-end">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
-                    <button type="button" class="btn btn-outline-secondary clearBtn" ><i class="bi bi-arrow-clockwise"></i> 초기화</button>
-                </div>
-            </form>
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" id="searchInput" class="form-control search-input" placeholder="검색"
+                       data-bs-toggle="dropdown" aria-expanded="false" th:value="${keyword}">
+                <ul class="dropdown-menu" id="dropdownMenu" title="검색 대상 선택" data-bs-toggle="tooltip" data-bs-placement="bottom">
+                    <li>
+                        <label class="checkbox-toss">
+                            <input type="checkbox" id="allCheck" onchange="toggleAll(this)">
+                            <span>(모두 선택)</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="checkbox-toss">
+                            <input type="checkbox" id="orderId"
+                                   th:checked="${selectedCategory != null and selectedCategory.contains('orderId')}">
+                            <span>발주코드</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="checkbox-toss">
+                            <input type="checkbox" id="pCompany"
+                                   th:checked="${selectedCategory != null and selectedCategory.contains('pCompany')}">
+                            <span>협력업체</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="checkbox-toss">
+                            <input type="checkbox" id="matId"
+                                   th:checked="${selectedCategory != null and selectedCategory.contains('matId')}">
+                            <span>자재코드</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="checkbox-toss">
+                            <input type="checkbox" id="matName"
+                                   th:checked="${selectedCategory != null and selectedCategory.contains('matName')}">
+                            <span>자재명</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="checkbox-toss">
+                            <input type="checkbox" id="titemQty"
+                                   th:checked="${selectedCategory != null and selectedCategory.contains('titemQty')}">
+                            <span>납입량</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="checkbox-toss">
+                            <input type="checkbox" id="titemPrice"
+                                   th:checked="${selectedCategory != null and selectedCategory.contains('titemPrice')}">
+                            <span>단가</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="checkbox-toss">
+                            <input type="checkbox" id="amount"
+                                   th:checked="${selectedCategory != null and selectedCategory.contains('amount')}">
+                            <span>총 금액</span>
+                        </label>
+                    </li>
+                    <li>
+                        <label class="checkbox-toss">
+                            <input type="checkbox" id="incomingLastCompletedAt"
+                                   th:checked="${selectedCategory != null and selectedCategory.contains('incomingLastCompletedAt')}">
+                            <span>날짜</span>
+                        </label>
+                    </li>
+                </ul>
+            </div>
+
+
+            <div class="d-flex gap-2 align-items-center">
+                <i class="bi bi-funnel text-secondary" title="정렬 필터"></i>
+                <select class="form-select form-select w-auto" name="sort" id="sortSelect">
+                    <option value="newest" th:selected="${selectedSort == 'newest'}">최신 순</option>
+                    <option value="oldest" th:selected="${selectedSort == 'oldest'}">오래된 순</option>
+                    <option value="companyAsc" th:selected="${selectedSort == 'matIdAsc'}">발주 코드 순</option>
+                    <option value="materialAsc" th:selected="${selectedSort == 'totalAmountDes'}">총 금액 높은 순</option>
+                </select>
+                <button class="btn btn-primary ms-2" id="generateStatementBtn">
+                    <i class="bi bi-file-earmark-text me-1"></i> 거래명세서 발행
+                </button>
+            </div>
+
         </div>
 
-        <div class="card p-4 mb-5">
-            <table class="table table-bordered table-hover data-table text-center">
-                <thead class="table-light">
+        <!-- 테이블 -->
+        <div class="table-responsive rounded border table-scroll">
+            <table class="table table-hover text-center align-middle mb-0">
+                <thead class="table-light text-dark border-bottom">
                 <tr>
-                    <th>발주코드</th>
-                    <th>협력사</th>
-                    <th>자재코드</th>
-                    <th>자재명</th>
-                    <th>납입량</th>
-                    <th>단가</th>
-                    <th>총금액</th>
-                    <th>날짜</th>
+                    <th scope="col"><input type="checkbox" id="selectAll"></th>
+                    <th scope="col">발주코드</th>
+                    <th scope="col">협력업체</th>
+                    <th scope="col">자재코드</th>
+                    <th scope="col">자재명</th>
+                    <th scope="col">납입량</th>
+                    <th scope="col">단가(원)</th>
+                    <th scope="col">총 금액(원)</th>
+                    <th scope="col">날짜</th>
                 </tr>
                 </thead>
-                <tbody>
-                <tr th:each="Transation:${TransationList}">
+                <tbody class="table-group-divider">
+                <tr th:each="Transation : ${TransationList}">
+                    <td><input type="checkbox" name="selectedRows"
+                               th:attr="data-partner-id=${Transation.partnerId}"
+                               th:value="${Transation.orderId}"></td>
                     <td th:text="${Transation.orderId}"></td>
                     <td th:text="${Transation.pCompany}"></td>
                     <td th:text="${Transation.matId}"></td>
@@ -69,40 +150,217 @@
             </table>
         </div>
 
-        <h2 class="mb-4">명세서</h2>
-        <div class="card p-4">
-            <form id="statement-form" class="row g-3">
-                <div class="col-md-4">
-                    <label for="buyer" class="form-label">거래사</label>
-                    <input type="text" class="form-control" id="buyer">
+        <!-- 거래명세서 미리보기 모달 -->
+        <div class="modal fade" id="transactionPreviewModal" tabindex="-1"
+             aria-labelledby="transactionPreviewModalLabel" aria-hidden="true">
+            <div class="modal-dialog modal-xl modal-dialog-scrollable">
+                <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                        <h5 class="modal-title" id="transactionPreviewModalLabel">거래명세서 미리보기</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="닫기"></button>
+                    </div>
+                    <div class="modal-body" id="previewModalBody">
+                        <!-- JS로 미리보기 내용 삽입됨 -->
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">취소</button>
+                        <button type="button" class="btn btn-success" id="confirmIssueBtn">
+                            <i class="bi bi-check-circle"></i> 거래명세서 발행
+                        </button>
+                    </div>
                 </div>
-                <div class="col-md-4">
-                    <label for="vendor" class="form-label">협력사</label>
-                    <input type="text" class="form-control" id="vendor">
-                </div>
-                <div class="col-md-4">
-                    <label for="trade-date" class="form-label">거래일</label>
-                    <input type="date" class="form-control" id="trade-date">
-                </div>
-                <div class="col-12">
-                    <label for="details" class="form-label">거래 관련 세부 내용</label>
-                    <textarea class="form-control" id="details" rows="4" placeholder="거래 관련 세부 내용"></textarea>
-                </div>
-                <div class="col-12 text-end mt-4">
-                    <button type="submit" class="btn btn-primary"><i class="bi bi-file-earmark-check me-1"></i> 발행</button>
-                </div>
-            </form>
+            </div>
         </div>
-    </div>
-</th:block>
-<script layout:fragment="script" th:inline="javascript">
-    document.querySelector(".clearBtn").addEventListener("click", function (e) {
-        e.preventDefault()
-        e.stopPropagation()
 
-        self.location = '/internal/incoming/trans'
-    }, false)
-</script>
+
+    </div>
+
+    <script>
+        document.getElementById("selectAll").addEventListener("change", function () {
+            const checkboxes = document.querySelectorAll("input[name='selectedRows']");
+            checkboxes.forEach(cb => cb.checked = this.checked);
+        });
+
+        document.getElementById("generateStatementBtn").addEventListener("click", () => {
+            const checkedRows = Array.from(document.querySelectorAll("input[name='selectedRows']:checked"));
+            if (checkedRows.length === 0) {
+                alert("📌 최소 한 개 이상 선택해주세요.");
+                return;
+            }
+
+            const groupedData = {};
+
+            checkedRows.forEach(cb => {
+                const row = cb.closest("tr");
+                const partnerId = cb.getAttribute("data-partner-id");
+                const orderId = row.children[1].textContent;
+                const company = row.children[2].textContent;
+                const matId = row.children[3].textContent;
+                const matName = row.children[4].textContent;
+                const qty = row.children[5].textContent;
+                const price = row.children[6].textContent;
+                const amount = row.children[7].textContent;
+                const date = row.children[8].textContent;
+
+                if (!groupedData[partnerId]) {
+                    groupedData[partnerId] = {
+                        company,
+                        rows: []
+                    };
+                }
+
+                groupedData[partnerId].rows.push({orderId, matId, matName, qty, price, amount, date});
+            });
+
+            let html = '';
+
+            for (const partnerId in groupedData) {
+                const group = groupedData[partnerId];
+                html += `
+          <h6 class="fw-bold mb-2 mt-4"><i class="bi bi-building"></i> ${group.company}</h6>
+          <div class="table-responsive">
+            <table class="table table-bordered table-hover text-center align-middle mb-4">
+              <thead class="table-light">
+                <tr>
+                  <th>발주코드</th>
+                  <th>자재코드</th>
+                  <th>자재명</th>
+                  <th>납입량</th>
+                  <th>단가(원)</th>
+                  <th>총 금액(원)</th>
+                  <th>날짜</th>
+                </tr>
+              </thead>
+              <tbody>
+        `;
+
+                group.rows.forEach(item => {
+                    html += `
+              <tr>
+                <td>${item.orderId}</td>
+                <td>${item.matId}</td>
+                <td>${item.matName}</td>
+                <td>${item.qty}</td>
+                <td>${item.price}</td>
+                <td>${item.amount}</td>
+                <td>${item.date}</td>
+              </tr>
+            `;
+                });
+
+                html += `</tbody></table></div>`;
+            }
+
+            document.getElementById("previewModalBody").innerHTML = html;
+            new bootstrap.Modal(document.getElementById("transactionPreviewModal")).show();
+        });
+
+        document.getElementById("confirmIssueBtn").onclick = () => {
+            const checkedRows = Array.from(document.querySelectorAll("input[name='selectedRows']:checked"));
+            if (checkedRows.length === 0) {
+                alert("📌 최소 한 개 이상 선택해주세요.");
+                return;
+            }
+
+            const partnerMap = {};
+
+            checkedRows.forEach(cb => {
+                const row = cb.closest("tr");
+                const partnerId = cb.getAttribute("data-partner-id");
+                const orderId = cb.value;
+
+                const matId = row.children[3].textContent;
+                const qty = parseInt(row.children[5].textContent.replace(/,/g, "")) || 0;
+                const price = parseInt(row.children[6].textContent.replace(/,/g, "")) || 0;
+
+                if (!partnerMap[partnerId]) {
+                    partnerMap[partnerId] = [];
+                }
+
+                partnerMap[partnerId].push({
+                    orderId: orderId,
+                    matId: matId,
+                    qty: qty,
+                    price: price
+                });
+            });
+
+            // 최종 payload 구성
+            const partnerTransactions = Object.entries(partnerMap).map(([partnerId, items]) => ({
+                partnerId: parseInt(partnerId),
+                items: items
+            }));
+
+            console.log(JSON.stringify({partnerTransactions: partnerTransactions}, null, 2));
+
+            fetch("/internal/transaction/statement", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    "X-CSRF-TOKEN": document.querySelector('meta[name="_csrf"]').getAttribute("content")
+                },
+                body: JSON.stringify({partnerTransactions: partnerTransactions})
+            })
+                .then(res => {
+                    if (res.ok) {
+                        alert("✅ 거래명세서가 성공적으로 발행되었습니다.");
+                        window.location.reload();
+                    } else {
+                        throw new Error("서버 오류");
+                    }
+                })
+                .catch(err => {
+                    alert("❌ 거래명세서 발행 실패: " + err.message);
+                });
+        };
+    </script>
+
+    <script th:src="@{/js/util/tooltip-custom.js}"></script>
+    <script>
+        function toggleAll(source) {
+            const checkboxes = document.querySelectorAll("#dropdownMenu input[type='checkbox']");
+            checkboxes.forEach(cb => {
+                if (cb !== source) cb.checked = source.checked;
+            });
+        }
+
+        function applyInternalTransFilter() {
+            const keyword = document.getElementById("searchInput").value.trim();
+            const sort = document.getElementById("sortSelect").value;
+
+            // 체크된 검색 기준 추출
+            const selectedCategory = Array.from(document.querySelectorAll("#dropdownMenu input[type='checkbox']:checked"))
+                .filter(cb => cb.id !== 'allCheck')
+                .map(cb => cb.id);
+
+            // ✅ 체크박스 선택 안 된 경우 → 토스트 알림
+            if (selectedCategory.length === 0) {
+                const toast = new bootstrap.Toast(document.getElementById('toastAlert'));
+                toast.show();
+                return; // 검색 실행 중단
+            }
+
+            let url = `/internal/incoming/trans?`;
+
+            if (keyword) url += `keyword=${encodeURIComponent(keyword)}&`;
+            if (selectedCategory.length > 0) {
+                selectedCategory.forEach(cat => url += `category=${cat}&`);
+            }
+            url += `sort=${sort}`;
+
+            location.href = url;
+        }
+
+        // Enter 키 검색
+        document.getElementById("searchInput").addEventListener("keypress", e => {
+            if (e.key === "Enter") applyInternalTransFilter();
+        });
+
+        // 정렬 변경 시
+        document.getElementById("sortSelect").addEventListener("change", applyInternalTransFilter);
+    </script>
+</th:block>
+
 
 </body>
 </html>

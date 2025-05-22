@@ -101,11 +101,19 @@
       } */
 
 .calendar-container {
-    height: 476px;
+    /*height: 684px;*/
+}
+
+.card-calendar {
+    height: 100%;
+}
+
+.fc-daygrid-block-event .fc-event-time, .fc-daygrid-block-event .fc-event-title {
+    cursor: pointer;
 }
 
 .fc-direction-ltr {
-    height: 470px !important;
+    height: 570px !important;
 }
 
 .today-schedule {
@@ -132,7 +140,7 @@
 }
 
 .kpi-title {
-    font-size: 0.95rem;
+    font-size: 1.2rem;
     color: #6c757d;
 }
 

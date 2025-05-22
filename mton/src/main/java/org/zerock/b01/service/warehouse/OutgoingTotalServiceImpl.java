@@ -5,6 +5,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.zerock.b01.controller.operation.repository.PbomRepository;
 import org.zerock.b01.domain.operation.Material;
 import org.zerock.b01.domain.operation.Pbom;
@@ -30,6 +31,7 @@ public class OutgoingTotalServiceImpl implements OutgoingTotalService {
   private final PbomRepository pbomRepository;
 
   @Override
+  @Transactional
   public void createOutgoingTotalListByPrdPlan(ProductionPlan plan) {
     String prodId = plan.getProduct().getProdId();  // 상품 코드
     int planQty = plan.getPrdplanQty();  // 생산계획 수량

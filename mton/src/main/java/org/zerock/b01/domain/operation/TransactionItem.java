@@ -15,19 +15,7 @@ public class TransactionItem {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long titemId;
 
-    @ManyToOne
-    @JoinColumn(name = "tran_id", nullable = false)
-    private Transaction transaction;
-
-    @ManyToOne
-    @JoinColumn(name ="order_id" , nullable = false)
-    private Ordering ordering;
-
-    @Column(nullable = false)
-    private String matId;
-
-    @Column(nullable = false)
-    private String matName;
+    private String titemStore; // 보관위치
 
     @Column(nullable = false)
     private int titemPrice;
@@ -35,9 +23,21 @@ public class TransactionItem {
     @Column(nullable = false)
     private int titemQty;
 
+    @ManyToOne
+    @JoinColumn(name = "tran_id", nullable = false)
+    private Transaction transaction;
+
+    @ManyToOne
+    @JoinColumn(name = "mat_id")
+    private Material material;
+
     @Column(nullable = false)
     private int amount;
 
     @Column(nullable = false)
     private String remark;
+
+    @ManyToOne
+    @JoinColumn(name ="order_id" , nullable = false)
+    private Ordering ordering;
 }
