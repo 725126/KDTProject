@@ -234,7 +234,8 @@ let pbomList = [];
         result.then(res => {
             pbomList = res;
             automaticPplan(res, pplanInputTable);
-            tableRowsEditor.addPPlanTableUtilBtn(pplanInputTable);
+            // 성능 문제로 버튼 다는 것은 포기
+            // tableRowsEditor.addPPlanTableUtilBtn(pplanInputTable);
         });
     });
 
@@ -246,15 +247,14 @@ let pbomList = [];
 
         const pplan = document.getElementById("prdplan-select");
         const pplanIds = Array.from(pplan.options).map(x => x.value);
-        console.log(pplanIds);
         const dest = "/internal/procurement/calc/pplan/all";
 
         const result = jsonFetcherList(dest, pplanIds);
         result.then(res => {
-            console.log(res);
             pbomList = res;
             automaticPplan(res, pplanInputTable);
-            tableRowsEditor.addPPlanTableUtilBtn(pplanInputTable);
+            // 성능 문제로 버튼 다는 것은 포기
+            // tableRowsEditor.addPPlanTableUtilBtn(pplanInputTable);
         });
     });
 })();
