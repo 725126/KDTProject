@@ -166,6 +166,13 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
     // 생산량 변경을 할 경우
     @Override
     public StatusTuple updateQty(HashMap<String, Integer> changeList) {
-        return null;
+        List<String> ids = changeList.keySet().stream().collect(Collectors.toList());
+        List<ProductionPlan> originals = productionPlanRepository.findAllById(ids);
+
+        originals.forEach(x -> x.changeQty(changeList.get(x.getPrdplanId())));
+        productionPlanRepository.saveAll(originals);
+
+        // 구현 중단으로 그냥 업데이트만 하기로 한다.
+        return new StatusTuple(true, "생산량 변경");
     }
 }

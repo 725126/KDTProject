@@ -35,4 +35,5 @@ public class ProductionPlan {
     public void changeStat(String stat) {
         this.prdplanStat = stat;
     }
+    public void changeQty(int qty) { this.prdplanQty = qty; }
 }
