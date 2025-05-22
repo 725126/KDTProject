@@ -88,7 +88,6 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
       ordering.markAsCompleted();
       orderingRepository.save(ordering);
 
-      transactionItemService.createTransactionItemsForOrdering(ordering);
     }
   }
 

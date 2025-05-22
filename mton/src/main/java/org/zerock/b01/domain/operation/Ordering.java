@@ -33,6 +33,9 @@ public class Ordering {
     @Column(nullable = false)
     private int orderQty;
 
+    @Column(nullable = false)
+    private boolean transIssued; // 거래명세 발행 여부
+
     @Column(name = "order_stat", nullable = false)
     @Check(constraints = "order_stat IN ('진행중', '완료', '취소', '발주중', '취소대기')")
     private String orderStat;
@@ -44,5 +47,9 @@ public class Ordering {
 
     public void changeOrderStat(String stat) {
         this.orderStat = stat;
+    }
+
+    public void setTransIssued(boolean transIssued) {
+        this.transIssued = transIssued;
     }
 }

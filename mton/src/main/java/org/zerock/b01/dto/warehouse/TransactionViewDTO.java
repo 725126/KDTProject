@@ -1,9 +1,6 @@
 package org.zerock.b01.dto.warehouse;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import java.time.LocalDate;
 
@@ -23,10 +20,30 @@ public class TransactionViewDTO {
 
   private int titemPrice;
 
-  private int titemQty;
+  private Long titemQty;
 
-  private int amount;
+  private Long amount;
 
   private String pCompany;
+
+  private Long partnerId;
+
+  public TransactionViewDTO(String orderId, String pCompany, Long partnerId,
+                            String matId, String matName,
+                            int titemPrice, Long titemQty, Long amount) {
+    this.orderId = orderId;
+    this.pCompany = pCompany;
+    this.partnerId = partnerId;
+    this.matId = matId;
+    this.matName = matName;
+    this.titemPrice = titemPrice;
+    this.titemQty = titemQty;
+    this.amount = amount;
+  }
+
+  // 🔹 입고 완료일 추가 setter (stream map에서 넣어줄 용도)
+  public void setIncomingLastCompletedAt(LocalDate incomingLastCompletedAt) {
+    this.incomingLastCompletedAt = incomingLastCompletedAt;
+  }
 
 }

@@ -37,7 +37,8 @@ public class PageResponseDTO<E> {
         this.dtoList = dtoList;
 
         // 화면에서의 마지막 번호
-        this.end = (int) Math.ceil((this.page / 10.0)) * 10;
+//        this.end = (int) Math.ceil((this.page / 10.0)) * 10;
+        this.end = (int) Math.ceil(((this.page + 1) / 10.0)) * 10;
 
         // 화면에서의 시작 번호
         this.start = this.end - 9;

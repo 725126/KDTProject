@@ -29,7 +29,8 @@ public class DeliveryController {
 
     //납입지시요청페이지
     @GetMapping("/request")
-    public String listDeliveryRequests(PageRequestDTO pageRequestDTO, Model model) {
+    public String listDeliveryRequests(PageRequestDTO pageRequestDTO,
+                                       Model model) {
 
         PageResponseDTO<DeliveryRequestDTO> responseDTO = deliveryRequestService.listWithDeliveryRequest(pageRequestDTO);
 
@@ -37,7 +38,10 @@ public class DeliveryController {
 
         model.addAttribute("responseDTO", responseDTO);
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", responseDTO.getTotal());
+
+        model.addAttribute("currentPage", responseDTO.getPage() + 1);
+        model.addAttribute("totalPages", responseDTO.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/delivery/request";
     }
@@ -60,7 +64,7 @@ public class DeliveryController {
 
         model.addAttribute("drItemList", drItemList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", drItemList.getTotal());
+        model.addAttribute("totalPages", drItemList.getTotal());
 
         return "page/warehouse/delivery/instruction";
 
@@ -76,7 +80,9 @@ public class DeliveryController {
 
         model.addAttribute("drItemList", drItemList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", drItemList.getTotal());
+
+        model.addAttribute("currentPage", drItemList.getPage() + 1);
+        model.addAttribute("totalPages", drItemList.getEnd());
 
         return "page/warehouse/delivery/status";
     }

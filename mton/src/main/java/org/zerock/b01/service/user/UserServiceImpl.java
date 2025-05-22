@@ -210,6 +210,12 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
+    public Partner findByPartner(User user) {
+        return partnerRepository.findByUser(user)
+                .orElseThrow(() -> new RuntimeException("협력업체 회원 정보를 찾을 수 없습니다."));
+    }
+
+    @Override
     public User getUserByEmail(String email) {
         return userRepository.findByuEmail(email)
                 .orElseThrow(() -> new RuntimeException("회원 정보를 찾을 수 없습니다."));

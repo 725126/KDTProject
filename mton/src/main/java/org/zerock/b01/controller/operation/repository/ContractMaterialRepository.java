@@ -28,6 +28,40 @@ public interface ContractMaterialRepository extends JpaRepository<ContractMateri
             "LOWER(m.matName) LIKE LOWER(CONCAT('%', :keyword, '%')))")
     Page<ContractMaterial> searchContractMaterials(@Param("keyword") String keyword, Pageable pageable);
 
+    @Query("SELECT cm FROM ContractMaterial cm " +
+            "JOIN FETCH cm.contract c " +
+            "JOIN FETCH c.partner p " +
+            "LEFT JOIN FETCH cm.material m " +
+            "WHERE p.partnerId = :partnerId " +
+            "AND (:keyword IS NULL OR LOWER(m.matName) LIKE LOWER(CONCAT('%', :keyword, '%')) " +
+            "OR LOWER(p.pCompany) LIKE LOWER(CONCAT('%', :keyword, '%')))")
+    Page<ContractMaterial> searchByPartner(@Param("partnerId") Long partnerId,
+                                           @Param("keyword") String keyword,
+                                           Pageable pageable);
+
+    @Query("""
+            SELECT cm FROM ContractMaterial cm
+            JOIN FETCH cm.contract c
+            JOIN FETCH c.partner p
+            LEFT JOIN FETCH cm.material m
+            WHERE p.partnerId = :partnerId
+            AND (
+                :keyword IS NULL OR
+                (:category = 'code' AND LOWER(c.conId) LIKE LOWER(CONCAT('%', :keyword, '%'))) OR
+                (:category = 'material' AND LOWER(m.matName) LIKE LOWER(CONCAT('%', :keyword, '%'))) OR
+                (:category = 'price' AND CAST(cm.cmtPrice AS string) LIKE CONCAT('%', :keyword, '%')) OR
+                (:category = 'qty' AND CAST(cm.cmtQty AS string) LIKE CONCAT('%', :keyword, '%')) OR
+                (:category = 'leadtime' AND CAST(cm.cmtReq AS string) LIKE CONCAT('%', :keyword, '%')) OR
+                (:category = 'startDate' AND CAST(c.conDate AS string) LIKE CONCAT('%', :keyword, '%')) OR
+                (:category = 'endDate' AND CAST(c.conEnd AS string) LIKE CONCAT('%', :keyword, '%')) OR
+                (:category = 'explain' AND LOWER(cm.cmtExplains) LIKE LOWER(CONCAT('%', :keyword, '%')))
+            )
+            """)
+    Page<ContractMaterial> searchByPartnerWithFilter(@Param("partnerId") Long partnerId,
+                                                     @Param("keyword") String keyword,
+                                                     @Param("category") String category,
+                                                     Pageable pageable);
+
     // 마지막 계약자재코드 찾기 (자동 생성용)
     @Query("SELECT c.cmtId FROM ContractMaterial c WHERE c.cmtId LIKE ?1% ORDER BY c.cmtId DESC LIMIT 1")
     String findLastOrderIdByPrefix(String prefix);

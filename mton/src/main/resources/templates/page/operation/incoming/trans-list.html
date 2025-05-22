@@ -1,0 +1,206 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+  <meta charset="UTF-8">
+  <title>자재ON > 거래 명세 확인</title>
+  <link rel="stylesheet" th:href="@{/css/component/tooltip-custom.css}">
+  <link rel="stylesheet" th:href="@{/css/component/search-input.css}">
+</head>
+<body>
+
+<!-- 거래 명세 발행 레이아웃 -->
+<th:block layout:fragment="incoming-trans-list">
+  <!-- 트렌디한 브레드크럼 UI (Bootstrap 5 + 커스텀 스타일 적용) -->
+  <nav aria-label="breadcrumb">
+    <ol class="breadcrumb px-3 py-2 rounded">
+      <li class="breadcrumb-item">
+        <a href="/internal/home" class="text-decoration-none text-dark">
+          <i class="bi bi-house-door me-1"></i> 홈
+        </a>
+      </li>
+      <li class="breadcrumb-item">
+        <a href="#" class="text-decoration-none text-dark">
+          <i class="bi bi-person-workspace me-1"></i> 입고
+        </a>
+      </li>
+      <li class="breadcrumb-item active text-primary" aria-current="page">
+        <i class="bi bi-file-earmark-text me-1"></i> 거래 명세 확인
+      </li>
+    </ol>
+  </nav>
+
+  <!-- CSS 커스터마이징 (선택사항) -->
+  <style>
+    .breadcrumb-item + .breadcrumb-item::before {
+      content: ">";
+      color: #6c757d;
+      margin: 0 0.5rem;
+    }
+    .breadcrumb a:hover {
+      text-decoration: underline;
+    }
+  </style>
+
+  <div class="container-xl py-5">
+    <div class="mb-4">
+
+      <div class="d-flex justify-content-between mb-3">
+        <div class="position-relative w-25">
+          <div id="toastAlert" class="toast align-items-center text-bg-warning border-0 position-absolute top-0 start-0 z-3"
+               role="alert" aria-live="assertive" aria-atomic="true" style="z-index: 9999;">
+            <div class="d-flex">
+              <div class="toast-body">
+                📌 검색 기준을 최소 1개 이상 선택해주세요.
+              </div>
+              <button type="button" class="btn-close btn-close-white me-2 m-auto"
+                      data-bs-dismiss="toast" aria-label="Close"></button>
+            </div>
+          </div>
+
+          <i class="bi bi-search search-icon"></i>
+          <input type="text" id="searchInput" class="form-control search-input" placeholder="검색"
+                 data-bs-toggle="dropdown" aria-expanded="false" th:value="${keyword}">
+          <ul class="dropdown-menu" id="dropdownMenu" title="검색 대상 선택" data-bs-toggle="tooltip" data-bs-placement="bottom">
+            <li>
+              <label class="checkbox-toss">
+                <input type="checkbox" id="allCheck" onchange="toggleAll(this)">
+                <span>(모두 선택)</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox-toss">
+                <input type="checkbox" id="tranId"
+                       th:checked="${selectedCategory != null and selectedCategory.contains('tranId')}">
+                <span>거래 코드</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox-toss">
+                <input type="checkbox" id="companyName"
+                       th:checked="${selectedCategory != null and selectedCategory.contains('companyName')}">
+                <span>회사명</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox-toss">
+                <input type="checkbox" id="tranDate"
+                       th:checked="${selectedCategory != null and selectedCategory.contains('tranDate')}">
+                <span>발행일</span>
+              </label>
+            </li>
+            <li>
+              <label class="checkbox-toss">
+                <input type="checkbox" id="totalAmount"
+                       th:checked="${selectedCategory != null and selectedCategory.contains('totalAmount')}">
+                <span>총 금액</span>
+              </label>
+            </li>
+          </ul>
+        </div>
+
+
+        <div class="d-flex gap-2 align-items-center">
+          <i class="bi bi-funnel text-secondary" title="보기 개수 / 정렬 필터"></i>
+          <select class="form-select form-select w-auto" name="size" id="postCountSelect">
+            <option value="10" th:selected="${selectedSize == 10}">10개씩 보기</option>
+            <option value="20" th:selected="${selectedSize == 20}">20개씩 보기</option>
+            <option value="30" th:selected="${selectedSize == 30}">30개씩 보기</option>
+          </select>
+          <select class="form-select form-select w-auto" name="sort" id="sortSelect">
+            <option value="newest" th:selected="${selectedSort == 'newest'}">최신 순</option>
+            <option value="oldest" th:selected="${selectedSort == 'oldest'}">오래된 순</option>
+            <option value="companyAsc" th:selected="${selectedSort == 'matIdAsc'}">거래 코드 순</option>
+            <option value="materialAsc" th:selected="${selectedSort == 'totalAmountDes'}">총 금액 높은 순</option>
+          </select>
+        </div>
+      </div>
+
+      <div class="table-responsive border rounded">
+        <table class="table table-hover text-center align-middle mb-0">
+          <thead class="table-light text-dark">
+          <tr>
+            <th scope="col">거래번호</th>
+            <th scope="col">회사명</th>
+            <th scope="col">발행일</th>
+            <th scope="col">총금액</th>
+            <th scope="col">PDF</th>
+          </tr>
+          </thead>
+          <tbody>
+          <tr th:each="tran : ${transactionList}">
+            <td th:text="${tran.tranId}"></td>
+            <td th:text="${tran.companyName}"></td>
+            <td th:text="${tran.tranDate}"></td>
+            <td th:text="${#numbers.formatInteger(tran.totalAmount, 3, 'COMMA')} + '원'"></td>
+            <td>
+              <div class="btn-group btn-group-sm">
+                <a class="btn btn-outline-success"
+                   th:if="${tran.tranId != null}"
+                   th:href="@{/trans/pdf/{tranId}(tranId=${tran.tranId})}" target="_blank">
+                  <i class="bi bi-eye"></i>
+                </a>
+                <a class="btn btn-outline-success"
+                   th:href="@{/trans/pdf/{tranId}(tranId=${tran.tranId})}"
+                   th:download="'거래명세서_' + ${tran.tranId} + '.pdf'">
+                  <i class="bi bi-download"></i>
+                </a>
+              </div>
+            </td>
+          </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- 페이지네이션 -->
+    <th:block th:replace="fragment/pagination :: paginationFragment"></th:block>
+
+  </div>
+
+  <script>
+    function toggleAll(source) {
+      const checkboxes = document.querySelectorAll("#dropdownMenu input[type='checkbox']");
+      checkboxes.forEach(cb => {
+        if (cb !== source) cb.checked = source.checked;
+      });
+    }
+
+    // 필터링 함수
+    function applyTransactionFilters() {
+      const keyword = document.getElementById("searchInput").value.trim();
+      const sort = document.getElementById("sortSelect").value;
+      const size = document.getElementById("postCountSelect").value;
+
+      const selectedCategory = Array.from(document.querySelectorAll("#dropdownMenu input[type='checkbox']:checked"))
+              .filter(cb => cb.id !== 'allCheck')
+              .map(cb => cb.id);
+
+      // ✅ 체크박스 선택 안 된 경우 → 토스트 알림
+      if (selectedCategory.length === 0) {
+        const toast = new bootstrap.Toast(document.getElementById('toastAlert'));
+        toast.show();
+        return; // 검색 실행 중단
+      }
+
+      let url = `/internal/incoming/trans-list?page=0&size=${size}&sort=${sort}`;
+      if (keyword) url += `&keyword=${encodeURIComponent(keyword)}`;
+      selectedCategory.forEach(cat => url += `&category=${cat}`);
+
+      location.href = url;
+    }
+
+    // 이벤트 바인딩
+    document.getElementById("sortSelect").addEventListener("change", applyTransactionFilters);
+    document.getElementById("postCountSelect").addEventListener("change", applyTransactionFilters);
+    document.getElementById("searchInput").addEventListener("keypress", e => {
+      if (e.key === "Enter") applyTransactionFilters();
+    });
+  </script>
+
+  <script th:src="@{/js/util/tooltip-custom.js}"></script>
+</th:block>
+
+</body>
+</html>
