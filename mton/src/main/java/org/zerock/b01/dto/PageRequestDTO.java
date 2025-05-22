@@ -30,7 +30,6 @@ public class PageRequestDTO {
 
     private String keyword;
 
-    //
 
     private String orderId;
 
@@ -106,22 +105,6 @@ public class PageRequestDTO {
     //
     private String updateReason;
 
-    public String[] getTypes() {
-        if (type == null || type.isEmpty()) {
-            return null;
-        }
-
-        return type.split("");
-    }
-
-    // String... = String[]
-    // String[]보다 더 유연하게 사용가능
-    // 직접 String[]을 생성할 필요 없이 여러 인자 전달 가능
-    public Pageable getPageable(String... props) {
-        return PageRequest.of(this.page - 1, this.size, Sort.by(props).ascending() );
-
-    }
-
     private String link;
 
     public void setPage(int page) {
@@ -170,45 +153,5 @@ public class PageRequestDTO {
         }
         return link;
     }
-//    public String[] getTypes() {
-//        if (type == null || type.isEmpty()) {
-//            return null;
-//        }
-//
-//        return type.split("");
-//    }
-//
-//    // String... = String[]
-//    // String[]보다 더 유연하게 사용가능
-//    // 직접 String[]을 생성할 필요 없이 여러 인자 전달 가능
-//    public Pageable getPageable(String... props) {
-//        return PageRequest.of(this.page - 1, this.size, Sort.by(props).ascending() );
-//
-//    }
-//
-//    private String link;
-//
-//    public String getLink() {
-//        if (link == null) {
-//            StringBuilder builder = new StringBuilder();
-//
-//            builder.append("page=" + this.page);
-//            builder.append("&size=" + this.size);
-//            builder.append("&code=" + this.code);
-//
-//            if (type != null && type.length() > 0) {
-//                builder.append("&type=" + type);
-//            }
-//
-//            if (keyword != null) {
-//                try {
-//                    builder.append("&keyword=" + URLEncoder.encode(keyword, "UTF-8"));
-//                } catch (UnsupportedEncodingException e) {
-//
-//                }
-//            }
-//            link = builder.toString();
-//        }
-//        return link;
-//    }
+
 }
