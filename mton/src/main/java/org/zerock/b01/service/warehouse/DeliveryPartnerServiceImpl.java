@@ -28,7 +28,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
   private final IncomingService incomingService;
 
   @Override
-  public PageResponseDTO<DeliveryPartnerDTO> listWithDeliveryPartner(PageRequestDTO pageRequestDTO) {
+  public PageResponseDTO<DeliveryPartnerDTO> listWithDeliveryPartner(PageRequestDTO pageRequestDTO, Long partnerId) {
 
     // 검색 조건을 받아옵니다.
     String drItemCode = pageRequestDTO.getDrItemCode();
@@ -43,7 +43,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
     // 검색 조건과 페이지 정보를 이용하여 데이터를 조회합니다.
     Page<DeliveryPartner> result = deliveryPartnerRepository
             .searchDeliveryPartnerAll(drItemCode, orderId, matName,
-                    drItemDueDateStart, drItemDueDateEnd, pageable);
+                    drItemDueDateStart, drItemDueDateEnd, partnerId,pageable);
 
 
     List<DeliveryPartnerDTO> dtoList = new ArrayList<>();
@@ -68,6 +68,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
               .drItemDueDate(deliveryRequestItem.getDrItemDueDate())
               .incomingReturnTotalQty(incomingTotal != null ? incomingTotal.getIncomingReturnTotalQty() : 0)
               .incomingMissingTotalQty(incomingTotal != null ? incomingTotal.getIncomingMissingTotalQty() : 0)
+              .partnerId(ordering.getContractMaterial().getContract().getPartner().getPartnerId())
               .build();
 
       dtoList.add(dto);

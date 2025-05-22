@@ -57,6 +57,8 @@ public class PageRequestDTO {
 
     private String matType;
 
+    private Long partnerId;
+
     private LocalDate drItemDueDateStart;
 
     private LocalDate drItemDueDateEnd;

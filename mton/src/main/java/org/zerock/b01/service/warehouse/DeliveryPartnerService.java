@@ -9,7 +9,7 @@ import java.util.List;
 
 public interface DeliveryPartnerService {
 
-  PageResponseDTO<DeliveryPartnerDTO> listWithDeliveryPartner(PageRequestDTO pageRequestDTO);
+  PageResponseDTO<DeliveryPartnerDTO> listWithDeliveryPartner(PageRequestDTO pageRequestDTO, Long partnerId);
 
   void partialDelivery(DeliveryPartnerDTO dto);
 

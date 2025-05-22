@@ -33,6 +33,8 @@ public class DeliveryPartnerDTO {
 
   private int incomingMissingTotalQty;
 
+  private Long partnerId;
+
   public int getRemainingQty() {
     return drItemQty - deliveryPartnerQty + incomingReturnTotalQty + incomingMissingTotalQty;
   }

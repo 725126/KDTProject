@@ -13,7 +13,7 @@ public interface PartnerStorageService {
 
   PartnerStorage getOrCreatePartnerStorage(Partner partner, Material material);
 
-  PageResponseDTO<PartnerStorageDTO> listWithPartnerStorage(PageRequestDTO pageRequestDTO);
+  PageResponseDTO<PartnerStorageDTO> listWithPartnerStorage(PageRequestDTO pageRequestDTO,Long partnerId);
 
   void modifyStorage(List<PartnerStorageDTO> dtoList);
 
