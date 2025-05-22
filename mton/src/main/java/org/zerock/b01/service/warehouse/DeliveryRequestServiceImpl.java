@@ -82,7 +82,19 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     // PageResponseDTO로 변환하여 반환합니다.
     return PageResponseDTO.<DeliveryRequestDTO>withAll()
             .pageRequestDTO(pageRequestDTO)
-            .dtoList(dtoList)
+            .dtoList(
+                    dtoList.stream()
+                            .sorted((a, b) -> {
+                              if (a.getDrStatus().equals("완료") && !b.getDrStatus().equals("완료")) {
+                                return 1;
+                              } else if (!a.getDrStatus().equals("완료") && b.getDrStatus().equals("완료")) {
+                                return -1;
+                              } else {
+                                return 0;
+                              }
+                            })
+                            .collect(Collectors.toList())
+            )
             .total((int) result.getTotalElements())
             .build();
   }
@@ -221,6 +233,5 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
       }
     }
   }
-
 
 }

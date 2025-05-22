@@ -29,4 +29,5 @@ public class DeliveryPartnerItemServiceImpl implements DeliveryPartnerItemServic
 
     return deliveryPartnerItemRepository.save(item);
   }
+
 }

@@ -83,6 +83,7 @@ public class DeliveryController {
 
         model.addAttribute("currentPage", drItemList.getPage() + 1);
         model.addAttribute("totalPages", drItemList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/delivery/status";
     }

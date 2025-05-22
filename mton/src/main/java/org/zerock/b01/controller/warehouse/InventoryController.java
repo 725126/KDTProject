@@ -32,7 +32,10 @@ public class InventoryController {
 
         model.addAttribute("inventoryList", inventoryList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", inventoryList.getTotal());
+
+        model.addAttribute("currentPage", inventoryList.getPage() + 1);
+        model.addAttribute("totalPages", inventoryList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/inventory/status";
     }
@@ -47,7 +50,10 @@ public class InventoryController {
 
         model.addAttribute("inventoryHistoryList", inventoryHistoryList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", inventoryHistoryList.getTotal());
+
+        model.addAttribute("currentPage", inventoryHistoryList.getPage() + 1);
+        model.addAttribute("totalPages", inventoryHistoryList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/inventory/history";
     }
@@ -62,7 +68,10 @@ public class InventoryController {
 
         model.addAttribute("inventoryList", inventoryList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", inventoryList.getTotal());
+
+        model.addAttribute("currentPage", inventoryList.getPage() + 1);
+        model.addAttribute("totalPages", inventoryList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/inventory/price";
     }
