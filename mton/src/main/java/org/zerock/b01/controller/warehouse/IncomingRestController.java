@@ -21,9 +21,9 @@ import java.util.Map;
 
 @RestController
 @Log4j2
-@RequestMapping("/api/inspection")
+@RequestMapping("/api/incoming")
 @RequiredArgsConstructor
-public class IncomingInspectionController {
+public class IncomingRestController {
 
   private final IncomingService incomingService;
   private final IncomingTotalService incomingTotalService;

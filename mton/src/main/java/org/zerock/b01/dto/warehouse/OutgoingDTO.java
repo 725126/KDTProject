@@ -41,7 +41,7 @@ public class OutgoingDTO {
 
   private String outgoingCode;
 
-  private LocalDateTime ougoingDate;
+  private LocalDateTime outgoingDate;
 
   private int outgoingQty;
 

@@ -13,31 +13,38 @@
         <h1 class="mb-4">출고 처리 결과 조회</h1>
 
         <div class="card p-4 mb-4">
-            <form id="searchForm">
+            <form action="/internal/outgoing/result" method="get">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-4">
-                        <label for="releaseDateStart" class="form-label">출고마감일</label>
+                        <label class="form-label">출고마감일</label>
                         <div class="d-flex gap-1">
-                            <input type="date" class="form-control" id="releaseDateStart" name="releaseDateStart">
+                            <input type="date" class="form-control" name="outgoingCompletedAtStart"
+                                   th:value="${pageRequestDTO.outgoingCompletedAtStart != null ?
+                                   #temporals.format(pageRequestDTO.outgoingCompletedAtStart, 'yyyy-MM-dd') : ''}">
                             <span class="pt-2">~</span>
-                            <input type="date" class="form-control" id="releaseDateEnd" name="releaseDateEnd">
+                            <input type="date" class="form-control" name="outgoingCompletedAtEnd"
+                                   th:value="${pageRequestDTO.outgoingCompletedAtEnd != null ?
+                                   #temporals.format(pageRequestDTO.outgoingCompletedAtEnd, 'yyyy-MM-dd') : ''}">
                         </div>
                     </div>
                     <div class="col-md-2">
-                        <label for="planCode" class="form-label">생산계획코드</label>
-                        <input type="text" class="form-control" id="planCode" name="planCode">
+                        <label for="prdplanId" class="form-label">생산계획코드</label>
+                        <input type="text" class="form-control" id="prdplanId" name="prdplanId"
+                               th:value="${pageRequestDTO.prdplanId}">
                     </div>
                     <div class="col-md-2">
-                        <label for="productCode" class="form-label">자재코드</label>
-                        <input type="text" class="form-control" id="productCode" name="productCode">
+                        <label for="matId" class="form-label">자재코드</label>
+                        <input type="text" class="form-control" id="matId" name="matId"
+                               th:value="${pageRequestDTO.matId}">
                     </div>
                     <div class="col-md-2">
-                        <label for="productName" class="form-label">자재명</label>
-                        <input type="text" class="form-control" id="productName" name="productName">
+                        <label for="matName" class="form-label">자재명</label>
+                        <input type="text" class="form-control" id="matName" name="matName"
+                               th:value="${pageRequestDTO.matName}">
                     </div>
                     <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                        <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary clearBtn"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                     </div>
                 </div>
             </form>
@@ -55,18 +62,30 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>2025-04-15</td>
-                    <td>PLAN-20250401-001</td>
-                    <td>MAT-001</td>
-                    <td>전기자전거 모터</td>
-                    <td>100</td>
+                <tr th:each="outgoingTotal:${outgoingTotalList}" th:data-id="${outgoingTotal.outgoingTotalId}">
+                    <td th:text="${#temporals.format(outgoingTotal.outgoingCompletedAt,
+                    'yyyy-MM-dd HH:mm:ss')}"></td>
+                    <td th:text="${outgoingTotal.prdplanId}"></td>
+                    <td th:text="${outgoingTotal.matId}"></td>
+                    <td th:text="${outgoingTotal.matName}"></td>
+                    <td th:text="${outgoingTotal.outgoingTotalQty}"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
 </th:block>
+
+<script layout:fragment="script" th:inline="javascript">
+
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/internal/outgoing/result'
+    }, false)
+
+</script>
 
 </body>
 </html>

@@ -11,8 +11,10 @@ import org.zerock.b01.domain.user.Partner;
 @AllArgsConstructor
 @ToString
 public class PartnerStorage {
+
     @Id
-    private String pstorageId;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long pstorageId;
 
     @ManyToOne
     @JoinColumn(name = "partner_id", nullable = false)
@@ -24,4 +26,9 @@ public class PartnerStorage {
 
     @Column(nullable = false)
     private int sstorageQty;
+
+    public void changeStorageQty(int newQty) {
+        if (newQty < 0) throw new IllegalArgumentException("재고는 음수가 될 수 없습니다.");
+        this.sstorageQty = newQty;
+    }
 }

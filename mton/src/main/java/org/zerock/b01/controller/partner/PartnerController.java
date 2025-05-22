@@ -13,13 +13,16 @@ import org.zerock.b01.controller.operation.service.InspectionService;
 import org.zerock.b01.controller.operation.service.OrderingService;
 import org.zerock.b01.domain.operation.Inspection;
 import org.zerock.b01.domain.operation.Ordering;
+import org.zerock.b01.domain.operation.PartnerStorage;
 import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.partner.ContractMaterialDTO;
 import org.zerock.b01.dto.warehouse.DeliveryPartnerDTO;
+import org.zerock.b01.dto.warehouse.PartnerStorageDTO;
 import org.zerock.b01.security.CustomUserDetails;
 import org.zerock.b01.service.warehouse.DeliveryPartnerService;
+import org.zerock.b01.service.warehouse.PartnerStorageService;
 
 import java.util.HashMap;
 import java.util.List;
@@ -37,6 +40,7 @@ public class PartnerController {
     private final DeliveryPartnerService deliveryPartnerService;
     private final OrderingService orderingService;
     private final InspectionService inspectionService;
+    private final PartnerStorageService partnerStorageService;
 
     // 계약 정보 열람
     @GetMapping("/contract/view")
@@ -65,7 +69,16 @@ public class PartnerController {
 
     // 자재 재고 관리
     @GetMapping("/mat/inventory")
-    public String matInventoryGet() {
+    public String listPartnerStorage(PageRequestDTO pageRequestDTO, Model model) {
+
+        // 전체 납입지시 상세 항목 페이징 조회
+        PageResponseDTO<PartnerStorageDTO> PartnerStorageList =
+                partnerStorageService.listWithPartnerStorage(pageRequestDTO);
+
+        model.addAttribute("PartnerStorageList", PartnerStorageList.getDtoList());
+        model.addAttribute("pageRequestDTO", pageRequestDTO);
+        model.addAttribute("totalCount", PartnerStorageList.getTotal());
+
         return "page/partner/mat-inventory";
     }
 

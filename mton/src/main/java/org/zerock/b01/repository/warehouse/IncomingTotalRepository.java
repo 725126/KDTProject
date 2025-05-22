@@ -31,12 +31,19 @@ public interface IncomingTotalRepository extends JpaRepository<IncomingTotal, Lo
   boolean existsByOrderIdAndStatusNot(@Param("orderId") String orderId,
                                       @Param("status") IncomingStatus status);
 
-  List<IncomingTotal> findByDeliveryRequestItem_DeliveryRequest_Ordering(Ordering ordering);
-
   @Query("SELECT MAX(it.incomingCompletedAt) FROM IncomingTotal it " +
           "JOIN it.deliveryRequestItem dri " +
           "JOIN dri.deliveryRequest dr " +
           "JOIN dr.ordering o " +
           "WHERE o.orderId = :orderId AND o.orderStat = '완료'")
   LocalDateTime findLatestIncomingCompletedAtByOrderIdAndOrderStatCompleted(@Param("orderId") String orderId);
+
+  @Query("SELECT cm.material.matId, SUM(it.incomingEffectiveQty) " +
+          "FROM IncomingTotal it " +
+          "JOIN it.deliveryRequestItem dri " +
+          "JOIN dri.deliveryRequest dr " +
+          "JOIN dr.ordering o " +
+          "JOIN o.contractMaterial cm " +
+          "WHERE it.incomingStatus != '입고마감' ")
+  List<Object[]> sumUnclosedIncomingQtyByMaterial();
 }

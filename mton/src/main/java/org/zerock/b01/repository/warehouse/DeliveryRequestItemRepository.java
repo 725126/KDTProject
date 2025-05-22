@@ -25,8 +25,6 @@ public interface DeliveryRequestItemRepository extends JpaRepository<DeliveryReq
   @Query("select r from DeliveryRequestItem r where r.deliveryRequest.drId = :drId")
   Page<DeliveryRequestItem> listDeliveryRequestItem(Long drId, Pageable pageable);
 
-  @Query("SELECT d FROM DeliveryRequestItem d")
-  Page<DeliveryRequestItem> findAllItems(Pageable pageable);
 
   @Query("SELECT MAX(d.drItemDueDate) FROM DeliveryRequestItem d WHERE d.deliveryRequest.drId = :drId")
   LocalDate findLastDrItemDueDateByDrId(@Param("drId") Long drId);

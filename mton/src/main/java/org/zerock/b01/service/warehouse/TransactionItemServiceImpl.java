@@ -5,9 +5,6 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
-import org.zerock.b01.domain.operation.Ordering;
-import org.zerock.b01.domain.operation.TransactionItem;
-import org.zerock.b01.domain.warehouse.IncomingTotal;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
 import org.zerock.b01.dto.warehouse.TransactionViewDTO;
@@ -16,7 +13,6 @@ import org.zerock.b01.repository.warehouse.TransactionItemRepository;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -71,26 +67,4 @@ public class TransactionItemServiceImpl implements TransactionItemService {
             .build();
   }
 
-  public void createTransactionItemsForOrdering(Ordering ordering) {
-    List<IncomingTotal> incomingTotals = incomingTotalRepository.findByDeliveryRequestItem_DeliveryRequest_Ordering(ordering);
-
-    int totalQty = incomingTotals.stream()
-            .mapToInt(IncomingTotal::getIncomingEffectiveQty)
-            .sum();
-
-    // 가격 등은 계약자재(ContractMaterial) 기준이라 가정
-    int price = ordering.getContractMaterial().getCmtPrice();
-
-    TransactionItem item = TransactionItem.builder()
-            .ordering(ordering)
-            .matId(ordering.getContractMaterial().getMaterial().getMatId())
-            .matName(ordering.getContractMaterial().getMaterial().getMatName())
-            .titemPrice(price)
-            .titemQty(totalQty)
-            .amount(price * totalQty)
-            .remark("-")
-            .build();
-
-    transactionItemRepository.save(item);
-  }
 }
