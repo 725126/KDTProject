@@ -8,7 +8,7 @@ import java.time.LocalDate;
 
 public interface DeliveryRequestSearch {
 
-  Page<DeliveryRequest> searchDeliveryRequestAll(String orderId, String matName,
+  Page<DeliveryRequest> searchDeliveryRequestAll(String orderId, String pCompany, String matId, String matName,
                                                  LocalDate orderDateStart, LocalDate orderDateEnd,
                                                  LocalDate orderEndStart, LocalDate orderEndEnd,
                                                  Pageable pageable);

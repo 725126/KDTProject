@@ -30,6 +30,7 @@ public interface DeliveryRequestService {
     DeliveryRequestDTO dto = DeliveryRequestDTO.builder()
             .drId(deliveryRequest.getDrId())
             .orderId(deliveryRequest.getOrdering().getOrderId())
+            .pCompany(deliveryRequest.getOrdering().getContractMaterial().getContract().getPartner().getPCompany())
             .matName(deliveryRequest.getOrdering().getContractMaterial().getMaterial().getMatName())
             .orderDate(deliveryRequest.getOrdering().getOrderDate())
             .orderEnd(deliveryRequest.getOrdering().getOrderEnd())

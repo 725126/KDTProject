@@ -22,7 +22,8 @@ public interface OutgoingRepository extends JpaRepository<Outgoing, Long>, Outgo
 
   @Query("SELECT SUM(o.outgoingQty) " +
           "FROM Outgoing o " +
-          "WHERE o.inventory.inventoryId = :inventoryId ")
+          "WHERE o.inventory.inventoryId = :inventoryId " +
+          "AND o.outgoingTotal.outgoingStatus != '출고마감'")
   Optional<Integer> sumUnclosedOutgoingQtyByInventoryId(@Param("inventoryId") Long inventoryId);
 
   @Query("SELECT FUNCTION('DAYOFWEEK', o.outgoingDate) as dow, SUM(o.outgoingQty) " +

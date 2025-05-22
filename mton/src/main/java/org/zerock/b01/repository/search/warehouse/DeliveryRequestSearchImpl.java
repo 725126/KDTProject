@@ -1,14 +1,18 @@
 package org.zerock.b01.repository.search.warehouse;
 
 import com.querydsl.core.BooleanBuilder;
+import com.querydsl.core.types.dsl.CaseBuilder;
 import com.querydsl.jpa.JPQLQuery;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.zerock.b01.domain.operation.QContractMaterial;
 import org.zerock.b01.domain.operation.QMaterial;
 import org.zerock.b01.domain.operation.QOrdering;
+import org.zerock.b01.domain.user.QPartner;
 import org.zerock.b01.domain.warehouse.DeliveryRequest;
+import org.zerock.b01.domain.warehouse.DeliveryStatus;
 import org.zerock.b01.domain.warehouse.QDeliveryRequest;
 
 import java.time.LocalDate;
@@ -19,24 +23,37 @@ public class DeliveryRequestSearchImpl extends QuerydslRepositorySupport impleme
   public DeliveryRequestSearchImpl() {super(DeliveryRequest.class);}
 
   @Override
-  public Page<DeliveryRequest> searchDeliveryRequestAll(String orderId, String matName,
+  public Page<DeliveryRequest> searchDeliveryRequestAll(String orderId, String pCompany, String matId, String matName,
                                                  LocalDate orderDateStart, LocalDate orderDateEnd,
                                                  LocalDate orderEndStart, LocalDate orderEndEnd,
                                                  Pageable pageable) {
 
     QDeliveryRequest deliveryRequest = QDeliveryRequest.deliveryRequest;
     QOrdering ordering = QOrdering.ordering;
+    QContractMaterial contractMaterial = QContractMaterial.contractMaterial;
     QMaterial material = QMaterial.material;
+    QPartner partner = QPartner.partner;
 
     JPQLQuery<DeliveryRequest> query = from(deliveryRequest)
             .join(deliveryRequest.ordering, ordering)
-            .join(ordering.contractMaterial.material, material);
+            .join(ordering.contractMaterial, contractMaterial)
+            .join(contractMaterial.material, material)
+            .join(contractMaterial.contract.partner);
+
 
     BooleanBuilder builder = new BooleanBuilder();
 
     // 🔹 발주번호 검색
     if (orderId != null && !orderId.trim().isEmpty()) {
       builder.and(ordering.orderId.contains(orderId));
+    }
+    // 🔹 협력사명 검색
+    if (pCompany != null && !pCompany.trim().isEmpty()) {
+      builder.and(partner.pCompany.contains(pCompany));
+    }
+    // 🔹 자재코드 검색
+    if (matId != null && !matId.trim().isEmpty()) {
+      builder.and(material.matId.contains(matId));
     }
 
     // 🔹 자재명 검색
@@ -64,6 +81,14 @@ public class DeliveryRequestSearchImpl extends QuerydslRepositorySupport impleme
 
     // 🔹 조건 적용 및 페이징
     query.where(builder);
+
+    query.orderBy(
+            new CaseBuilder()
+                    .when(deliveryRequest.drStatus.eq(DeliveryStatus.완료)).then(1)
+                    .otherwise(0)
+                    .asc(),
+            deliveryRequest.drId.asc()
+    );
     this.getQuerydsl().applyPagination(pageable, query);
 
     List<DeliveryRequest> result = query.fetch();

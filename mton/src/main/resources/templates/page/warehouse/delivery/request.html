@@ -37,13 +37,28 @@
                     <!-- 발주코드 -->
                     <div class="col-md-2">
                         <label for="orderId" class="form-label">발주코드</label>
-                        <input type="text" name="orderId" id="orderId" class="form-control">
+                        <input type="text" name="orderId" id="orderId" class="form-control"
+                               th:value="${pageRequestDTO.orderId}">
+                    </div>
+
+                    <!-- 협력사 -->
+                    <div class="col-md-2">
+                        <label for="pCompany" class="form-label">협력사</label>
+                        <input type="text" class="form-control" id="pCompany" name="pCompany"
+                               th:value="${pageRequestDTO.pCompany}">
+                    </div>
+                    <!-- 자재코드 -->
+                    <div class="col-md-2">
+                        <label for="matId" class="form-label">자재명</label>
+                        <input type="text" class="form-control" name="matId" id="matId"
+                               th:value="${pageRequestDTO.matId}">
                     </div>
 
                     <!-- 자재명 -->
                     <div class="col-md-2">
                         <label for="matName" class="form-label">자재명</label>
-                        <input type="text" name="matName" id="matName" class="form-control">
+                        <input type="text" class="form-control" name="matName" id="matName"
+                               th:value="${pageRequestDTO.matName}">
                     </div>
 
                     <!-- 발주일자 -->
@@ -104,6 +119,8 @@
                 <thead class="table-light">
                 <tr>
                     <th>발주코드</th>
+                    <th>협력사</th>
+                    <th>자재코드</th>
                     <th>자재명</th>
                     <th>발주일자</th>
                     <th>납기일자</th>
@@ -115,12 +132,14 @@
                 </thead>
                 <tbody>
                 <tr th:each="dto:${responseDTO.dtoList}">
-                    <td th:text="${dto.orderId}"></td>  <!-- orderId -->
-                    <td th:text="${dto.matName}"></td>  <!-- matName -->
-                    <td th:text="${dto.orderDate}"></td>  <!-- orderDate -->
-                    <td th:text="${dto.orderEnd}"></td>  <!-- orderEnd -->
-                    <td th:text="${dto.orderQty}"></td>  <!-- orderQty -->
-                    <td th:text="${dto.drTotalQty}"></td>  <!-- drTotalQty -->
+                    <td th:text="${dto.orderId}"></td>
+                    <td th:text="${dto.pCompany}"></td>
+                    <td th:text="${dto.matId}"></td>
+                    <td th:text="${dto.matName}"></td>
+                    <td th:text="${dto.orderDate}"></td>
+                    <td th:text="${dto.orderEnd}"></td>
+                    <td th:text="${dto.orderQty}"></td>
+                    <td th:text="${dto.drTotalQty}"></td>
                     <td class="text-center">
                         <span th:text="${dto.drStatus}" th:classappend="' badge ' + (${dto.drStatus} == '완료' ? 'bg-success' : 'bg-warning')"></span>
                     </td>

@@ -22,6 +22,10 @@ public class DeliveryRequestDTO {
 
   private String orderId;
 
+  private String pCompany;
+
+  private String matId;
+
   private String matName;
 
   private LocalDate orderDate;
