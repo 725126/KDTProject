@@ -285,6 +285,18 @@ public class ProductController {
             return new StatusTuple(false, "PRDPLAN 수정사항은 없습니다.");
         }
 
+        HashMap<String, Integer> changeList = new HashMap<String, Integer>();
+
+        list.forEach(hashMap ->
+            changeList.put(
+                    hashMap.get(ProductionPlanTableHead.PRDPLAN_ID.getLabel()),
+                    Integer.parseInt(hashMap.get(ProductionPlanTableHead.PRDPLAN_QTY.getLabel()))
+            )
+        );
+
+        return productionPlanService.updateQty(changeList);
+
+        /* 현재 쓰이지 않음
         List<ProductionPlanDTO> productionPlanDTOList = list.stream().map(hashmap -> ProductionPlanDTO.builder()
                 .prdplanId(hashmap.get(ProductionPlanTableHead.PRDPLAN_ID.getLabel()))
                 .prodId(hashmap.get(ProductionPlanTableHead.PROD_ID.getLabel()))
@@ -293,6 +305,7 @@ public class ProductController {
                 .build()).collect(Collectors.toList());
 
         return productionPlanService.updateAll(productionPlanDTOList);
+        현재 쓰이지 않음 */
     }
 
     @ResponseBody
