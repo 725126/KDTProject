@@ -81,7 +81,8 @@ public class UserController {
 
     // [협력업체] 회원 로그인 시 홈 화면
     @GetMapping("/external/home")
-    public String homePageExternal(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public String homePageExternal(@AuthenticationPrincipal CustomUserDetails customUserDetails,
+                                   Model model) {
         log.info("[협력업체] 회원 로그인: {}", customUserDetails);
 
         // *** 중요 ***
@@ -90,6 +91,16 @@ public class UserController {
             // 로그인 안 되어 있으면 시작 페이지로
             return "redirect:/intro";
         }
+
+        int ongoingContracts = dashboardService.getOngoingContractCountForPartner(customUserDetails.getUser());
+        int onTimeRate = dashboardService.getOnTimeRate(customUserDetails.getUser());
+        int inspectionRate = dashboardService.getInspectionCompletionRate(customUserDetails.getUser());
+        long monthlyAmount = dashboardService.getCurrentMonthTransactionAmount(customUserDetails.getUser());
+
+        model.addAttribute("ongoingContracts", ongoingContracts);
+        model.addAttribute("onTimeRate", onTimeRate);
+        model.addAttribute("inspectionRate", inspectionRate);
+        model.addAttribute("monthlyAmount", monthlyAmount);
 
         return "page/user/external-home"; // home.html 열기
     }

@@ -5,6 +5,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+import org.zerock.b01.domain.user.Partner;
 import org.zerock.b01.domain.warehouse.DeliveryRequest;
 import org.zerock.b01.domain.warehouse.DeliveryRequestItem;
 import org.zerock.b01.repository.search.warehouse.DeliveryRequestItemSearch;
@@ -29,6 +30,14 @@ public interface DeliveryRequestItemRepository extends JpaRepository<DeliveryReq
   @Query("SELECT MAX(d.drItemDueDate) FROM DeliveryRequestItem d WHERE d.deliveryRequest.drId = :drId")
   LocalDate findLastDrItemDueDateByDrId(@Param("drId") Long drId);
 
-  List<DeliveryRequestItem> findByDeliveryRequest(DeliveryRequest deliveryRequest);;
+  List<DeliveryRequestItem> findByDeliveryRequest(DeliveryRequest deliveryRequest);
+
+  // 납기 예정일 (drItemDueDate)
+  @Query("""
+    SELECT d FROM DeliveryRequestItem d
+    WHERE d.deliveryRequest.ordering.contractMaterial.contract.partner = :partner
+    """)
+  List<DeliveryRequestItem> findDueItemsByPartner(@Param("partner") Partner partner);
+
 
 }
