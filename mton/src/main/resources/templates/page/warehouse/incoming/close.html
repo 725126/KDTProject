@@ -101,7 +101,12 @@
     function closeIncoming() {
         const incomingTotalId = document.getElementById("incomingTotalId").value;
 
-        fetch("/api/inspection/close", {
+        const confirmed = confirm("정말 입고를 마감하시겠습니까? 입고마감 후에는 수정할 수 없습니다.");
+        if (!confirmed) {
+            return; // 취소한 경우 아무 작업도 하지 않음
+        }
+
+        fetch("/api/incoming/close", {
             method: "POST",
             headers: {
                 "Content-Type": "application/json",

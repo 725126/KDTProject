@@ -20,7 +20,8 @@ public class OutgoingTotalSearchImpl extends QuerydslRepositorySupport implement
   @Override
   public Page<OutgoingTotal> searchOutgoingTotal(LocalDate prdplanEndStart, LocalDate prdplanEndEnd,
                                                 String prdplanId, String matId, String matName,
-                                                String outgoingStatus, Pageable pageable) {
+                                                String outgoingStatus, LocalDate outgoingCompletedAtStart,
+                                                LocalDate outgoingCompletedAtEnd, Pageable pageable) {
 
     QOutgoingTotal outgoingTotal = QOutgoingTotal.outgoingTotal;
     QProductionPlan productionPlan = QProductionPlan.productionPlan;
@@ -41,7 +42,7 @@ public class OutgoingTotalSearchImpl extends QuerydslRepositorySupport implement
       builder.and(productionPlan.prdplanEnd.loe(prdplanEndEnd));
     }
 
-    // 🔹 입고코드 검색
+    // 🔹 생산계획코드 검색
     if (prdplanId != null && !prdplanId.trim().isEmpty()) {
       builder.and(productionPlan.prdplanId.contains(prdplanId));
     }
@@ -56,9 +57,23 @@ public class OutgoingTotalSearchImpl extends QuerydslRepositorySupport implement
       builder.and(material.matName.contains(matName));
     }
 
-    // 🔹 입고 상세 상태 검색
+    // 🔹 출고 상세 상태 검색
     if (outgoingStatus != null && !outgoingStatus.trim().isEmpty()) {
       builder.and(outgoingTotal.outgoingStatus.eq(OutgoingStatus.valueOf(outgoingStatus)));
+    }
+
+    // 🔹 일자 범위 검색
+    if (outgoingCompletedAtStart != null && outgoingCompletedAtEnd != null) {
+      builder.and(outgoingTotal.outgoingCompletedAt
+              .goe(outgoingCompletedAtStart.atStartOfDay()));
+      builder.and(outgoingTotal.outgoingCompletedAt
+              .lt(outgoingCompletedAtEnd.plusDays(1).atStartOfDay()));
+    } else if (outgoingCompletedAtStart != null) {
+      builder.and(outgoingTotal.outgoingCompletedAt
+              .goe(outgoingCompletedAtStart.atStartOfDay()));
+    } else if (outgoingCompletedAtEnd != null) {
+      builder.and(outgoingTotal.outgoingCompletedAt
+              .lt(outgoingCompletedAtEnd.plusDays(1).atStartOfDay()));
     }
 
 

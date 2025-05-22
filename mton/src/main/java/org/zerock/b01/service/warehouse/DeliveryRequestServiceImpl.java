@@ -105,6 +105,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     return deliveryRequestDTO;
   }
 
+  @Override
   public void updateDeliveryRequestStatus(Long drId) {
     DeliveryRequest dr = deliveryRequestRepository.findById(drId)
             .orElseThrow(() -> new RuntimeException("해당 납입지시 없음"));
@@ -119,6 +120,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     deliveryRequestRepository.save(dr);
   }
 
+  @Override
   public void createDeliveryRequestFromOrdering(String orderId) {
     Ordering ordering = orderingRepository.findById(orderId)
             .orElseThrow(() -> new RuntimeException("발주정보가 존재하지 않습니다."));
@@ -133,6 +135,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     deliveryRequestRepository.save(dr);
   }
 
+  @Override
   public void deleteByOrderIds(List<String> orderIds) {
     List<DeliveryRequest> requests = deliveryRequestRepository.findByOrderingOrderIdIn(orderIds);
 
@@ -164,6 +167,7 @@ public class DeliveryRequestServiceImpl implements DeliveryRequestService {
     }
   }
 
+  @Override
   public void validateOrderingUpdate(List<OrderingDTO> list) {
     List<String> orderIds = list.stream()
             .map(OrderingDTO::getOrderId)

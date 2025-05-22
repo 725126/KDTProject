@@ -183,6 +183,7 @@ public class IncomingServiceImpl implements IncomingService {
   }
 
   // 부분입고
+  @Override
   public void partialIncoming(IncomingInspectionDTO dto) {
     validateIncomingQty(dto.getIncomingQty());
 
@@ -217,6 +218,7 @@ public class IncomingServiceImpl implements IncomingService {
   }
 
   // 입고
+  @Override
   public void fullIncoming(List<IncomingInspectionDTO> dtoList) {
     for (IncomingInspectionDTO dto : dtoList) {
 
@@ -260,11 +262,19 @@ public class IncomingServiceImpl implements IncomingService {
   }
 
   //수정
+  @Override
   public void modifyIncoming(IncomingInspectionDTO dto) {
     validateIncomingQty(dto.getIncomingQty());
 
     Incoming incoming = incomingRepository.findById(dto.getIncomingId())
             .orElseThrow(() -> new IllegalArgumentException("해당 항목 없음"));
+
+    IncomingTotal total = incoming.getIncomingTotal();
+
+    // 입고 마감 상태일 경우 작업 불가
+    if (total.getIncomingStatus() == IncomingStatus.입고마감) {
+      throw new IllegalStateException("이미 입고 마감된 항목은 수정할 수 없습니다.");
+    }
 
     int newQty = dto.getIncomingQty();
     int expectedQty = incoming.getDeliveryPartnerItem().getDeliveryPartnerItemQty();
@@ -274,8 +284,6 @@ public class IncomingServiceImpl implements IncomingService {
 
     // 새로 계산된 미입고 수량
     int newMissingQty = Math.max(expectedQty - newQty, 0);
-
-    IncomingTotal total = incoming.getIncomingTotal();
 
     // 기존 수량 제거하고 새 수량 반영
     total.addToTotalAndMissingTotalQty(-oldQty, -Math.max(expectedQty - oldQty, 0)); // 기존 수량 제거
@@ -309,10 +317,18 @@ public class IncomingServiceImpl implements IncomingService {
   }
 
   // 반품 등록
+  @Override
   public void returnIncoming(IncomingInspectionDTO dto) {
 
     Incoming incoming = incomingRepository.findById(dto.getIncomingId())
             .orElseThrow(() -> new IllegalArgumentException("해당 항목 없음"));
+
+    IncomingTotal total = incoming.getIncomingTotal();
+
+    // ✅ 입고마감 상태일 경우 반품 불가
+    if (total.getIncomingStatus() == IncomingStatus.입고마감) {
+      throw new IllegalStateException("입고 마감된 항목은 반품할 수 없습니다.");
+    }
 
     int returnQty = dto.getIncomingReturnQty();
     int incomingQty = incoming.getIncomingQty();
@@ -328,7 +344,6 @@ public class IncomingServiceImpl implements IncomingService {
     }
 
     // 반품된 수량만큼 업데이트
-    IncomingTotal total = incoming.getIncomingTotal();
     total.addToReturnTotalQty(returnQty);
 
     incoming.updateIncomingReturnQty(newTotalReturnQty);

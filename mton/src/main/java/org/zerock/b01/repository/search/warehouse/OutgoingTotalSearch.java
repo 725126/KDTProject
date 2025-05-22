@@ -9,6 +9,7 @@ import java.time.LocalDate;
 public interface OutgoingTotalSearch {
 
   Page<OutgoingTotal> searchOutgoingTotal(LocalDate prdplanEndStart, LocalDate prdplanEndEnd,
-                                         String prdplanId, String matId, String matName,
-                                         String outgoingStatus, Pageable pageable);
+                                          String prdplanId, String matId, String matName,
+                                          String outgoingStatus, LocalDate outgoingCompletedAtStart,
+                                          LocalDate outgoingCompletedAtEnd, Pageable pageable);
 }

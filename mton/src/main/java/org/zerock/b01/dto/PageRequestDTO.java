@@ -52,7 +52,9 @@ public class PageRequestDTO {
 
     private String prdplanId;
 
-    private String incomingStatus;
+    private String outgoingCode;
+
+    private String matType;
 
     private LocalDate drItemDueDateStart;
 
@@ -82,9 +84,24 @@ public class PageRequestDTO {
 
     private LocalDate prdplanEndEnd;
 
+    private LocalDate outgoingDateStart;
+
+    private LocalDate outgoingDateEnd;
+
+    private LocalDate outgoingCompletedAtStart;
+
+    private LocalDate outgoingCompletedAtEnd;
+
+    private LocalDate updateDateStart;
+    private LocalDate updateDateEnd;
+
+    private String incomingStatus;
+
     private String incomingItemStatus;
 
     private String outgoingStatus;
+
+    private String updateReason;
 
     public String[] getTypes() {
         if (type == null || type.isEmpty()) {

@@ -95,6 +95,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
   }
 
   // 부분출하
+  @Override
   public void partialDelivery(DeliveryPartnerDTO dto) {
     validateDeliveryQty(dto.getDeliveryPartnerQty());
 
@@ -119,6 +120,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
   }
 
   // 출하
+  @Override
   public void fullDelivery(List<DeliveryPartnerDTO> dtoList) {
     for (DeliveryPartnerDTO dto : dtoList) {
 
@@ -148,6 +150,7 @@ public class DeliveryPartnerServiceImpl implements DeliveryPartnerService{
     }
   }
 
+  @Override
   public void updateDeliveryPartnerStatus(DeliveryPartner deliveryPartner) {
     int drQty = deliveryPartner.getDeliveryRequestItem().getDrItemQty();
     int shippedQty = deliveryPartner.getDeliveryPartnerQty();

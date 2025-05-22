@@ -4,6 +4,8 @@
       layout:decorate="~{layout/basic/in-home.html}">
 <head>
     <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>자재ON - 출고 > 출고 조회</title>
     <link rel="stylesheet" th:href="@{/css/component/bottom-nav.css}">
 </head>
@@ -65,6 +67,7 @@
             <table class="table table-bordered table-hover data-table text-center" id="resultTable">
                 <thead class="table-light">
                 <tr>
+                    <th><input type="checkbox" id="selectAll" onclick="toggleAll(this)"></th>
                     <th>출고예정일</th>
                     <th>생산계획코드</th>
                     <th>자재코드</th>
@@ -74,40 +77,52 @@
                     <th>출고잔여수량</th>
                     <th>출고일</th>
                     <th>출고마감일</th>
+                    <th>창고</th>
                     <th>상태</th>
-                    <th>출고</th>
+<!--                    <th>출고</th>-->
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="outgoingTotal:${outgoingTotalList}" th:data-id="${outgoingTotal.outgoingTotalId}">
+                    <td><input type="checkbox" class="rowCheck"
+                               th:disabled="${outgoingTotal.outgoingStatus == '출고마감'}"></td>
                     <td th:text="${outgoingTotal.prdplanEnd}"></td>
                     <td th:text="${outgoingTotal.prdplanId}"></td>
                     <td th:text="${outgoingTotal.matId}"></td>
                     <td th:text="${outgoingTotal.matName}"></td>
                     <td th:text="${outgoingTotal.estimatedOutgoingQty}"></td>
                     <td th:text="${outgoingTotal.outgoingTotalQty}"></td>
-                    <td th:text="${outgoingTotal.prdplanEnd}"></td>
+                    <td th:text="${outgoingTotal.estimatedOutgoingQty - outgoingTotal.outgoingTotalQty}"></td>
                     <td th:text="${outgoingTotal.outgoingFirstDate != null ?
                         #temporals.format(outgoingTotal.outgoingFirstDate,
                     'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
                     <td th:text="${outgoingTotal.outgoingCompletedAt != null ?
                         #temporals.format(outgoingTotal.outgoingCompletedAt,
                     'yyyy-MM-dd HH:mm:ss') : '-'}"></td>
+                    <td>
+                        <select name="cstorageId" id="cstorageIdSelect">
+                            <option value="">선택하세요</option>
+                            <th:block th:each="inv : ${inventoryMap[outgoingTotal.matId]}">
+                                <option th:value="${inv.inventoryId}"
+                                        th:text="${inv.cstorageId + ' - 재고: ' + inv.availableQty}">
+                                </option>
+                            </th:block>
+                        </select>
+                    </td>
                     <td class="text-center">
-                        <span th:if="${outgoingTotal.outgoingStatus != '출고마감대기중'}"
-                              th:text="${outgoingTotal.outgoingStatus}"
+                        <span th:text="${outgoingTotal.outgoingStatus}"
                               th:classappend="${outgoingTotal.outgoingStatus == '출고마감' ? ' badge bg-success' :
                               outgoingTotal.outgoingStatus == '부분출고' ? ' badge bg-info text-dark' :
                               outgoingTotal.outgoingStatus == '출고대기' ? ' badge bg-warning text-dark' :
+                              outgoingTotal.outgoingStatus == '출고마감대기중' ? ' badge bg-primary text-white' :
                               ' badge bg-secondary'}">
-
                         </span>
                     </td>
-                    <td class="text-center">
-                        <button class="btn btn-sm btn-outline-primary"
-                                th:attr="data-outgoing_total_id=${outgoingTotal.outgoingTotalId}"
-                                onclick="goToOutgoing(this)">출고</button>
-                    </td>
+<!--                    <td class="text-center">-->
+<!--                        <button class="btn btn-sm btn-outline-primary"-->
+<!--                                th:attr="data-id=${outgoingTotal.outgoingTotalId}"-->
+<!--                                onclick="goToOutgoing(this)">출고지시</button>-->
+<!--                    </td>-->
                 </tr>
                 </tbody>
             </table>
@@ -121,7 +136,7 @@
                     <i class="bi bi-truck"></i>
                     <span>출고</span>
                 </a>
-                <a class="nav-item nav-link" href="#" onclick="finalizeShipment()">
+                <a class="nav-item nav-link" href="#" onclick="CloseOutgoing()">
                     <i class="bi bi-lock"></i>
                     <span>출고마감</span>
                 </a>
@@ -139,13 +154,187 @@
         self.location = '/internal/outgoing/status'
     }, false)
 
-    function goToOutgoing(button) {
-        var outgoingTotalId = button.getAttribute('data-outgoing_total_id'); // data-order-id 값을 가져옵니다.
-
-        console.log(outgoingTotalId)
-
-        window.location.href = '/internal/outgoing/instruction?outgoingTotalId=' + encodeURIComponent(outgoingTotalId);
+    function toggleAll(source) {
+        document.querySelectorAll(".rowCheck").forEach(cb => cb.checked = source.checked);
     }
+
+    // function goToOutgoing(button) {
+    //     var outgoingTotalId = button.getAttribute('data-id'); // data-order-id 값을 가져옵니다.
+    //
+    //     console.log(outgoingTotalId)
+    //
+    //     window.location.href = '/internal/outgoing/instruction?outgoingTotalId=' + encodeURIComponent(outgoingTotalId);
+    // }
+
+    // 부분출고 처리
+    function partialShipment() {
+        const checkedRows = document.querySelectorAll(".rowCheck:checked");
+
+        if (checkedRows.length !== 1) {
+            alert("부분출고는 하나만 선택할 수 있습니다.");
+            return;
+        }
+
+        const row = checkedRows[0].closest("tr");
+        const outgoingTotalId = row.getAttribute("data-id");
+
+        const remainingQtyText = row.children[7].innerText.trim(); // 출고잔여수량 컬럼
+        const remainingQty = parseInt(remainingQtyText, 10);
+
+        if (remainingQty <= 0) {
+            alert("출고 가능한 수량이 없습니다.");
+            return;
+        }
+
+        const cstorageIdSelect = row.querySelector('select[name="cstorageId"]');
+        const inventoryId = cstorageIdSelect ? cstorageIdSelect.value : null;
+
+        if (!inventoryId) {
+            alert("창고를 선택해주세요.");
+            return;
+        }
+
+        const inputQty = prompt(`출고할 수량을 입력하세요 (출고 가능 수량: ${remainingQty})`);
+        if (inputQty === null) return;
+
+        const qty = parseInt(inputQty.trim(), 10);
+
+        if (isNaN(qty) || qty <= 0 || qty > remainingQty) {
+            alert(`유효한 수량이 아닙니다.\n출고 가능 수량: ${remainingQty}개 이하로 입력하세요.`);
+            return;
+        }
+
+        fetch('/api/outgoing/partial', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify({
+                outgoingTotalId: outgoingTotalId,
+                outgoingQty: qty,
+                inventoryId: inventoryId
+            })
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("부분출고가 완료되었습니다.");
+                    location.reload();
+                } else {
+                    alert("출고 처리 중 오류가 발생했습니다.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("서버 통신 중 오류가 발생했습니다.");
+            });
+    }
+
+    // 전체출고 처리
+    function fullShipment() {
+        const checkedRows = document.querySelectorAll(".rowCheck:checked");
+
+        if (checkedRows.length === 0) {
+            alert("전체출고할 항목을 선택해주세요.");
+            return;
+        }
+
+        const confirmed = confirm("선택한 항목을 전체출고 하시겠습니까?");
+        if (!confirmed) return;
+
+
+        const dtoList = [];
+
+        for (let rowCheckBox of checkedRows) {
+            const row = rowCheckBox.closest("tr");
+            const outgoingTotalId = row.getAttribute("data-id");
+            const remainingQty = parseInt(row.children[7].innerText.trim(), 10); // 출고잔여수량
+
+            if (remainingQty <= 0) {
+                alert("이미 출고가 완료된 항목이 있습니다.");
+                return;
+            }
+
+            const cstorageIdSelect = row.querySelector('select[name="cstorageId"]');
+            const inventoryId = cstorageIdSelect ? cstorageIdSelect.value : null;
+
+            if (!inventoryId) {
+                alert("창고를 선택해주세요.");
+                return;
+            }
+
+            // 출고 가능 최대 수량 = 남은 수량
+            dtoList.push({
+                outgoingTotalId: outgoingTotalId,
+                outgoingQty: remainingQty,
+                inventoryId: inventoryId
+            });
+        }
+
+        fetch('/api/outgoing/full', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify(dtoList)
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("전체출고가 완료되었습니다.");
+                    location.reload();
+                } else {
+                    alert("전체출고 처리 중 오류가 발생했습니다.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("서버 통신 중 오류가 발생했습니다.");
+            });
+    }
+
+    // 출고마감 처리
+    function CloseOutgoing() {
+        const checkedRows = document.querySelectorAll(".rowCheck:checked");
+
+        if (checkedRows.length === 0) {
+            alert("출고마감할 항목을 선택해주세요.");
+            return;
+        }
+
+        if (checkedRows.length > 1) {
+            alert("출고마감은 한 항목만 선택할 수 있습니다. 하나만 선택해주세요.");
+            return;
+        }
+
+        const confirmed = confirm("정말 출고를 마감하시겠습니까? 출고마감 후에는 수정할 수 없습니다.");
+        if (!confirmed) return;
+
+        const outgoingTotalId = checkedRows[0].closest("tr").getAttribute("data-id");
+
+        fetch('/api/outgoing/close', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]').getAttribute('content')
+            },
+            body: JSON.stringify({ outgoingTotalId: outgoingTotalId })  // 단일 ID만 전송
+        })
+            .then(res => {
+                if (res.ok) {
+                    alert("출고마감이 완료되었습니다.");
+                    location.reload();
+                } else {
+                    alert("출고마감 처리 중 오류가 발생했습니다.");
+                }
+            })
+            .catch(err => {
+                console.error(err);
+                alert("서버 통신 중 오류가 발생했습니다.");
+            });
+    }
+
+
 </script>
 
 </body>

@@ -9,7 +9,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
 import org.zerock.b01.domain.operation.*;
 import org.zerock.b01.domain.user.QPartner;
-import org.zerock.b01.domain.warehouse.IncomingTotal;
 import org.zerock.b01.domain.warehouse.QDeliveryRequest;
 import org.zerock.b01.domain.warehouse.QDeliveryRequestItem;
 import org.zerock.b01.domain.warehouse.QIncomingTotal;

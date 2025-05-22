@@ -13,23 +13,26 @@
         <h1 class="mb-4">재고금액</h1>
 
         <div class="card p-4 mb-4">
-            <form id="searchForm">
+            <form action="/internal/inventory/price" method="get">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-2">
-                        <label for="materialCode" class="form-label">자재코드</label>
-                        <input type="text" class="form-control" id="materialCode" name="materialCode">
+                        <label for="matId" class="form-label">자재코드</label>
+                        <input type="text" class="form-control" id="matId" name="matId"
+                               th:value="${pageRequestDTO.matId}">
                     </div>
                     <div class="col-md-2">
-                        <label for="category" class="form-label">카테고리</label>
-                        <input type="text" class="form-control" id="category" name="category">
+                        <label for="matType" class="form-label">종별</label>
+                        <input type="text" class="form-control" id="matType" name="matType"
+                               th:value="${pageRequestDTO.matType}">
                     </div>
                     <div class="col-md-2">
-                        <label for="materialName" class="form-label">자재명</label>
-                        <input type="text" class="form-control" id="materialName" name="materialName">
+                        <label for="matName" class="form-label">자재명</label>
+                        <input type="text" class="form-control" id="matName" name="matName"
+                               th:value="${pageRequestDTO.matName}">
                     </div>
                     <div class="col-12 d-flex justify-content-end gap-2 mt-4">
-                        <button type="button" class="btn btn-primary" onclick="search()"><i class="bi bi-search"></i> 검색</button>
-                        <button type="button" class="btn btn-outline-secondary" onclick="resetForm()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+                        <button type="submit" class="btn btn-primary" ><i class="bi bi-search"></i> 검색</button>
+                        <button type="button" class="btn btn-outline-secondary clearBtn"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
                     </div>
                 </div>
             </form>
@@ -40,7 +43,7 @@
                 <thead class="table-light">
                 <tr>
                     <th>자재코드</th>
-                    <th>카테고리</th>
+                    <th>종별</th>
                     <th>자재명</th>
                     <th>총재고</th>
                     <th>단가</th>
@@ -48,45 +51,13 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr>
-                    <td>MT-A001</td>
-                    <td>프레임</td>
-                    <td>알루미늄 본체 프레임</td>
-                    <td>150</td>
-                    <td>25,000</td>
-                    <td>3,750,000</td>
-                </tr>
-                <tr>
-                    <td>MT-B021</td>
-                    <td>배터리</td>
-                    <td>리튬이온 배터리 36V</td>
-                    <td>80</td>
-                    <td>55,000</td>
-                    <td>4,400,000</td>
-                </tr>
-                <tr>
-                    <td>MT-C105</td>
-                    <td>모터</td>
-                    <td>브러시리스 모터 250W</td>
-                    <td>60</td>
-                    <td>42,000</td>
-                    <td>2,520,000</td>
-                </tr>
-                <tr>
-                    <td>MT-D402</td>
-                    <td>브레이크</td>
-                    <td>디스크 브레이크 세트</td>
-                    <td>200</td>
-                    <td>11,000</td>
-                    <td>2,200,000</td>
-                </tr>
-                <tr>
-                    <td>MT-E007</td>
-                    <td>타이어</td>
-                    <td>12인치 고무 타이어</td>
-                    <td>120</td>
-                    <td>18,000</td>
-                    <td>2,160,000</td>
+                <tr th:each="inventory:${inventoryList}">
+                    <td th:text="${inventory.matId}"></td>
+                    <td th:text="${inventory.matType}"></td>
+                    <td th:text="${inventory.matName}"></td>
+                    <td th:text="${inventory.allTotalQty}"></td>
+                    <td th:text="${inventory.allTotalQty != 0 ? inventory.allTotalPrice / inventory.allTotalQty : 0}"></td>
+                    <td th:text="${inventory.allTotalPrice}"></td>
                 </tr>
                 </tbody>
 
@@ -95,6 +66,17 @@
     </div>
 
 </th:block>
+
+<script layout:fragment="script" th:inline="javascript">
+
+    document.querySelector(".clearBtn").addEventListener("click", function (e) {
+        e.preventDefault()
+        e.stopPropagation()
+
+        self.location = '/internal/inventory/price'
+    }, false)
+
+</script>
 
 </body>
 </html>

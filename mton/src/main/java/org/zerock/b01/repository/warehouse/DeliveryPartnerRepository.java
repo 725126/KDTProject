@@ -5,7 +5,6 @@ import org.zerock.b01.domain.warehouse.DeliveryPartner;
 import org.zerock.b01.domain.warehouse.DeliveryRequestItem;
 import org.zerock.b01.domain.warehouse.IncomingTotal;
 import org.zerock.b01.repository.search.warehouse.DeliveryPartnerSearch;
-import org.zerock.b01.repository.search.warehouse.DeliveryPartnerSearchImpl;
 
 import java.util.List;
 import java.util.Optional;

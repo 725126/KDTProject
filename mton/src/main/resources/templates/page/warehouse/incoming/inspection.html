@@ -118,7 +118,8 @@
                 <tbody id="inspection-body">
                 <tr th:each="incomingInspection:${incomingInspectionList}"
                         th:data-id="${incomingInspection.incomingId}">
-                    <td><input type="checkbox" class="rowCheck"></td>
+                    <td><input type="checkbox" class="rowCheck"
+                               th:disabled="${incomingInspection.incomingStatus == '입고마감'}"></td>
                     <td th:text="${incomingInspection.deliveryPartnerItemDate}"></td>
                     <td th:text="${incomingInspection.incomingCode}"></td>
                     <td th:text="${incomingInspection.pCompany}"></td>
@@ -170,10 +171,6 @@
                 <i class="bi bi-arrow-counterclockwise"></i>
                 <span>반품처리</span>
             </a>
-            <a class="nav-item nav-link" href="#" onclick="finalizeReceive()">
-                <i class="bi bi-archive"></i>
-                <span>입고마감</span>
-            </a>
         </nav>
 
 
@@ -188,9 +185,12 @@
         self.location = '/internal/incoming/inspection'
     }, false)
 
-    // 체크박스 전체 선택
     function toggleAll(source) {
-        document.querySelectorAll(".rowCheck").forEach(cb => cb.checked = source.checked);
+        document.querySelectorAll(".rowCheck").forEach(cb => {
+            if (!cb.disabled) {
+                cb.checked = source.checked;
+            }
+        });
     }
 
     //부분입고 처리
@@ -237,7 +237,7 @@
             return;
         }
 
-        const url = isModifyMode ? '/api/inspection/modify' : '/api/inspection/partial';
+        const url = isModifyMode ? '/api/incoming/modify' : '/api/incoming/partial';
 
         fetch(url, {
             method: 'POST',
@@ -273,6 +273,9 @@
             return;
         }
 
+        const confirmed = confirm("선택한 항목을 전체입고 하시겠습니까?");
+        if (!confirmed) return;
+
         const dtoList = [];
 
         for (let row of checkedRows) {  // forEach 대신 for문 사용
@@ -296,7 +299,7 @@
             dtoList.push({ incomingId, incomingQty: qty });
         }
 
-        fetch('/api/inspection/full', {
+        fetch('/api/incoming/full', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
