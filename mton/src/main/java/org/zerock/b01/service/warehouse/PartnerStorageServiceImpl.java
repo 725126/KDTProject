@@ -40,11 +40,12 @@ public class PartnerStorageServiceImpl implements PartnerStorageService {
             });
   }
 
-  public PageResponseDTO<PartnerStorageDTO> listWithPartnerStorage(PageRequestDTO pageRequestDTO) {
+  public PageResponseDTO<PartnerStorageDTO> listWithPartnerStorage(PageRequestDTO pageRequestDTO,Long partnerId) {
 
     Pageable pageable = pageRequestDTO.getPageable("pstorageId");
 
-    Page<PartnerStorage> result = partnerStorageRepository.findAll(pageable);
+    Page<PartnerStorage> result = partnerStorageRepository.findByPartner_PartnerId(partnerId, pageable);
+
 
     List<PartnerStorageDTO> dtoList = result.getContent().stream()
             .map(partnerStorage -> PartnerStorageDTO.builder()

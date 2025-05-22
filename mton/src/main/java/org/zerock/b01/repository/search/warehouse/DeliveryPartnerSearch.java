@@ -10,5 +10,5 @@ public interface DeliveryPartnerSearch {
 
   Page<DeliveryPartner> searchDeliveryPartnerAll(String drItemCode, String orderId, String matName,
                                                  LocalDate drItemDueDateStart, LocalDate drItemDueDateEnd,
-                                                 Pageable pageable);
+                                                 Long partnerId, Pageable pageable);
 }

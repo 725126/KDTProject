@@ -131,11 +131,13 @@ public class PartnerController {
 
     // 자재 재고 관리
     @GetMapping("/mat/inventory")
-    public String listPartnerStorage(PageRequestDTO pageRequestDTO, Model model) {
+    public String listPartnerStorage(@AuthenticationPrincipal CustomUserDetails userDetails,
+                                     PageRequestDTO pageRequestDTO, Model model) {
 
-        // 전체 납입지시 상세 항목 페이징 조회
+        Long partnerId = userService.findByPartner(userDetails.getUser()).getPartnerId();
+
         PageResponseDTO<PartnerStorageDTO> PartnerStorageList =
-                partnerStorageService.listWithPartnerStorage(pageRequestDTO);
+                partnerStorageService.listWithPartnerStorage(pageRequestDTO, partnerId);
 
         model.addAttribute("PartnerStorageList", PartnerStorageList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
@@ -191,7 +193,7 @@ public class PartnerController {
 
         // 전체 납입지시 상세 항목 페이징 조회
         PageResponseDTO<DeliveryPartnerDTO> drPartnerList =
-                deliveryPartnerService.listWithDeliveryPartner(pageRequestDTO);
+                deliveryPartnerService.listWithDeliveryPartner(pageRequestDTO,partnerId);
 
         model.addAttribute("drPartnerList", drPartnerList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);

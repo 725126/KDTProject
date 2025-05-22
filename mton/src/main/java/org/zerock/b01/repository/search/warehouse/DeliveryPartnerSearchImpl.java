@@ -6,8 +6,10 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.support.QuerydslRepositorySupport;
+import org.zerock.b01.domain.operation.QContractMaterial;
 import org.zerock.b01.domain.operation.QMaterial;
 import org.zerock.b01.domain.operation.QOrdering;
+import org.zerock.b01.domain.user.QPartner;
 import org.zerock.b01.domain.warehouse.DeliveryPartner;
 import org.zerock.b01.domain.warehouse.QDeliveryPartner;
 import org.zerock.b01.domain.warehouse.QDeliveryRequestItem;
@@ -22,17 +24,21 @@ public class DeliveryPartnerSearchImpl extends QuerydslRepositorySupport impleme
   @Override
   public Page<DeliveryPartner> searchDeliveryPartnerAll(String drItemCode, String orderId, String matName,
                                                                 LocalDate drItemDueDateStart, LocalDate drItemDueDateEnd,
-                                                                Pageable pageable) {
+                                                                Long partnerId, Pageable pageable) {
 
     QDeliveryPartner deliveryPartner = QDeliveryPartner.deliveryPartner;
     QDeliveryRequestItem deliveryRequestItem = QDeliveryRequestItem.deliveryRequestItem;
     QOrdering ordering = QOrdering.ordering;
+    QContractMaterial contractMaterial = QContractMaterial.contractMaterial;
     QMaterial material = QMaterial.material;
+    QPartner partner = QPartner.partner;
 
     JPQLQuery<DeliveryPartner> query = from(deliveryPartner)
             .join(deliveryPartner.deliveryRequestItem, deliveryRequestItem)
             .join(deliveryRequestItem.deliveryRequest.ordering, ordering)
-            .join(ordering.contractMaterial.material, material);
+            .join(ordering.contractMaterial, contractMaterial)
+            .join(contractMaterial.material, material)
+            .join(contractMaterial.contract.partner, partner);
 
     BooleanBuilder builder = new BooleanBuilder();
 
@@ -58,6 +64,10 @@ public class DeliveryPartnerSearchImpl extends QuerydslRepositorySupport impleme
       builder.and(deliveryRequestItem.drItemDueDate.goe(drItemDueDateStart));
     } else if (drItemDueDateEnd != null) {
       builder.and(deliveryRequestItem.drItemDueDate.loe(drItemDueDateEnd));
+    }
+
+    if (partnerId != null) {
+      builder.and(partner.partnerId.eq(partnerId));
     }
 
     // 🔹 조건 적용 및 페이징

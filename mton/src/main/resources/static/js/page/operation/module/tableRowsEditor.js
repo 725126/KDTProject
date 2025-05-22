@@ -17,6 +17,20 @@ let contmatDBData;
 // 수정 전 원래 값을 담는 변수와 삭제 전 삭제할 ID를 담는 변수
 let originalValues = {};
 
+function clearDBData() {
+    matDBData = null;
+    prdDBData = null;
+    pbomDBData = null;
+    prdplanDBData = null;
+    prdplanDBEditData = null;
+    pplanDBData = null;
+    pplanDBEditData = null;
+    pplanDBData = null;
+    pplanDBEditData = null;
+    orderDBData = null;
+    contmatDBData = null;
+}
+
 // 등록 이후 목록으로 넘어가는 이벤트 발생용 함수
 function viewChange() {
     document.querySelector("#mod-view").checked = true;
@@ -210,7 +224,71 @@ function initEditButtons(table) {
     tutorialMessage.bindTutorialMessage(allRevertButton, tmessage.editAllRevertTutorial);
 }
 
+function makeEditButtons() {
+    const deleteLabel = document.createElement("label");
+    deleteLabel.style.padding = "0";
+    deleteLabel.style.display = "flex";
+    deleteLabel.style.justifyContent = "center";
+    deleteLabel.style.alignItems = "center";
+    deleteLabel.style.borderStyle = "none";
+    deleteLabel.style.position = "absolute";
+    deleteLabel.style.top = "8px";
+    deleteLabel.style.right = "6px";
+    deleteLabel.style.width = "24px";
+    deleteLabel.style.height = "24px";
+    deleteLabel.style.fontSize = "24px";
+    deleteLabel.innerHTML = "&times;";
+    deleteLabel.classList.add("opacity-btn");
+    deleteLabel.style.cursor = "pointer";
+    deleteLabel.setAttribute("red-button", "true");
+
+    // 삭제 체크박스
+    const deleteCheck = document.createElement("input");
+    deleteCheck.style.position = "absolute";
+    deleteCheck.type = "checkbox";
+    deleteCheck.style.opacity = "0";
+    deleteCheck.style.pointerEvents = "none";
+    // 라벨에 넣어줌
+    deleteLabel.appendChild(deleteCheck);
+
+    // 수정버튼
+    const editButton = document.createElement("button");
+    editButton.style.padding = "0";
+    editButton.style.display = "flex";
+    editButton.style.justifyContent = "center";
+    editButton.style.alignItems = "center";
+    editButton.style.borderStyle = "none";
+    editButton.style.position = "absolute";
+    editButton.style.top = "8px";
+    editButton.style.right = "32px";
+    editButton.style.width = "24px";
+    editButton.style.height = "24px";
+    editButton.style.fontSize = "24px";
+    editButton.innerHTML = "&bernou;";
+    editButton.classList.add("opacity-btn");
+
+    // 되돌리기 버튼
+    const revertButton = editButton.cloneNode(true);
+    revertButton.innerHTML = "&circlearrowright;"
+    revertButton.style.display = "none";
+    revertButton.setAttribute("revert", "disabled");
+
+    return {edit: editButton, del: deleteLabel, revert: revertButton};
+}
+
+function addTableEditButtons2(table, ...protectedCols) {
+    const btns = makeEditButtons();
+
+    // 임시로 버튼 넣어봄
+
+    // 개별 버튼에 이벤트를 할당하는 대신 부모에게 위임함
+    table.addEventListener("click", function (e) {
+        console.log(e.target);
+    });
+}
+
 // 행에 수정 관련 버튼을 넣음
+// TODO: 현재 성능 저하 이슈가 너무 커서 몇몇 페이지에서 사용하지 않을 예정
 function addEditButtons(table, row, ...protectedCols) {
     // 삭제 체크박스 라벨
     // 스타일링은 이녀석에게 할 것
@@ -941,7 +1019,8 @@ function viewPPlanTable(init = false) {
             reloadTable(pplanViewTable, "pplan");
             reloadTable(pplanEditTable, "pplanedit");
 
-            addTableEditButtons(pplanEditTable);
+            // 성능저하의 원흉
+            addTableEditButtons2(pplanEditTable);
 
             makeTableCellDBSelect(pplanEditTable, 1, prdplanDBData, dbElementNames.prdplanId);
             makeTableCellDBSelect(pplanEditTable, 2, matDBData, dbElementNames.matId);
@@ -954,6 +1033,8 @@ function viewPPlanTable(init = false) {
         if (init) {
             initEmptyPPlanTable(pplanInputTable);
         }
+    }).then(value => {
+        clearDBData();
     });
 }
 
@@ -968,10 +1049,11 @@ function viewOrderingTable(init = false) {
             reloadTable(orderViewTable, "", orderDBData);
             reloadTable(orderEditTable, "", orderDBData);
 
-            addTableEditButtons(orderEditTable);
+            addTableEditButtons2(orderEditTable);
 
-            makeTableCellDBSelect(orderEditTable, 2, contmatDBData, dbElementNames.conmatId);
-            makeTableCellDBSelect(orderEditTable, 1, pplanDBData, dbElementNames.pplanId);
+            // select 의 option 이 엄청 많이 삽입되므로 이 방식은 메모리에 부담을 줌
+            // makeTableCellDBSelect(orderEditTable, 2, contmatDBData, dbElementNames.conmatId);
+            // makeTableCellDBSelect(orderEditTable, 1, pplanDBData, dbElementNames.pplanId);
             makeTableCellDatePicker(orderEditTable, 4);
             makeTableCellDatePicker(orderEditTable, 5);
             makeTableCellSelect(orderEditTable, 6, "발주중", "취소");

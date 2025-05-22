@@ -1,5 +1,7 @@
 package org.zerock.b01.repository.warehouse;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.zerock.b01.domain.operation.Material;
@@ -16,4 +18,6 @@ public interface PartnerStorageRepository extends JpaRepository<PartnerStorage, 
   List<Object[]> sumPartnerQtyByMaterial();
 
   Optional<PartnerStorage> findByPartnerAndMaterial(Partner partner, Material material);
+
+  Page<PartnerStorage> findByPartner_PartnerId(Long partnerId, Pageable pageable);
 }

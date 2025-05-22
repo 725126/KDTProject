@@ -18,4 +18,6 @@ public class PartnerStorageDTO {
   private String matName;
 
   private int sstorageQty;
+
+  private Long partnerId;
 }
