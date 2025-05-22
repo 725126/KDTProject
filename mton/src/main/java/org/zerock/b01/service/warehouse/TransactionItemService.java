@@ -19,7 +19,7 @@ public interface TransactionItemService {
 //  List<TransactionViewDTO> listWithTransactionItem();
   List<TransactionViewDTO> listWithTransactionItem(String keyword, List<String> category, String sort);
 
-  void createTransactionItemsForOrdering(Ordering ordering);
+//  void createTransactionItemsForOrdering(Ordering ordering);
 
   void createTransactionByPartner(List<PartnerTransactionDTO> partnerTransactions);
 

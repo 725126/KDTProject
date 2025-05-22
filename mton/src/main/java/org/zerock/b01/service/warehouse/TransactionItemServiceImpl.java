@@ -124,27 +124,27 @@ public class TransactionItemServiceImpl implements TransactionItemService  {
         return stream.sorted(comparator).toList();
     }
 
-    public void createTransactionItemsForOrdering(Ordering ordering) {
-        List<IncomingTotal> incomingTotals = incomingTotalRepository.findByDeliveryRequestItem_DeliveryRequest_Ordering(ordering);
-
-        int totalQty = incomingTotals.stream()
-                .mapToInt(IncomingTotal::getIncomingEffectiveQty)
-                .sum();
-
-        // 가격 등은 계약자재(ContractMaterial) 기준이라 가정
-        int price = ordering.getContractMaterial().getCmtPrice();
-
-        TransactionItem item = TransactionItem.builder()
-                .ordering(ordering)
-                .material(ordering.getContractMaterial().getMaterial())
-                .titemPrice(price)
-                .titemQty(totalQty)
-                .amount(price * totalQty)
-                .remark("-")
-                .build();
-
-        transactionItemRepository.save(item);
-    }
+//    public void createTransactionItemsForOrdering(Ordering ordering) {
+//        List<IncomingTotal> incomingTotals = incomingTotalRepository.findByDeliveryRequestItem_DeliveryRequest_Ordering(ordering);
+//
+//        int totalQty = incomingTotals.stream()
+//                .mapToInt(IncomingTotal::getIncomingEffectiveQty)
+//                .sum();
+//
+//        // 가격 등은 계약자재(ContractMaterial) 기준이라 가정
+//        int price = ordering.getContractMaterial().getCmtPrice();
+//
+//        TransactionItem item = TransactionItem.builder()
+//                .ordering(ordering)
+//                .material(ordering.getContractMaterial().getMaterial())
+//                .titemPrice(price)
+//                .titemQty(totalQty)
+//                .amount(price * totalQty)
+//                .remark("-")
+//                .build();
+//
+//        transactionItemRepository.save(item);
+//    }
 
     @Override
     @Transactional
@@ -358,7 +358,6 @@ public class TransactionItemServiceImpl implements TransactionItemService  {
 
         return new PageImpl<>(dtoList, pageable, total);
     }
-
 
 
 }
