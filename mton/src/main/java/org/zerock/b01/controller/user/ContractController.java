@@ -18,16 +18,14 @@ import org.zerock.b01.controller.operation.repository.ContractFileRepository;
 import org.zerock.b01.controller.operation.repository.ContractMaterialRepository;
 import org.zerock.b01.controller.operation.repository.ContractRepository;
 import org.zerock.b01.controller.operation.repository.MaterialRepository;
-import org.zerock.b01.domain.operation.Contract;
-import org.zerock.b01.domain.operation.ContractFile;
-import org.zerock.b01.domain.operation.ContractMaterial;
-import org.zerock.b01.domain.operation.Material;
+import org.zerock.b01.domain.operation.*;
 import org.zerock.b01.domain.user.Partner;
 import org.zerock.b01.dto.operation.ContractDTO;
 import org.zerock.b01.dto.operation.ContractMaterialViewDTO;
 import org.zerock.b01.repository.user.PartnerRepository;
 import org.zerock.b01.security.CustomUserDetails;
 import org.zerock.b01.service.operation.ContractService;
+import org.zerock.b01.service.warehouse.PartnerStorageService;
 
 import java.io.FileNotFoundException;
 import java.io.IOException;
@@ -52,6 +50,7 @@ public class ContractController {
     private final ContractRepository contractRepository;
     private final ContractMaterialRepository contractMaterialRepository;
     private final ContractFileRepository contractFileRepository;
+    private final PartnerStorageService partnerStorageService;
 
 
     @Value("C:\\upload")
@@ -99,6 +98,10 @@ public class ContractController {
                     .build();
 
             contractMaterialRepository.save(contractMaterial);
+
+            if (material != null) {
+                partnerStorageService.getOrCreatePartnerStorage(partner, material);
+            }
         }
 
         // 계약서 파일 저장 (파일 시스템 or DB Blob)

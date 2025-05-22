@@ -4,6 +4,7 @@ import org.zerock.b01.domain.operation.StatusTuple;
 import org.zerock.b01.dto.operation.ProductionPlanDTO;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public interface ProductionPlanService {
@@ -12,4 +13,5 @@ public interface ProductionPlanService {
     StatusTuple deleteAll(ArrayList<String> arrayList);
     StatusTuple updateAll(List<ProductionPlanDTO> list);
     StatusTuple cancelAll(ArrayList<String> arrayList);
+    StatusTuple updateQty(HashMap<String, Integer> changeList);
 }

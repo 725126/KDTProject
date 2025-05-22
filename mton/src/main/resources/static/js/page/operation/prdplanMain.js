@@ -110,7 +110,7 @@ const prdplanInputTable = document.querySelector("#prdplan-table");
             },
             body: JSON.stringify(canceledPrdPlanIds)
         }).then(res => res.json()).then(data => {
-            console.log(data);
+            alert(data.message);
         });
     });
 

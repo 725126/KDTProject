@@ -54,7 +54,9 @@ public class PageRequestDTO {
 
     private String prdplanId;
 
-    private String incomingStatus;
+    private String outgoingCode;
+
+    private String matType;
 
     private LocalDate drItemDueDateStart;
 
@@ -84,11 +86,41 @@ public class PageRequestDTO {
 
     private LocalDate prdplanEndEnd;
 
+    private LocalDate outgoingDateStart;
+
+    private LocalDate outgoingDateEnd;
+
+    private LocalDate outgoingCompletedAtStart;
+
+    private LocalDate outgoingCompletedAtEnd;
+
+    private LocalDate updateDateStart;
+    private LocalDate updateDateEnd;
+
+    private String incomingStatus;
+
     private String incomingItemStatus;
 
     private String outgoingStatus;
 
     //
+    private String updateReason;
+
+    public String[] getTypes() {
+        if (type == null || type.isEmpty()) {
+            return null;
+        }
+
+        return type.split("");
+    }
+
+    // String... = String[]
+    // String[]보다 더 유연하게 사용가능
+    // 직접 String[]을 생성할 필요 없이 여러 인자 전달 가능
+    public Pageable getPageable(String... props) {
+        return PageRequest.of(this.page - 1, this.size, Sort.by(props).ascending() );
+
+    }
 
     private String link;
 

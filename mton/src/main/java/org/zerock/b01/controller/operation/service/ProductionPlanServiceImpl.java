@@ -18,6 +18,7 @@ import org.zerock.b01.service.warehouse.OutgoingTotalService;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -160,5 +161,11 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
         } catch (Exception e) {
             return new StatusTuple(false, e.getMessage());
         }
+    }
+
+    // 생산량 변경을 할 경우
+    @Override
+    public StatusTuple updateQty(HashMap<String, Integer> changeList) {
+        return null;
     }
 }

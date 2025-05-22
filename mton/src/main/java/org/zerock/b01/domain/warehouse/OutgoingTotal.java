@@ -40,4 +40,24 @@ public class OutgoingTotal {
   @Enumerated(EnumType.STRING)
   @Column(nullable = false)
   private OutgoingStatus outgoingStatus;
+
+  // 상태를 업데이트하는 메서드 추가
+  public void updateOutgoingStatus(OutgoingStatus newStatus) {
+    this.outgoingStatus = newStatus;
+  }
+
+  public void markAsCompleted() {
+    this.outgoingCompletedAt = LocalDateTime.now();
+    this.outgoingStatus = OutgoingStatus.출고마감;
+  }
+
+  public void markFirstOutgoing() {
+    if (this.outgoingFirstDate == null) {
+      this.outgoingFirstDate = LocalDateTime.now();
+    }
+  }
+
+  public void addToTotalQty(int totalQty) {
+    this.outgoingTotalQty += totalQty;
+  }
 }

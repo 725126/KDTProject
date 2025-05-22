@@ -18,6 +18,7 @@ public class DeliveryPartnerItemServiceImpl implements DeliveryPartnerItemServic
 
   private final DeliveryPartnerItemRepository deliveryPartnerItemRepository;
 
+  @Override
   public DeliveryPartnerItem saveDeliveryPartnerItem(DeliveryPartner deliveryPartner, int deliveredQty) {
     // 이력 저장
     DeliveryPartnerItem item = DeliveryPartnerItem.builder()

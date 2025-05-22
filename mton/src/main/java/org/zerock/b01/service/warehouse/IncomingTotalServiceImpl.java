@@ -6,20 +6,17 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.zerock.b01.controller.operation.repository.OrderingRepository;
+import org.zerock.b01.domain.operation.Material;
 import org.zerock.b01.domain.operation.Ordering;
 import org.zerock.b01.domain.warehouse.*;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
-import org.zerock.b01.dto.warehouse.IncomingInspectionDTO;
 import org.zerock.b01.dto.warehouse.IncomingTotalDTO;
-import org.zerock.b01.repository.warehouse.DeliveryPartnerRepository;
 import org.zerock.b01.repository.warehouse.DeliveryRequestItemRepository;
 import org.zerock.b01.repository.warehouse.IncomingTotalRepository;
 
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,8 +26,10 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
   private final IncomingTotalRepository incomingTotalRepository;
   private final DeliveryRequestItemRepository deliveryRequestItemRepository;
   private final OrderingRepository orderingRepository;
-  private final TransactionItemService transactionItemService;
+  private final InventoryService inventoryService;
+  private final InventoryHistoryService inventoryHistoryService;
 
+  @Override
   public void updateIncomingStatus(Long drItemId) {
     DeliveryRequestItem item = deliveryRequestItemRepository.findById(drItemId)
             .orElseThrow(() -> new IllegalArgumentException("해당 납입지시 항목이 존재하지 않습니다."));
@@ -54,7 +53,7 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
     incomingTotalRepository.save(incomingTotal);   // 저장
   }
 
-
+  @Override
   public void closeIncoming(Long incomingTotalId) {
     IncomingTotal incomingTotal = incomingTotalRepository.findById(incomingTotalId)
             .orElseThrow(() -> new IllegalArgumentException("해당 납입지시 항목이 존재하지 않습니다."));
@@ -65,6 +64,29 @@ public class IncomingTotalServiceImpl implements IncomingTotalService {
     if (totalQty != expectedQty) {
       throw new IllegalStateException("전량 입고된 경우에만 마감할 수 있습니다.");
     }
+
+    CompanyStorage storage = incomingTotal.getDeliveryRequestItem().getCompanyStorage();
+    Material material = incomingTotal.getDeliveryRequestItem().getDeliveryRequest()
+              .getOrdering().getContractMaterial().getMaterial();
+
+    int cmtPrice = incomingTotal.getDeliveryRequestItem().getDeliveryRequest().getOrdering().getContractMaterial().getCmtPrice();
+    Long contractPrice = Long.valueOf(cmtPrice);
+
+    Long changePrice = contractPrice * totalQty;
+
+    // 1. 재고 객체 조회 혹은 신규 생성
+    Inventory inventory = inventoryService.getOrCreateInventory(storage,material);
+
+    inventoryHistoryService.registerHistory(
+            inventory,
+            storage.getCstorageId(),
+            material.getMatName(),
+            totalQty,
+            changePrice,
+            InventoryUpdateReason.입고
+    );
+
+    inventoryService.addQtyAndSave(inventory, totalQty, changePrice);
 
     incomingTotal.markAsCompleted();
     incomingTotalRepository.save(incomingTotal);

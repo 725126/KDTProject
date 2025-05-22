@@ -14,39 +14,38 @@
     <h1 class="mb-4">출고 이력</h1>
 
     <div class="card p-4 mb-4">
-      <form id="searchForm">
+      <form action="/internal/outgoing/history" method="get">
         <div class="row g-3 align-items-end">
           <div class="col-md-4">
             <label class="form-label">출고일</label>
             <div class="d-flex gap-1">
-              <input type="date" class="form-control" id="search-outgoing-start">
+              <input type="date" class="form-control" name="outgoingCompletedAtStart"
+                     th:value="${pageRequestDTO.outgoingCompletedAtStart != null ?
+                                   #temporals.format(pageRequestDTO.outgoingCompletedAtStart, 'yyyy-MM-dd') : ''}">
               <span class="pt-2">~</span>
-              <input type="date" class="form-control" id="search-outgoing-end">
+              <input type="date" class="form-control" name="outgoingCompletedAtEnd"
+                     th:value="${pageRequestDTO.outgoingCompletedAtEnd != null ?
+                                   #temporals.format(pageRequestDTO.outgoingCompletedAtEnd, 'yyyy-MM-dd') : ''}">
             </div>
           </div>
           <div class="col-md-2">
-            <label class="form-label">출고코드</label>
-            <input type="text" class="form-control" id="search-outgoing-code">
+            <label class="form-label" for="outgoingCode">출고코드</label>
+            <input type="text" class="form-control" id="outgoingCode" name="outgoingCode"
+                   th:value="${pageRequestDTO.outgoingCode}">
           </div>
           <div class="col-md-2">
-            <label class="form-label">자재코드</label>
-            <input type="text" class="form-control" id="search-material-code">
+            <label class="form-label" for="matId">자재코드</label>
+            <input type="text" class="form-control" id="matId" name="matId"
+                   th:value="${pageRequestDTO.matId}">
           </div>
           <div class="col-md-2">
-            <label class="form-label">자재명</label>
-            <input type="text" class="form-control" id="search-material-name">
-          </div>
-          <div class="col-md-2">
-            <label class="form-label">상태</label>
-            <select id="search-status" class="form-select">
-              <option value="">전체</option>
-              <option value="부분출고">부분출고</option>
-              <option value="출고마감">출고마감</option>
-            </select>
+            <label class="form-label" for="matName">자재명</label>
+            <input type="text" class="form-control" id="matName" name="matName"
+                   th:value="${pageRequestDTO.matName}">
           </div>
           <div class="col-12 d-flex justify-content-end gap-2">
-            <button type="button" class="btn btn-primary" onclick="searchTable()"><i class="bi bi-search"></i> 검색</button>
-            <button type="button" class="btn btn-outline-secondary" onclick="resetSearch()"><i class="bi bi-arrow-clockwise"></i> 초기화</button>
+            <button type="submit" class="btn btn-primary"><i class="bi bi-search"></i> 검색</button>
+            <button type="button" class="btn btn-outline-secondary clearBtn" ><i class="bi bi-arrow-clockwise"></i> 초기화</button>
           </div>
         </div>
       </form>
@@ -56,26 +55,36 @@
       <table class="table table-bordered table-hover data-table text-center">
         <thead class="table-light">
         <tr>
+          <th>처리일</th>
           <th>출고코드</th>
-          <th>출고일</th>
           <th>자재코드</th>
           <th>자재명</th>
           <th>출고수량</th>
         </tr>
         </thead>
         <tbody id="outgoing-history-body">
-        <tr>
-          <td>OUT-24041001</td>
-          <td>2025-04-10</td>
-          <td>MAT-001</td>
-          <td>전기자전거 모터</td>
-          <td>2</td>
+        <tr th:each="outgoing:${outgoingList}" th:data-id="${outgoing.outgoingId}">
+          <td th:text="${#temporals.format(outgoing.outgoingDate,
+                                    'yyyy-MM-dd HH:mm:ss')}"></td>
+          <td th:text="${outgoing.outgoingCode}"></td>
+          <td th:text="${outgoing.matId}"></td>
+          <td th:text="${outgoing.matName}"></td>
+          <td th:text="${outgoing.outgoingQty}"></td>
         </tr>
         </tbody>
       </table>
     </div>
   </div>
 </th:block>
+<script layout:fragment="script" th:inline="javascript">
+
+  document.querySelector(".clearBtn").addEventListener("click", function (e) {
+    e.preventDefault()
+    e.stopPropagation()
+
+    self.location = '/internal/outgoing/history'
+  }, false)
+</script>
 
 </body>
 </html>

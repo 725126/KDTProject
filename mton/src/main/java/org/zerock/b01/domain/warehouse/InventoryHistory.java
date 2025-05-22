@@ -22,13 +22,10 @@ public class InventoryHistory {
   @JoinColumn(name = "inventory_id", nullable = false)
   private Inventory inventory;
 
-  @ManyToOne
-  @JoinColumn(name = "cstorage_id", nullable = false)
-  private CompanyStorage companyStorage;
+  @Column(nullable = false)
+  private String cstorageId;
 
-  @ManyToOne
-  @JoinColumn(name = "mat_id", nullable = false)
-  private Material material;
+  private String matName;
 
   @Column(nullable = false)
   private int changeQty;
