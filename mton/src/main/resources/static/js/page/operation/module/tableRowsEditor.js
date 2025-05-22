@@ -293,9 +293,11 @@ function addEditButtons(table, row, ...protectedCols) {
             cells[i].setAttribute("contenteditable", "true");
         }
 
+        const proCol = protectedCols.flat();
+
         // 보호하도록 선택한 열은 수정 불가능하게 변경
-        if (protectedCols !== null && protectedCols.length > 0) {
-            for (const i of protectedCols) {
+        if (proCol !== null && proCol.length > 0) {
+            for (const i of proCol) {
                 cells[i].setAttribute("contenteditable", "false");
             }
         }
@@ -364,6 +366,14 @@ function addTableEditButtons(table) {
 
     for (let i = 1; i < rows.length; i++) {
         addEditButtons(table, rows[i]);
+    }
+}
+
+function addTableEditButtonsWithProtect(table, ...protectiveCols) {
+    const rows = table.rows;
+
+    for (let i = 1; i < rows.length; i++) {
+        addEditButtons(table, rows[i], protectiveCols);
     }
 }
 
@@ -885,7 +895,7 @@ function viewPrdPlanTable(init = false) {
             reloadTable(prdplanViewTable, "prdplan");
             reloadTable(prdplanEditTable, "prdplanedit");
 
-            addTableEditButtons(prdplanEditTable);
+            addTableEditButtonsWithProtect(prdplanEditTable, 0, 1, 3);
 
             makeTableCellDBSelectWithLabel(prdplanEditTable, 1, prdDBData, dbElementNames.prodId, dbElementNames.prodName);
             makeTableCellDatePicker(prdplanEditTable, 3);
