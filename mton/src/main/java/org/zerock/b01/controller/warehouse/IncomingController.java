@@ -37,7 +37,10 @@ public class IncomingController { // 입고
 
         model.addAttribute("incomingList", incomingList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", incomingList.getTotal());
+
+        model.addAttribute("currentPage", incomingList.getPage() + 1);
+        model.addAttribute("totalPages", incomingList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/incoming/planned";
     }
@@ -52,7 +55,10 @@ public class IncomingController { // 입고
 
         model.addAttribute("incomingInspectionList", incomingInspectionList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", incomingInspectionList.getTotal());
+
+        model.addAttribute("currentPage", incomingInspectionList.getPage() + 1);
+        model.addAttribute("totalPages", incomingInspectionList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/incoming/inspection";
     }
@@ -85,7 +91,10 @@ public class IncomingController { // 입고
 
         model.addAttribute("incomingItemList", incomingItemList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", incomingItemList.getTotal());
+
+        model.addAttribute("currentPage", incomingItemList.getPage() + 1);
+        model.addAttribute("totalPages", incomingItemList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/incoming/history";
     }
@@ -100,7 +109,10 @@ public class IncomingController { // 입고
 
         model.addAttribute("incomingTotalList", incomingTotalList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", incomingTotalList.getTotal());
+
+        model.addAttribute("currentPage", incomingTotalList.getPage() + 1);
+        model.addAttribute("totalPages", incomingTotalList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/incoming/status";
     }

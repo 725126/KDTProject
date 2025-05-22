@@ -27,6 +27,7 @@ import org.zerock.b01.dto.user.UserResponseDTO;
 import org.zerock.b01.dto.user.UserUpdateDTO;
 import org.zerock.b01.security.CustomUserDetails;
 import org.zerock.b01.service.user.UserService;
+import org.zerock.b01.service.warehouse.DashboardService;
 
 import java.util.List;
 import java.util.Map;
@@ -37,6 +38,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserController {
     private final UserService userService;
+    private final DashboardService dashboardService;
 
     // 회원 관리 - 인트로(로그인)
     @GetMapping("/intro")
@@ -60,7 +62,7 @@ public class UserController {
 
     // [내부직원] 로그인 시 홈 화면
     @GetMapping("/internal/home")
-    public String homePageInternal(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public String homePageInternal(@AuthenticationPrincipal CustomUserDetails customUserDetails,Model model) {
         log.info("[내부직원] 로그인: {}", customUserDetails);
 
         // *** 중요 ***
@@ -69,6 +71,9 @@ public class UserController {
             // 로그인 안 되어 있으면 시작 페이지로
             return "redirect:/intro";
         }
+
+        model.addAttribute("todayIncomingCount", dashboardService.getTodayIncomingCount());
+        model.addAttribute("todayPlannedCount", dashboardService.getTodayPlannedCount());
 
         return "page/user/internal-home"; // home.html 열기
     }

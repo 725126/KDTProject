@@ -96,6 +96,16 @@
 
 
         <div class="card p-4">
+            <div class="d-flex justify-content-end mb-3">
+                <div class="d-flex gap-2 align-items-center">
+                    <i class="bi bi-funnel text-secondary" title="보기 개수"></i>
+                    <select class="form-select form-select w-auto" name="size" id="postCountSelect">
+                        <option value="10" th:selected="${selectedSize == 10}">10개씩 보기</option>
+                        <option value="20" th:selected="${selectedSize == 20}">20개씩 보기</option>
+                        <option value="30" th:selected="${selectedSize == 30}">30개씩 보기</option>
+                    </select>
+                </div>
+            </div>
             <table class="table table-bordered table-hover data-table text-center">
                 <thead class="table-light">
                 <tr>
@@ -142,19 +152,18 @@
                               incomingInspection.incomingStatus == '부분입고' ? ' badge bg-info text-dark' :
                               incomingInspection.incomingStatus == '미입고' ? ' badge bg-warning text-dark' :
                               ' badge bg-secondary'}">
-
                         </span>
-
                         <a th:if="${incomingInspection.incomingStatus == '입고마감대기중'}"
                            th:text="${incomingInspection.incomingStatus}"
                            th:href="@{/internal/incoming/close(drItemId=${incomingInspection.drItemId})}"
                            class="badge bg-primary text-white text-decoration-none">
                         </a>
                     </td>
-
                 </tr>
                 </tbody>
             </table>
+            <!-- 페이지네이션 -->
+            <th:block th:replace="fragment/pagination :: paginationFragment"></th:block>
         </div>
 
         <!-- 하단 고정 액션 버튼 바 -->
@@ -385,6 +394,17 @@
             alert("서버 통신 중 오류가 발생했습니다.");
         });
     }
+
+    // 보기 개수 js
+    function applyTransactionFilters() {
+        const size = document.getElementById("postCountSelect").value;
+
+        location.href = `/internal/incoming/inspection?page=0&size=${size}`;
+    }
+
+    // 보기 개수 js  이벤트 바인딩
+    document.getElementById("postCountSelect").addEventListener("change", applyTransactionFilters);
+
 
 </script>
 </body>

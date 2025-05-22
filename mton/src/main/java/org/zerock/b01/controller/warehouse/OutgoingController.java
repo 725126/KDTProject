@@ -37,13 +37,15 @@ public class OutgoingController {
     @GetMapping("/status")
     public String listOutgoingStatus(PageRequestDTO pageRequestDTO, Model model) {
 
-        // 전체 납입지시 상세 항목 페이징 조회
         PageResponseDTO<OutgoingTotalDTO> outgoingTotalList =
                 outgoingTotalService.listWithOutgoingTotal(pageRequestDTO);
 
         model.addAttribute("outgoingTotalList", outgoingTotalList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", outgoingTotalList.getTotal());
+
+        model.addAttribute("currentPage", outgoingTotalList.getPage() + 1);
+        model.addAttribute("totalPages", outgoingTotalList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
 
         List<InventoryDTO> allInventories = inventoryService.findAllInventoryDTOs();
@@ -70,7 +72,10 @@ public class OutgoingController {
 
         model.addAttribute("outgoingList", outgoingList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", outgoingList.getTotal());
+
+        model.addAttribute("currentPage", outgoingList.getPage() + 1);
+        model.addAttribute("totalPages", outgoingList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/outgoing/history";
     }
@@ -95,7 +100,10 @@ public class OutgoingController {
 
         model.addAttribute("outgoingTotalList", allResults.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", allResults.getTotal());
+
+        model.addAttribute("currentPage", allResults.getPage() + 1);
+        model.addAttribute("totalPages", allResults.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/outgoing/result";
     }
