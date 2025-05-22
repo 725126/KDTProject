@@ -89,8 +89,8 @@
                     <td th:text="${inventory.matName}"></td>
                     <td th:text="${inventory.allTotalQty}"></td>
                     <td th:text="${inventory.allIncomingEffectiveQty}"></td>
-                    <td th:text="${inventory.allTotalQty - inventory.allEstimatedOutgoingQty}"></td>
-                    <td th:text="${inventory.allEstimatedOutgoingQty}"></td>
+                    <td th:text="${inventory.allTotalQty - inventory.allOutgoingTotalQty}"></td>
+                    <td th:text="${inventory.allOutgoingTotalQty}"></td>
                     <td th:text="${inventory.partnerQty}"></td>
                     <td th:text="${inventory.allTotalQty + inventory.partnerQty}"></td>
                 </tr>

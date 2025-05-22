@@ -45,7 +45,7 @@
                         <input type="number"
                                class="form-control text-center sstorage-input"
                                th:value="${storage.sstorageQty}"
-                               th:data-id="${storage.pstorageId}" />
+                               th:data-id="${storage.pstorageId}">
                     </td>
                 </tr>
                 </tbody>
@@ -79,9 +79,9 @@
             },
             body: JSON.stringify(updatedList)
         })
-            .then(res => res.json())
+            .then(res => res.text())
             .then(data => {
-                alert("저장되었습니다."); // 또는 페이지 상단에 메시지 표시
+                alert(data); // 또는 페이지 상단에 메시지 표시
             })
             .catch(err => {
                 console.error("저장 실패", err);

@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.zerock.b01.dto.PageRequestDTO;
 import org.zerock.b01.dto.PageResponseDTO;
+import org.zerock.b01.dto.warehouse.CompanyStorageDTO;
 import org.zerock.b01.dto.warehouse.InventoryHistoryDTO;
 import org.zerock.b01.dto.warehouse.InventoryTotalDTO;
 import org.zerock.b01.service.warehouse.InventoryHistoryService;
@@ -74,5 +75,11 @@ public class InventoryController {
         model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/warehouse/inventory/price";
+    }
+
+    @GetMapping("/companyStorage")
+    public String listInventoryCompanyStorage(Model model) {
+        model.addAttribute("companyStorageDTO", new CompanyStorageDTO());
+        return "page/warehouse/inventory/companyStorage";
     }
 }

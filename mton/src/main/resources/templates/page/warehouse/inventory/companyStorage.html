@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html xmlns:layout="http://www.ultraq.net.nz/thymeleaf/layout"
+      xmlns:th="http://www.thymeleaf.org"
+      layout:decorate="~{layout/basic/in-home.html}">
+<head>
+    <meta charset="UTF-8">
+    <meta name="_csrf" th:content="${_csrf.token}">
+    <meta name="_csrf_header" th:content="${_csrf.headerName}">
+    <title>자재ON - 창고 > 창고 등록</title>
+</head>
+<body>
+
+<th:block layout:fragment="inventory-companyStorage">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="#" class="text-decoration-none text-dark">
+                    <i class="bi bi-building me-1"></i> 창고
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                창고 등록
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
+
+    <!-- 창고 등록 form -->
+    <div class="container py-5">
+        <div class="card p-4 mb-4">
+
+            <!-- 성공 메시지 출력 (컨트롤러에서 model에 저장해서 전달한다고 가정) -->
+            <div th:if="${successMessage}" class="alert alert-success" role="alert" th:text="${successMessage}"></div>
+            <div th:if="${errorMessage}" class="alert alert-danger" role="alert" th:text="${errorMessage}"></div>
+
+            <form id="registerForm" th:object="${companyStorageDTO}">
+                <div class="row g-3">
+                    <div class="col-md-3">
+                        <label for="cstorageId" class="form-label">창고 ID</label>
+                        <input type="text" class="form-control" id="cstorageId" name="cstorageId" th:field="*{cstorageId}" required>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="cstorageAddress" class="form-label">주소</label>
+                        <input type="text" class="form-control" id="cstorageAddress" name="cstorageAddress" th:field="*{cstorageAddress}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="cstorageContactNumber" class="form-label">연락처</label>
+                        <input type="text" class="form-control" id="cstorageContactNumber" name="cstorageContactNumber" th:field="*{cstorageContactNumber}">
+                    </div>
+                    <div class="col-md-2">
+                        <label for="cstorageManager" class="form-label">담당자</label>
+                        <input type="text" class="form-control" id="cstorageManager" name="cstorageManager" th:field="*{cstorageManager}">
+                    </div>
+                </div>
+
+                <div class="d-flex justify-content-end gap-2 mt-4">
+                    <button type="submit" class="btn btn-primary"><i class="bi bi-save"></i> 저장</button>
+                    <button type="reset" class="btn btn-outline-secondary"><i class="bi bi-x-circle"></i> 초기화</button>
+                </div>
+            </form>
+        </div>
+    </div>
+</th:block>
+
+<script layout:fragment="script" th:inline="javascript">
+    document.addEventListener('DOMContentLoaded', () => {
+        const form = document.querySelector('#registerForm');
+
+        form.addEventListener('submit', async (e) => {
+            e.preventDefault(); // 기본 폼 제출 막기
+
+            const formData = new FormData(form);
+            const jsonData = {};
+            formData.forEach((value, key) => {
+                jsonData[key] = value;
+            });
+
+            try {
+                const response = await fetch('/api/inventory/register', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'Accept': 'application/json',
+                        'X-CSRF-TOKEN': document.querySelector('meta[name="_csrf"]')?.getAttribute('content') || ''
+                    },
+                    body: JSON.stringify(jsonData)
+                });
+
+                const text = await response.text();
+
+                if (response.ok) {
+                    alert('창고 등록 완료! ID: ' + jsonData.cstorageId);
+                    form.reset();
+                } else if (response.status === 409) {
+                    alert('⚠️ ' + text);  // 중복된 ID
+                } else {
+                    alert('등록 실패: ' + text);
+                }
+
+            } catch (error) {
+                console.error('등록 실패:', error);
+                alert('등록 중 오류가 발생했습니다.');
+            }
+        });
+    });
+</script>
+
+</body>
+</html>

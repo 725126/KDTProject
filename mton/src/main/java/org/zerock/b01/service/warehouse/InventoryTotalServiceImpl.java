@@ -60,7 +60,7 @@ public class InventoryTotalServiceImpl implements InventoryTotalService {
             .searchInventoryByMaterial(matId, matType, matName, pageable);
 
     Map<String, Integer> incomingQtyMap = getUnclosedIncomingQtyMap();
-    Map<String, Integer> outgoingQtyMap = getUnclosedEstimatedOutgoingQtyMap();
+    Map<String, Integer> outgoingQtyMap = getUnclosedOutgoingTotalQtyMap();
     Map<String, Integer> partnerQtyMap = getPartnerQtyMap();
 
     // 조회된 데이터(DeliveryRequest)를 DeliveryRequestDTO로 변환합니다.
@@ -79,7 +79,7 @@ public class InventoryTotalServiceImpl implements InventoryTotalService {
               .allTotalQty(inventoryTotal.getAllTotalQty())
               .allTotalPrice(inventoryTotal.getAllTotalPrice())
               .allIncomingEffectiveQty(incomingQtyMap.getOrDefault(currentMatId, 0))
-              .allEstimatedOutgoingQty(outgoingQtyMap.getOrDefault(currentMatId, 0))
+              .allOutgoingTotalQty(outgoingQtyMap.getOrDefault(currentMatId, 0))
               .partnerQty(partnerQtyMap.getOrDefault(currentMatId, 0))
               .build();
 
@@ -122,8 +122,8 @@ public class InventoryTotalServiceImpl implements InventoryTotalService {
     return partnerQtyMap;
   }
 
-  public Map<String, Integer> getUnclosedEstimatedOutgoingQtyMap() {
-    List<Object[]> rawResult = outgoingTotalRepository.sumUnclosedEstimatedOutgoingQtyByMaterial();
+  public Map<String, Integer> getUnclosedOutgoingTotalQtyMap() {
+    List<Object[]> rawResult = outgoingTotalRepository.sumUnclosedOutgoingTotalQtyByMaterial();
     Map<String, Integer> resultMap = new HashMap<>();
 
     for (Object[] row : rawResult) {

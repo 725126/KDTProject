@@ -24,7 +24,7 @@ public class InventoryTotalDTO {
 
   private int allIncomingEffectiveQty;
 
-  private int allEstimatedOutgoingQty;
+  private int allOutgoingTotalQty;
 
   private int partnerQty;
 

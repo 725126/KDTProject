@@ -69,7 +69,9 @@ public class PartnerStorageServiceImpl implements PartnerStorageService {
       PartnerStorage partnerStorage = partnerStorageRepository.findById(dto.getPstorageId())
               .orElseThrow(() -> new IllegalArgumentException("해당 재고 없음"));
 
-      partnerStorage.changeStorageQty(dto.getSstorageQty()); // 핵심 수정 메서드
+      partnerStorage.changeStorageQty(dto.getSstorageQty());
+
+      partnerStorageRepository.save(partnerStorage);
     }
   }
 

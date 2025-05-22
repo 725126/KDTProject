@@ -14,11 +14,11 @@ public interface OutgoingTotalRepository extends JpaRepository<OutgoingTotal, Lo
 
   List<OutgoingTotal> findAllByProductionPlanPrdplanId(String prdplanId);
 
-  @Query("SELECT ot.material.matId, SUM(ot.estimatedOutgoingQty) " +
+  @Query("SELECT ot.material.matId, SUM(ot.outgoingTotalQty) " +
           "FROM OutgoingTotal ot " +
           "WHERE ot.outgoingStatus != '출고마감' " +
           "GROUP BY ot.material.matId")
-  List<Object[]> sumUnclosedEstimatedOutgoingQtyByMaterial();
+  List<Object[]> sumUnclosedOutgoingTotalQtyByMaterial();
 
   List<OutgoingTotal> findByOutgoingStatus(OutgoingStatus status);
 
