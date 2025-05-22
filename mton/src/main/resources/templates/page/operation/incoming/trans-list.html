@@ -12,7 +12,7 @@
 
 <!-- 거래 명세 발행 레이아웃 -->
 <th:block layout:fragment="incoming-trans-list">
-  <!-- 트렌디한 브레드크럼 UI (Bootstrap 5 + 커스텀 스타일 적용) -->
+  <!-- 브레드크럼 start -->
   <nav aria-label="breadcrumb">
     <ol class="breadcrumb px-3 py-2 rounded">
       <li class="breadcrumb-item">
@@ -22,14 +22,15 @@
       </li>
       <li class="breadcrumb-item">
         <a href="#" class="text-decoration-none text-dark">
-          <i class="bi bi-person-workspace me-1"></i> 입고
+          <i class="bi bi-box-arrow-in-down me-1"></i> 입고
         </a>
       </li>
       <li class="breadcrumb-item active text-primary" aria-current="page">
-        <i class="bi bi-file-earmark-text me-1"></i> 거래 명세 확인
+        거래 명세 확인
       </li>
     </ol>
   </nav>
+  <!-- 브레드크럼 end -->
 
   <!-- CSS 커스터마이징 (선택사항) -->
   <style>

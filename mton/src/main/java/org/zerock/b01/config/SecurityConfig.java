@@ -43,11 +43,25 @@ public class SecurityConfig {
                         .requestMatchers("/check/email").permitAll()
                         // 사업자등록번호 중복확인 링크 누구나 접근 가능
                         .requestMatchers("/check/business-no").permitAll()
-                        // '/my/admin' 경로는 'ADMIN' 역할(Role)을 가진 사용자만 접근 허용
+                        // 하기 경로는 'ADMIN' 역할(Role)을 가진 사용자만 접근 허용
                         .requestMatchers("/admin/**").hasRole("ADMIN")
-                        // '/my/internal' 경로는 'ADMIN', 'PRODUCTION', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
-                        .requestMatchers("/internal/**").hasAnyRole("PRODUCTION", "PURCHASING", "ADMIN")
-                        // '/my/external' 경로는 'ADMIN', 'PARTNER' 역할 중 하나라도 있으면 접근 허용
+                        // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
+                        .requestMatchers("/internal/procurement/**").hasAnyRole("PURCHASING", "ADMIN")
+                        // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
+                        .requestMatchers("/internal/transaction/**").hasAnyRole("PURCHASING", "ADMIN")
+                        // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
+                        .requestMatchers("/internal/delivery/**").hasAnyRole("PURCHASING", "ADMIN")
+                        // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
+                        .requestMatchers("/internal/inventory/**").hasAnyRole("PURCHASING", "ADMIN")
+                        // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
+                        .requestMatchers("/internal/incoming/**").hasAnyRole("PURCHASING", "ADMIN")
+                        // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
+                        .requestMatchers("/internal/outgoing/**").hasAnyRole("PURCHASING", "ADMIN")
+                        // 하기 경로는 'ADMIN', 'PRODUCTION' 역할 중 하나라도 있으면 접근 허용
+                        .requestMatchers("/internal/product/**").hasAnyRole("PRODUCTION", "ADMIN")
+                        // 하기 경로는 'ADMIN', 'PRODUCTION', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
+                        .requestMatchers("/internal/**").hasAnyRole("ADMIN", "PURCHASING","PRODUCTION")
+                        // 하기 경로는 'ADMIN', 'PARTNER' 역할 중 하나라도 있으면 접근 허용
                         .requestMatchers("/external/**").hasAnyRole("PARTNER")
                         // 위에서 지정하지 않은 모든 요청은 인증된 사용자만 접근 가능
                         .anyRequest().authenticated()
@@ -67,6 +81,10 @@ public class SecurityConfig {
                         .successHandler(customLoginSuccessHandler)
                         // 로그인 관련 페이지는 누구나 접근할 수 있게 허용
                         .permitAll()
+                )
+                // 권한 외 접근 제한 페이지
+                .exceptionHandling((exception) -> exception
+                        .accessDeniedPage("/error/access-denied")
                 )
                 // 자동 로그인
                 .rememberMe(httpSecurityRememberMeConfigurer ->

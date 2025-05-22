@@ -9,9 +9,28 @@
 <body>
 
 <th:block layout:fragment="delivery-request">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="#" class="text-decoration-none text-dark">
+                    <i class="bi bi-truck me-1"></i> 납입 지시
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                납입 지시 요청
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
+
     <div class="container py-5">
         <form action="/internal/delivery/request" method="get">
-            <h2 class="mb-4">납입지시 요청</h2>
 
             <div class="card p-4 mb-5">
                 <div class="row g-3 align-items-end">

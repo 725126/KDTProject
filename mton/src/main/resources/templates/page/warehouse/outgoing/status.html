@@ -12,8 +12,27 @@
 <body>
 
 <th:block layout:fragment="outgoing-status">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="#" class="text-decoration-none text-dark">
+                    <i class="bi bi-box-arrow-up me-1"></i> 출고
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                출고 조회
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
+
     <div class="container py-5">
-        <h1 class="mb-4">출고 조회</h1>
 
         <div class="card p-4 mb-4">
             <form action="/internal/outgoing/status" method="get">

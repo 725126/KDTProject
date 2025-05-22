@@ -81,6 +81,25 @@
 <body>
 
 <th:block layout:fragment="procurement-contract">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="#" class="text-decoration-none text-dark">
+                    <i class="bi bi-cart-check me-1"></i> 구매 및 발주
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                계약 정보
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
 
     <div class="container-xl mt-5">
         <!-- 개별 등록 -->

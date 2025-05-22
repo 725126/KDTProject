@@ -381,3 +381,12 @@ body {
 .sidebar.collapsed li.has-active-sub i {
     color: #394867 !important;
 }
+
+.breadcrumb-item + .breadcrumb-item::before {
+    content: ">";
+    color: #6c757d;
+    margin: 0 0.5rem;
+}
+.breadcrumb a:hover {
+    text-decoration: underline;
+}

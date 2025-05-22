@@ -32,9 +32,24 @@
 <body>
 
 <th:block layout:fragment="contract-view">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                <i class="bi bi-file-earmark-text me-1"></i> 계약 정보 열람
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
+
     <div class="container-xl py-5">
         <div class="mb-4">
-            <h4 class="fw-semibold mb-3"><i class="bi bi-file-earmark-text"></i> 계약 정보 열람</h4>
+
             <!-- 검색 + 필터 영역 (선택사항) -->
             <div class="d-flex justify-content-between mb-3">
                 <div class="d-flex align-items-center gap-2 w-50">

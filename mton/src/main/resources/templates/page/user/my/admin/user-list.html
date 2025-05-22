@@ -10,9 +10,27 @@
 <body>
 
 <th:block layout:fragment="user-list">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="#" class="text-decoration-none text-dark">
+                    <i class="bi bi-gear-fill me-1"></i> 관리페이지
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                <i class="bi bi-people-fill me-1"></i> 회원 목록
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
 
     <!-- 필터 start -->
-    <h4 class="ms-2 fw-bold"><i class="bi bi-people-fill me-3"></i>회원 목록</h4>
     <div class="row g-3 align-items-end mb-5">
 
         <!-- 검색창 -->

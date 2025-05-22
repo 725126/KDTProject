@@ -11,9 +11,23 @@
 <body>
 
 <th:block layout:fragment="delivery">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                <i class="bi bi-truck me-1"></i> 납품 지시 요청
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
+
     <div class="container py-5">
         <form action="/external/delivery" method="get">
-            <h2 class="mb-4">납품지시요청</h2>
 
             <!-- 검색 영역 -->
             <div class="card p-4 mb-4">

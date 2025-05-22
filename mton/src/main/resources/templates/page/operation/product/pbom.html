@@ -13,9 +13,28 @@
 <body>
 
 <th:block layout:fragment="product-pbom">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item">
+                <a href="#" class="text-decoration-none text-dark">
+                    <i class="bi bi-gear-fill me-1"></i> 생산
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                품목 등록
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
+
     <div class="tutorial" id="tutorial-box">튜토리얼 메시지</div>
     <div class="container py-5 pb-0 position-relative">
-        <h2 class="mb-4" id="upload-test">품목 관리</h2>
         <div class="row g-4 mb-3">
             <form id="manage-mod" class="mb-3">
                 <div class="form-check form-check-inline position-relative ps-0 me-1" id="manage-view">

@@ -4,7 +4,7 @@
       layout:decorate="~{layout/basic/ex-home.html}">
 <head>
     <meta charset="UTF-8">
-    <title>자재ON(협력업체 전용) - 발주 변동사항</title>
+    <title>자재ON(협력업체 전용) - 발주 변동 확인</title>
     <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
     <link rel="stylesheet" th:href="@{/css/page/operation/pbom.css}">
     <meta name="_csrf" th:content="${_csrf.token}">
@@ -13,6 +13,21 @@
 <body>
 
 <th:block layout:fragment="contmat">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                <i class="bi bi-clipboard-check me-1"></i> 발주 변동 확인
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
+
     <div class="tutorial" id="tutorial-box">튜토리얼 메시지</div>
     <div class="container py-5">
         <h2 class="mb-4">

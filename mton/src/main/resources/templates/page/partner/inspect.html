@@ -13,6 +13,21 @@
 <body>
 
 <th:block layout:fragment="contmat">
+    <!-- 브레드크럼 start -->
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb px-3 py-2 rounded">
+            <li class="breadcrumb-item">
+                <a href="/internal/home" class="text-decoration-none text-dark">
+                    <i class="bi bi-house-door me-1"></i> 홈
+                </a>
+            </li>
+            <li class="breadcrumb-item active text-primary" aria-current="page">
+                <i class="bi bi-clipboard-check me-1"></i> 진척 검수 수행
+            </li>
+        </ol>
+    </nav>
+    <!-- 브레드크럼 end -->
+
     <div class="tutorial" id="tutorial-box">튜토리얼 메시지</div>
     <div class="container py-5">
         <h2 class="mb-4">
