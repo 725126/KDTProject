@@ -48,7 +48,7 @@ let current
         e.stopPropagation();
 
         if (currentStatBtn !== null) {
-            if (qtySelect.value === "완료") {
+            if (qtySelect.value === "완료요청") {
                 // 장납기 자재인지 검출해야함
                 const list = Array.from(insTable.rows).filter(x =>
                     x.cells[1].innerText === currentStatBtn.parentElement.parentElement.cells[0].innerText
@@ -70,7 +70,7 @@ let current
                 case "취소":
                     currentStatBtn.classList.add("btn-danger");
                     break;
-                case "완료":
+                case "완료요청":
                     currentStatBtn.classList.add("btn-success");
                     break;
             }
@@ -83,7 +83,7 @@ let current
 
         statBtns.forEach(x => {
             // 장납기 자재인지 검출해야함
-            if (qtySelect.value === "완료") {
+            if (qtySelect.value === "완료요청") {
                 const list = Array.from(insTable.rows).filter(y =>
                     y.cells[1].innerText === x.parentElement.parentElement.cells[0].innerText
                     && y.cells[6].querySelector("span").innerText === "진행중"
@@ -102,7 +102,7 @@ let current
                 case "취소":
                     x.classList.add("btn-danger");
                     break;
-                case "완료":
+                case "완료요청":
                     x.classList.add("btn-success");
                     break;
             }

@@ -37,7 +37,7 @@ public class Ordering {
     private boolean transIssued; // 거래명세 발행 여부
 
     @Column(name = "order_stat", nullable = false)
-    @Check(constraints = "order_stat IN ('진행중', '완료', '취소', '발주중', '취소대기')")
+    @Check(constraints = "order_stat IN ('진행중', '완료', '취소', '발주중', '취소대기', '완료요청')")
     private String orderStat;
 
 
