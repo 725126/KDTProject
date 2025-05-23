@@ -52,8 +52,6 @@ public class SecurityConfig {
                         // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
                         .requestMatchers("/internal/delivery/**").hasAnyRole("PURCHASING", "ADMIN")
                         // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
-                        .requestMatchers("/internal/inventory/**").hasAnyRole("PURCHASING", "ADMIN")
-                        // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
                         .requestMatchers("/internal/incoming/**").hasAnyRole("PURCHASING", "ADMIN")
                         // 하기 경로는 'ADMIN', 'PURCHASING' 역할 중 하나라도 있으면 접근 허용
                         .requestMatchers("/internal/outgoing/**").hasAnyRole("PURCHASING", "ADMIN")
