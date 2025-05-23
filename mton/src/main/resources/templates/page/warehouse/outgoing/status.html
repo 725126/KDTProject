@@ -159,25 +159,47 @@
             <!-- 페이지네이션 -->
             <th:block th:replace="fragment/pagination :: paginationFragment"></th:block>
 
-            <nav class="bottom-navbar">
-                <a class="nav-item nav-link partial-btn" href="#" onclick="partialShipment()">
-                    <i class="bi bi-box-arrow-up"></i>
-                    <span>부분출고</span>
-                </a>
-                <a class="nav-item nav-link full-btn" href="#" onclick="fullShipment()">
-                    <i class="bi bi-truck"></i>
-                    <span>출고</span>
-                </a>
-                <a class="nav-item nav-link return-btn" href="#" onclick="CloseOutgoing()">
-                    <i class="bi bi-lock"></i>
-                    <span>출고마감</span>
-                </a>
-            </nav>
+<!--            <nav class="bottom-navbar">-->
+<!--                <a class="nav-item nav-link partial-btn" href="#" onclick="partialShipment()">-->
+<!--                    <i class="bi bi-box-arrow-up"></i>-->
+<!--                    <span>부분출고</span>-->
+<!--                </a>-->
+<!--                <a class="nav-item nav-link full-btn" href="#" onclick="fullShipment()">-->
+<!--                    <i class="bi bi-truck"></i>-->
+<!--                    <span>출고</span>-->
+<!--                </a>-->
+<!--                <a class="nav-item nav-link return-btn" href="#" onclick="CloseOutgoing()">-->
+<!--                    <i class="bi bi-lock"></i>-->
+<!--                    <span>출고마감</span>-->
+<!--                </a>-->
+<!--            </nav>-->
+
+            <!-- 고정 사이드바 버튼 -->
+            <div class="floating-sidebar">
+                <button class="btn" onclick="scrollToTop()" title="맨 위로" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-arrow-up"></i> 맨 위로
+                </button>
+                <button class="btn" onclick="partialShipment()" title="부분출고" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-box-arrow-up"></i> 부분출고
+                </button>
+                <button class="btn" onclick="fullShipment()" title="출고" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-truck"></i> 출고
+                </button>
+                <button class="btn" onclick="CloseOutgoing()" title="출고마감" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-lock"></i> 출고마감
+                </button>
+            </div>
+
+
         </div>
     </div>
 
 </th:block>
 <script layout:fragment="script" th:inline="javascript">
+    function scrollToTop() {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
 
     document.querySelector(".clearBtn").addEventListener("click", function (e) {
         e.preventDefault()
@@ -382,6 +404,5 @@
 
 
 </script>
-
 </body>
 </html>
