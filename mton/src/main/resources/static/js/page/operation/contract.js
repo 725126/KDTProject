@@ -286,7 +286,7 @@ function handlePreviewSubmit() {
             },
             body: formData
         })
-            .then(response => response.json())
+            // .then(response => response.json())
             .then(result => {
                 console.log("등록 결과:", result);
 
