@@ -402,6 +402,9 @@
         document.getElementById('cancelButton').style.display = 'none';
         document.getElementById('removeButton').style.display = 'inline-block';
 
+        //저장버튼보이게 설정
+        document.getElementById('saveButton').style.display = 'inline-block';
+
         // 수정 중인 행 초기화
         editingRow = null;
     }
@@ -422,9 +425,13 @@
         document.getElementById('updateButton').style.display = 'inline-block';
         document.getElementById('addButton').style.display = 'none';
 
+
         // 수정 취소 버튼을 보이게 설정
         document.getElementById('cancelButton').style.display = 'inline-block';
         document.getElementById('removeButton').style.display = 'none';
+
+        //저장 버튼을 숨김
+        document.getElementById('saveButton').style.display = 'none';
 
         // 수정할 행을 저장
         editingRow = row;
@@ -531,6 +538,9 @@
                     // 수정 취소 버튼을 보이게 설정
                     document.getElementById('cancelButton').style.display = 'none';
                     document.getElementById('removeButton').style.display = 'inline-block';
+
+                    //저장버튼보이게 설정
+                    document.getElementById('saveButton').style.display = 'inline-block';
 
                     // 입력값 초기화
                     document.getElementById('drItemDueDate').value = '';

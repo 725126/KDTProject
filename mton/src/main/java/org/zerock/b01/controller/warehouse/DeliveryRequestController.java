@@ -5,6 +5,7 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
@@ -82,17 +83,23 @@ public class DeliveryRequestController {
 
   @Operation(description = "PUT 방식으로 납입지시등록 처리")
   @PutMapping(value = "/{drItemId}", consumes = MediaType.APPLICATION_JSON_VALUE)
-  public Map<String,Long> modifyDeliveryRequestItem(@PathVariable("drItemId") Long drItemId,
+  public ResponseEntity<?> modifyDeliveryRequestItem(@PathVariable("drItemId") Long drItemId,
                                                     @RequestBody DeliveryRequestItemDTO deliveryRequestItemDTO) {
     deliveryRequestItemDTO.setDrItemId(drItemId);
 
-    deliveryRequestItemService.modifyDeliveryRequestItem(deliveryRequestItemDTO);
+    try {
+      deliveryRequestItemService.modifyDeliveryRequestItem(deliveryRequestItemDTO);
 
-    Map<String,Long> resultMap = new HashMap<>();
+      Map<String, Long> resultMap = new HashMap<>();
+      resultMap.put("drItemId", drItemId);
+      return ResponseEntity.ok(resultMap);
 
-    resultMap.put("drItemId", drItemId);
-
-    return resultMap;
+    } catch (IllegalStateException e) {
+      // 여기서 에러 메시지를 JSON으로 반환
+      Map<String, String> errorMap = new HashMap<>();
+      errorMap.put("message", e.getMessage());
+      return ResponseEntity.badRequest().body(errorMap);
+    }
   }
 
   @Operation(description = "GET 방식으로 최신 납입지시일자 조회")

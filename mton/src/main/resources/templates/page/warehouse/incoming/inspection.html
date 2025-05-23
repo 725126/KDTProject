@@ -367,6 +367,11 @@
 
         const remainingReturnableQty = receivedQty - returnedQty;
 
+        if (receivedQty <= 0) {
+            alert("입고된 수량이 없습니다. 반품처리를 할 수 없습니다.");
+            return;
+        }
+
         if (remainingReturnableQty <= 0) {
             alert("더 이상 반품할 수 없습니다. (입고수량과 동일하게 반품됨)");
             return;

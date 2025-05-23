@@ -109,7 +109,8 @@
                     <td th:text="${inventoryHistory.matId}"></td>
                     <td th:text="${inventoryHistory.matType}"></td>
                     <td th:text="${inventoryHistory.matName}"></td>
-                    <td th:text="${inventoryHistory.updateDate}"></td>
+                    <td th:text="${#temporals.format(inventoryHistory.updateDate,
+                                    'yyyy-MM-dd HH:mm:ss')}"></td>
                     <td th:text="${inventoryHistory.updateReason}"></td>
                     <td th:text="${inventoryHistory.changeQty}"></td>
                     <td th:text="${inventoryHistory.changePrice}"></td>
