@@ -53,7 +53,7 @@ public class ContractController {
     private final PartnerStorageService partnerStorageService;
 
 
-    @Value("C:\\upload")
+    @Value("${org.zerock.upload.path}")
     private String uploadDir; // 실제 저장 경로
 
     @PostMapping("/submit")
