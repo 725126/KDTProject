@@ -1,0 +1,21 @@
+.search-form-container .form-label {
+    font-size: 0.85rem;
+    white-space: nowrap;
+    margin-bottom: 0;
+    margin-right: 6px;
+    display: inline-block;
+}
+
+.search-form-container .form-control,
+.search-form-container .form-select {
+    font-size: 0.85rem;
+    height: 30px;
+    padding: 2px 6px;
+}
+
+.search-form-container .row > [class^="col-"] {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 6px;
+}

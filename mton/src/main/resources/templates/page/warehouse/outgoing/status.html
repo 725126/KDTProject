@@ -8,6 +8,7 @@
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>자재ON - 출고 > 출고 조회</title>
     <link rel="stylesheet" th:href="@{/css/component/bottom-nav.css}">
+    <link rel="stylesheet" th:href="@{/css/component/search.css}">
 </head>
 <body>
 
@@ -32,9 +33,9 @@
     </nav>
     <!-- 브레드크럼 end -->
 
-    <div class="container py-5">
+    <div class="container">
 
-        <div class="card p-4 mb-4">
+        <div class="card p-4 mb-4 search-form-container">
             <form action="/internal/outgoing/status" method="get">
                 <div class="row g-3 align-items-end">
                     <div class="col-md-4">
