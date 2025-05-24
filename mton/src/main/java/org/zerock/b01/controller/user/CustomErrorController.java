@@ -27,8 +27,6 @@ public class CustomErrorController implements ErrorController {
         if (status != null) {
             int statusCode = Integer.valueOf(status.toString());
 
-            log.error(statusCode);
-
             if (statusCode == 404) {
                 return "page/user/error/404-page";
             }
