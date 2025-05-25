@@ -7,7 +7,7 @@
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>자재ON - 입고 > 입고 검수</title>
-    <link rel="stylesheet" th:href="@{/css/component/bottom-nav.css}">
+    <link rel="stylesheet" th:href="@{/css/component/sub-sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/component/search.css}">
 </head>
 <body>
@@ -187,18 +187,23 @@
         </div>
 
         <!-- 고정 사이드바 버튼 -->
-        <div class="floating-sidebar">
-            <button class="btn" onclick="scrollToTop()" title="맨 위로" data-bs-toggle="tooltip" data-bs-placement="left">
-                <i class="bi bi-arrow-up"></i> 맨 위로
-            </button>
-            <button class="btn" onclick="partialReceive()" title="부분입고" data-bs-toggle="tooltip" data-bs-placement="left">
-                <i class="bi bi-box-arrow-in-down"></i> 부분입고
-            </button>
-            <button class="btn" onclick="fullReceive()" title="입고" data-bs-toggle="tooltip" data-bs-placement="left">
-                <i class="bi bi-check-circle"></i> 입고
-            </button>
-            <button class="btn" onclick="returnItems()" title="반품처리" data-bs-toggle="tooltip" data-bs-placement="left">
-                <i class="bi bi-arrow-counterclockwise"></i> 반품처리
+        <div class="floating-sidebar-wrapper">
+            <div class="floating-sidebar-panel" id="floatingSidebar">
+                <button class="btn" onclick="scrollToTop()" title="맨 위로" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-arrow-up"></i> 맨 위로
+                </button>
+                <button class="btn" onclick="partialReceive()" title="부분입고" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-box-arrow-in-down"></i> 부분입고
+                </button>
+                <button class="btn" onclick="fullReceive()" title="입고" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-check-circle"></i> 입고
+                </button>
+                <button class="btn" onclick="returnItems()" title="반품처리" data-bs-toggle="tooltip" data-bs-placement="left">
+                    <i class="bi bi-arrow-counterclockwise"></i> 반품처리
+                </button>
+            </div>
+            <button class="btn sidebar-toggle-btn" onclick="toggleFloatingSidebar()">
+                <i class="bi bi-chevron-double-right" id="floatingSidebarIcon"></i>
             </button>
         </div>
 
@@ -208,6 +213,14 @@
 <script layout:fragment="script" th:inline="javascript">
     function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleFloatingSidebar() {
+        const sidebar = document.getElementById("floatingSidebar");
+        const icon = document.getElementById("floatingSidebarIcon");
+        sidebar.classList.toggle("collapsed");
+        icon.classList.toggle("bi-chevron-double-right");
+        icon.classList.toggle("bi-chevron-double-left");
     }
 
     document.querySelector(".clearBtn").addEventListener("click", function (e) {

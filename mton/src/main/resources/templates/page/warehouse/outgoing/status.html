@@ -7,7 +7,7 @@
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
     <title>자재ON - 출고 > 출고 조회</title>
-    <link rel="stylesheet" th:href="@{/css/component/bottom-nav.css}">
+    <link rel="stylesheet" th:href="@{/css/component/sub-sidebar.css}">
     <link rel="stylesheet" th:href="@{/css/component/search.css}">
 </head>
 <body>
@@ -119,7 +119,7 @@
                     <td th:text="${outgoingTotal.prdplanEnd}"></td>
                     <td th:text="${outgoingTotal.prdplanId}"></td>
                     <td th:text="${outgoingTotal.matId}"></td>
-                    <td th:text="${outgoingTotal.matName}"></td>
+                    <td th:text="${outgoingTotal.matName}" th:title="${outgoingTotal.matName}" class="text-truncate" style="max-width: 150px;"></td>
                     <td th:text="${outgoingTotal.estimatedOutgoingQty}"></td>
                     <td th:text="${outgoingTotal.outgoingTotalQty}"></td>
                     <td th:text="${outgoingTotal.estimatedOutgoingQty - outgoingTotal.outgoingTotalQty}"></td>
@@ -174,19 +174,24 @@
 <!--                </a>-->
 <!--            </nav>-->
 
-            <!-- 고정 사이드바 버튼 -->
-            <div class="floating-sidebar">
-                <button class="btn" onclick="scrollToTop()" title="맨 위로" data-bs-toggle="tooltip" data-bs-placement="left">
-                    <i class="bi bi-arrow-up"></i> 맨 위로
-                </button>
-                <button class="btn" onclick="partialShipment()" title="부분출고" data-bs-toggle="tooltip" data-bs-placement="left">
-                    <i class="bi bi-box-arrow-up"></i> 부분출고
-                </button>
-                <button class="btn" onclick="fullShipment()" title="출고" data-bs-toggle="tooltip" data-bs-placement="left">
-                    <i class="bi bi-truck"></i> 출고
-                </button>
-                <button class="btn" onclick="CloseOutgoing()" title="출고마감" data-bs-toggle="tooltip" data-bs-placement="left">
-                    <i class="bi bi-lock"></i> 출고마감
+            <!-- 고정 사이드바 -->
+            <div class="floating-sidebar-wrapper">
+                <div class="floating-sidebar-panel" id="floatingSidebar">
+                    <button class="btn" onclick="scrollToTop()">
+                        <i class="bi bi-arrow-up"></i> 맨 위로
+                    </button>
+                    <button class="btn" onclick="partialShipment()">
+                        <i class="bi bi-box-arrow-up"></i> 부분출고
+                    </button>
+                    <button class="btn" onclick="fullShipment()">
+                        <i class="bi bi-truck"></i> 출고
+                    </button>
+                    <button class="btn" onclick="CloseOutgoing()">
+                        <i class="bi bi-lock"></i> 출고마감
+                    </button>
+                </div>
+                <button class="btn sidebar-toggle-btn" onclick="toggleFloatingSidebar()">
+                    <i class="bi bi-chevron-double-right" id="floatingSidebarIcon"></i>
                 </button>
             </div>
 
@@ -198,6 +203,14 @@
 <script layout:fragment="script" th:inline="javascript">
     function scrollToTop() {
         window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+
+    function toggleFloatingSidebar() {
+        const sidebar = document.getElementById("floatingSidebar");
+        const icon = document.getElementById("floatingSidebarIcon");
+        sidebar.classList.toggle("collapsed");
+        icon.classList.toggle("bi-chevron-double-right");
+        icon.classList.toggle("bi-chevron-double-left");
     }
 
 

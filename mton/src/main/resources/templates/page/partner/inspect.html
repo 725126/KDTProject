@@ -7,6 +7,7 @@
     <title>자재ON(협력업체 전용) - 진척 검수 수행</title>
     <link rel="stylesheet" th:href="@{/css/component/file-box.css}">
     <link rel="stylesheet" th:href="@{/css/page/operation/pbom.css}">
+    <link rel="stylesheet" th:href="@{/css/component/search.css}">
     <meta name="_csrf" th:content="${_csrf.token}">
     <meta name="_csrf_header" th:content="${_csrf.headerName}">
 </head>
@@ -30,10 +31,12 @@
 
     <div class="tutorial" id="tutorial-box">튜토리얼 메시지</div>
     <div class="container">
-        <h2 class="mb-4">
-            발주 내역
-            <button type="button" id="ord-submit" class="btn btn-secondary btn-sm">제출</button>
-        </h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">발주 내역</h4>
+            <button type="button" id="ord-submit" class="btn btn-outline-primary">
+                <i class="bi bi-upload me-1"></i> 제출
+            </button>
+        </div>
         <div class="card p-4 mb-5 max-height-ins" id="table-card">
             <table id="ord-table" class="table table-bordered table-hover text-center table-excel">
                 <thead class="table-light">
@@ -64,29 +67,52 @@
                 </tr>
                 </tbody>
             </table>
-            <dialog id="qty-dialog">
+<!--            <dialog id="qty-dialog">-->
+<!--                <form method="dialog">-->
+<!--                    <div>-->
+<!--                        <label for="qty-select"></label>-->
+<!--                        <select id="qty-select">-->
+<!--                            <option>진행중</option>-->
+<!--                            <option>완료요청</option>-->
+<!--                            <option>취소</option>-->
+<!--                        </select>-->
+<!--                    </div>-->
+<!--                    <div>-->
+<!--                        <button type="submit" id="qty-submit">선택</button>-->
+<!--                        <button type="button" id="qty-submit-all">일괄적용</button>-->
+<!--                        <button id="qty-cancel" type="reset">닫기</button>-->
+<!--                    </div>-->
+<!--                </form>-->
+<!--            </dialog>-->
+            <dialog id="qty-dialog" class="p-4 rounded-3 border shadow w-100" style="max-width: 400px;">
                 <form method="dialog">
-                    <div>
-                        <label for="qty-select"></label>
-                        <select id="qty-select">
+                    <h5 class="mb-3">상태 선택</h5>
+
+                    <div class="mb-3">
+                        <label for="qty-select" class="form-label">처리 상태</label>
+                        <select id="qty-select" class="form-select">
                             <option>진행중</option>
                             <option>완료요청</option>
                             <option>취소</option>
                         </select>
                     </div>
-                    <div>
-                        <button type="submit" id="qty-submit">선택</button>
-                        <button type="button" id="qty-submit-all">일괄적용</button>
-                        <button id="qty-cancel" type="reset">닫기</button>
+
+                    <div class="d-flex justify-content-end gap-2">
+                        <button type="submit" id="qty-submit" class="btn btn-primary btn-sm">선택</button>
+                        <button type="button" id="qty-submit-all" class="btn btn-success btn-sm">일괄적용</button>
+                        <button id="qty-cancel" type="reset" class="btn btn-outline-secondary btn-sm">닫기</button>
                     </div>
                 </form>
             </dialog>
+
         </div>
 
-        <h2 class="mb-4">
-            진척도
-            <button type="button" id="ins-submit" class="btn btn-secondary btn-sm">제출</button>
-        </h2>
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h4 class="mb-0">진척도</h4>
+            <button type="button" id="ins-submit" class="btn btn-outline-primary">
+                <i class="bi bi-upload me-1"></i> 제출
+            </button>
+        </div>
         <div class="card p-4 table-card max-height-ins">
             <table class="table table-bordered table-hover text-center table-excel" id="ins-table">
                 <thead class="table-light">

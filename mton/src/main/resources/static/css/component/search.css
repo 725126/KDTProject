@@ -19,3 +19,18 @@
     gap: 6px;
     margin-bottom: 6px;
 }
+
+.container {
+    min-width: 95%;
+    margin: 0 auto;
+}
+
+table th{
+    white-space: nowrap;
+}
+
+table td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
