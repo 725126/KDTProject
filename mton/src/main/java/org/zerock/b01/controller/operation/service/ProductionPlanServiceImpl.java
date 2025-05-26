@@ -151,7 +151,7 @@ public class ProductionPlanServiceImpl implements ProductionPlanService {
             List<ProductionPlan> prdplans = productionPlanRepository.findAllById(arrayList);
             // 연관된 조달계획과 자재발주
             List<ProcurementPlan> pplans = procurementPlanRepository.findPPlanByPrdplanIds(arrayList).stream().filter(x -> !x.getPplanStat().equals("완료")).collect(Collectors.toList());
-            List<Ordering> orderings = orderingRepository.findOrderingByPPlanId(pplans.stream().map(ProcurementPlan::getPplanId).collect(Collectors.toList())).stream().filter(x -> !x.getOrderStat().equals("완료")).collect(Collectors.toList());
+            List<Ordering> orderings = orderingRepository.findOrderingByPPlanId(pplans.stream().map(ProcurementPlan::getPplanId).collect(Collectors.toList())).stream().filter(x -> !x.getOrderStat().equals("완료요청") && !x.getOrderStat().equals("완료")).collect(Collectors.toList());
 
             prdplans.forEach(x -> x.changeStat("취소"));
             pplans.forEach(x -> x.changeStat("취소"));
