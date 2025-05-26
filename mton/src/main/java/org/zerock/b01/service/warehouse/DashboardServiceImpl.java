@@ -377,7 +377,7 @@ public class DashboardServiceImpl implements DashboardService {
     // 3. 입고 완료
     incomingTotalRepository.findCompletedIncomingByPartner(partner)
             .forEach(i -> events.add(Map.of(
-                    "title", "입고 완료",
+                    "title", "입고 완료 - " + i.getDeliveryRequestItem().getDrItemCode(),
                     "start", i.getIncomingCompletedAt().toLocalDate().toString(),
                     "backgroundColor", "#28A745",
                     "borderColor", "#28A745",
