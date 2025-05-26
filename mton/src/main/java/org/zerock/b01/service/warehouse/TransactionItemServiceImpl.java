@@ -36,6 +36,10 @@ import org.zerock.b01.repository.warehouse.TransactionItemRepository;
 import org.zerock.b01.repository.warehouse.TransactionRepository;
 
 import java.io.ByteArrayOutputStream;
+import java.io.InputStream;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.StandardCopyOption;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -221,7 +225,17 @@ public class TransactionItemServiceImpl implements TransactionItemService  {
         PdfWriter.getInstance(doc, baos);
         doc.open();
 
-        BaseFont bfKorean = BaseFont.createFont("C:\\Windows\\Fonts\\malgun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+//        BaseFont bfKorean = BaseFont.createFont("C:\\Windows\\Fonts\\malgun.ttf", BaseFont.IDENTITY_H, BaseFont.EMBEDDED);
+        InputStream fontStream = getClass().getResourceAsStream("/fonts/NanumGothic-Regular.ttf");
+        Path tempFontFile = Files.createTempFile("nanumgothic", ".ttf");
+        Files.copy(fontStream, tempFontFile, StandardCopyOption.REPLACE_EXISTING);
+
+        BaseFont bfKorean = BaseFont.createFont(
+                tempFontFile.toAbsolutePath().toString(),
+                BaseFont.IDENTITY_H,
+                BaseFont.EMBEDDED
+        );
+
         Font titleFont = new Font(bfKorean, 18, Font.BOLD);
         Font cellFont = new Font(bfKorean, 11);
 
