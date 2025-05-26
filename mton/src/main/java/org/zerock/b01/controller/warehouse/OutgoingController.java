@@ -88,7 +88,7 @@ public class OutgoingController {
 
         // 전체 납입지시 상세 항목 페이징 조회
         PageResponseDTO<OutgoingTotalDTO> allResults =
-                outgoingTotalService.listWithOutgoingTotal(pageRequestDTO);
+                outgoingTotalService.listWithOutgoingTotalResult(pageRequestDTO);
 
         model.addAttribute("outgoingTotalList", allResults.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);

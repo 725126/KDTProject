@@ -12,4 +12,9 @@ public interface OutgoingTotalSearch {
                                           String prdplanId, String matId, String matName,
                                           String outgoingStatus, LocalDate outgoingCompletedAtStart,
                                           LocalDate outgoingCompletedAtEnd, Pageable pageable);
+
+  Page<OutgoingTotal> searchOutgoingTotalResult(LocalDate prdplanEndStart, LocalDate prdplanEndEnd,
+                                                String prdplanId, String matId, String matName,
+                                                String outgoingStatus, LocalDate outgoingCompletedAtStart,
+                                                LocalDate outgoingCompletedAtEnd, Pageable pageable);
 }

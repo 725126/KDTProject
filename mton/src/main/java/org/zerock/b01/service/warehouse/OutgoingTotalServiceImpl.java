@@ -115,6 +115,61 @@ public class OutgoingTotalServiceImpl implements OutgoingTotalService {
             .build();
   }
 
+  @Override
+  public PageResponseDTO<OutgoingTotalDTO> listWithOutgoingTotalResult(PageRequestDTO pageRequestDTO) {
+
+    // 검색 조건을 받아옵니다.
+    LocalDate prdplanEndStart = pageRequestDTO.getPrdplanEndStart();
+    LocalDate prdplanEndEnd = pageRequestDTO.getPrdplanEndEnd();
+    String prdplanId = pageRequestDTO.getPrdplanId();
+    String matId = pageRequestDTO.getMatId();
+    String matName = pageRequestDTO.getMatName();
+    String outgoingStatus= pageRequestDTO.getOutgoingStatus();
+    LocalDate outgoingCompletedAtStart = pageRequestDTO.getOutgoingCompletedAtStart();
+    LocalDate outgoingCompletedAtEnd = pageRequestDTO.getOutgoingCompletedAtEnd();
+
+    // Pageable을 pageRequestDTO에서 받아옵니다.
+    Pageable pageable = pageRequestDTO.getPageable("outgoingTotalId");
+
+    // 검색 조건과 페이지 정보를 이용하여 데이터를 조회합니다.
+    Page<OutgoingTotal> result = outgoingTotalRepository
+            .searchOutgoingTotalResult(prdplanEndStart, prdplanEndEnd,
+                    prdplanId, matId, matName, outgoingStatus,
+                    outgoingCompletedAtStart, outgoingCompletedAtEnd, pageable);
+
+    // 조회된 데이터(DeliveryRequest)를 DeliveryRequestDTO로 변환합니다.
+    List<OutgoingTotalDTO> dtoList = new ArrayList<>();
+
+
+
+    for (OutgoingTotal outgoingTotal : result.getContent()) {
+
+      // DTO 생성
+      OutgoingTotalDTO dto = OutgoingTotalDTO.builder()
+              .outgoingTotalId(outgoingTotal.getOutgoingTotalId())
+              .outgoingFirstDate(outgoingTotal.getOutgoingFirstDate())
+              .outgoingCompletedAt(outgoingTotal.getOutgoingCompletedAt())
+              .prdplanId(outgoingTotal.getProductionPlan().getPrdplanId())
+              .prdplanEnd(outgoingTotal.getProductionPlan().getPrdplanEnd())
+              .matId(outgoingTotal.getMaterial().getMatId())
+              .matName(outgoingTotal.getMaterial().getMatName())
+              .estimatedOutgoingQty(outgoingTotal.getEstimatedOutgoingQty())
+              .outgoingTotalQty(outgoingTotal.getOutgoingTotalQty())
+              .outgoingStatus(outgoingTotal.getOutgoingStatus().name())
+              .outgoingCompletedAt(outgoingTotal.getOutgoingCompletedAt())
+              .build();
+
+      dtoList.add(dto);
+    }
+
+    // PageResponseDTO로 변환하여 반환합니다.
+    return PageResponseDTO.<OutgoingTotalDTO>withAll()
+            .pageRequestDTO(pageRequestDTO)
+            .dtoList(dtoList)
+            .total((int) result.getTotalElements())
+            .build();
+  }
+
   public void updateOutgoingStatus(Long outgoingTotalId) {
     OutgoingTotal outgoingTotal = outgoingTotalRepository.findById(outgoingTotalId)
             .orElseThrow(() -> new IllegalArgumentException("해당 출고 항목이 존재하지 않습니다."));

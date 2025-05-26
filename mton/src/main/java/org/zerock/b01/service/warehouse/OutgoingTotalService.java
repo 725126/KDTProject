@@ -11,6 +11,8 @@ public interface OutgoingTotalService {
 
   PageResponseDTO<OutgoingTotalDTO> listWithOutgoingTotal(PageRequestDTO pageRequestDTO);
 
+  PageResponseDTO<OutgoingTotalDTO> listWithOutgoingTotalResult(PageRequestDTO pageRequestDTO);
+
   void updateOutgoingStatus(Long outgoingTotalId);
 
   void closeOutgoing(Long outgoingTotalId);
