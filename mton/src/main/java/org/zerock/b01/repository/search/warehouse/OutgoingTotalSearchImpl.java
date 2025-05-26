@@ -34,6 +34,10 @@ public class OutgoingTotalSearchImpl extends QuerydslRepositorySupport implement
 
     BooleanBuilder builder = new BooleanBuilder();
 
+    // 🔹 출고마감 제외
+    builder.and(outgoingTotal.outgoingStatus.ne(OutgoingStatus.출고마감));
+
+
     // 🔹 '취소' 상태인 생산계획 제외
     builder.and(productionPlan.prdplanStat.ne("취소"));
 
@@ -83,13 +87,6 @@ public class OutgoingTotalSearchImpl extends QuerydslRepositorySupport implement
 
     // 🔹 조건 적용 및 페이징
     query.where(builder);
-    query.orderBy(
-            new CaseBuilder()
-                    .when(outgoingTotal.outgoingStatus.eq(OutgoingStatus.출고마감)).then(1)
-                    .otherwise(0)
-                    .asc(),
-            outgoingTotal.outgoingTotalId.asc()
-    );
 
     this.getQuerydsl().applyPagination(pageable, query);
 

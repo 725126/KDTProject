@@ -129,6 +129,10 @@ public class IncomingSearchImpl extends QuerydslRepositorySupport implements Inc
 
     BooleanBuilder builder = new BooleanBuilder();
 
+    // 🔹 출고마감 제외
+    builder.and(incomingTotal.incomingStatus.ne(IncomingStatus.입고마감));
+
+
     // 🔹 입고예정일자 범위 검색
     if (deliveryPartnerItemDateStart != null && deliveryPartnerItemDateEnd != null) {
       builder.and(deliveryPartnerItem.deliveryPartnerItemDate
@@ -185,13 +189,7 @@ public class IncomingSearchImpl extends QuerydslRepositorySupport implements Inc
 
     // 🔹 조건 적용 및 페이징
     query.where(builder);
-    query.orderBy(
-            new CaseBuilder()
-                    .when(incomingTotal.incomingStatus.eq(IncomingStatus.입고마감)).then(1)
-                    .otherwise(0)
-                    .asc(),
-            incoming.incomingId.asc()
-    );
+    
     this.getQuerydsl().applyPagination(pageable, query);
 
     List<Incoming> result = query.fetch();
