@@ -197,7 +197,10 @@ public class PartnerController {
 
         model.addAttribute("drPartnerList", drPartnerList.getDtoList());
         model.addAttribute("pageRequestDTO", pageRequestDTO);
-        model.addAttribute("totalCount", drPartnerList.getTotal());
+
+        model.addAttribute("currentPage", drPartnerList.getPage() + 1);
+        model.addAttribute("totalPages", drPartnerList.getEnd());
+        model.addAttribute("selectedSize", pageRequestDTO.getSize());
 
         return "page/partner/delivery";
     }
