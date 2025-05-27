@@ -277,7 +277,7 @@ public class UserController {
 
         if (!validToken) {
             log.info("[비밀번호 재설정] 잘못된 접근: {}", token);
-            return "redirect:/intro?error=invalidToken"; // 잘못된 접근 시 intro로 보내기
+            return "redirect:/intro?error-token=invalidToken"; // 잘못된 접근 시 intro로 보내기
         }
 
         model.addAttribute("token", token);

@@ -96,7 +96,7 @@ public class UserServiceImpl implements UserService {
         user.setResetToken(token);
         userRepository.save(user);
 
-        String resetLink = "http://localhost:8080/reset/pw?token=" + token;
+        String resetLink = "http://mit305.iptime.org:9080/reset/pw?token=" + token;
 
         emailService.sendEmail(user.getUEmail(), "[자재ON] 비밀번호 재설정 요청",
                 "비밀번호를 재설정하려면 아래 링크를 클릭하세요.\n" + resetLink);
