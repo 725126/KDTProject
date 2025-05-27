@@ -189,7 +189,7 @@ public class IncomingSearchImpl extends QuerydslRepositorySupport implements Inc
 
     // 🔹 조건 적용 및 페이징
     query.where(builder);
-    
+
     this.getQuerydsl().applyPagination(pageable, query);
 
     List<Incoming> result = query.fetch();

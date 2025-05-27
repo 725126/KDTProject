@@ -43,6 +43,9 @@ public class DeliveryRequestSearchImpl extends QuerydslRepositorySupport impleme
 
     BooleanBuilder builder = new BooleanBuilder();
 
+    // 🔹 '취소' 상태인 생산계획 제외
+    builder.and(ordering.orderStat.ne("취소"));
+
     // 🔹 발주번호 검색
     if (orderId != null && !orderId.trim().isEmpty()) {
       builder.and(ordering.orderId.contains(orderId));
