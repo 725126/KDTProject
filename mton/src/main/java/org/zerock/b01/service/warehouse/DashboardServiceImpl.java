@@ -37,6 +37,7 @@ public class DashboardServiceImpl implements DashboardService {
   private final InventoryHistoryRepository inventoryHistoryRepository;
   private final DeliveryRequestItemRepository deliveryRequestItemRepository;
   private final IncomingTotalRepository incomingTotalRepository;
+  private final IncomingRepository incomingRepository;
   private final OutgoingTotalRepository outgoingTotalRepository;
   private final PartnerRepository partnerRepository;
   private final ContractRepository contractRepository;
@@ -56,9 +57,9 @@ public class DashboardServiceImpl implements DashboardService {
 
   // 월 발주 총액
   @Override
-  public int getCurrentMonthOrderTotal() {
+  public Long getCurrentMonthOrderTotal() {
     LocalDate now = LocalDate.now();
-    Integer total = orderingRepository.getMonthlyOrderTotal(now.getYear(), now.getMonthValue());
+    Long total = orderingRepository.getMonthlyOrderTotal(now.getYear(), now.getMonthValue());
     return total != null ? total : 0;
   }
 
@@ -159,18 +160,21 @@ public class DashboardServiceImpl implements DashboardService {
 //    }
 
     // 🔹 예시: 입고 예정일
-    List<DeliveryRequestItem> dueList = deliveryRequestItemRepository.findAll();
+    List<Incoming> dueList = incomingRepository.findAll();
 
-    for (DeliveryRequestItem d : dueList) {
+    for (Incoming i : dueList) {
       Map<String, Object> event = new HashMap<>();
-      event.put("title", "입고예정 - " + d.getDrItemCode());
-      event.put("start", d.getDrItemDueDate().toString());
+      event.put("title", "입고예정 - " + i.getIncomingCode());
+//      event.put("start", i.getDeliveryPartnerItem().(i.toString());
+      event.put("start", i.getDeliveryPartnerItem().getDeliveryPartnerItemDate().toLocalDate());
       event.put("backgroundColor", "#00909E");
 
       Map<String, Object> extendedProps = new HashMap<>();
       extendedProps.put("type", "입고 예정");
-      extendedProps.put("item", d.getDrItemCode());
-      extendedProps.put("remarks", "납입수량: " + d.getDrItemQty());
+      extendedProps.put("item", i.getDeliveryPartnerItem().getDeliveryPartner().
+              getDeliveryRequestItem().getDeliveryRequest()
+              .getOrdering().getContractMaterial().getMaterial().getMatName());
+      extendedProps.put("remarks", "입고수량: " + i.getDeliveryPartnerItem().getDeliveryPartnerItemQty());
 
       event.put("extendedProps", extendedProps);
 

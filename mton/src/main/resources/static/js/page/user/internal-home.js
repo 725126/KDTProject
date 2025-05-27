@@ -11,6 +11,9 @@ document.addEventListener('DOMContentLoaded', function () {
         },
         locale: 'ko',
         height: 684,
+        allDaySlot: true, // all-day 영역 켜기
+        dayMaxEvents: false, // 자동 더보기 끄고 직접 스크롤로 처리
+        slotEventOverlap: false, // 겹침 방지 (optional)
 
         events: '/internal/api/chart/calendar/events',
 

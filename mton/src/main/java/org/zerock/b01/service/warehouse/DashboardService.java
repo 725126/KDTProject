@@ -11,7 +11,8 @@ public interface DashboardService {
 
   Long getTodayPlannedCount();
 
-  int getCurrentMonthOrderTotal();
+//  int getCurrentMonthOrderTotal();
+  Long getCurrentMonthOrderTotal();
 
   double getCurrentMonthOrderProgressRate();
 

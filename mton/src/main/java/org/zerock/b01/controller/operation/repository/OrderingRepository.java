@@ -25,7 +25,7 @@ public interface OrderingRepository extends JpaRepository<Ordering, String> {
             "JOIN o.contractMaterial cm " +
             "WHERE FUNCTION('MONTH', o.orderDate) = :month " +
             "AND FUNCTION('YEAR', o.orderDate) = :year")
-    Integer getMonthlyOrderTotal(@Param("year") int year, @Param("month") int month);
+    Long getMonthlyOrderTotal(@Param("year") int year, @Param("month") int month);
 
     @Query("SELECT COUNT(o) FROM Ordering o " +
             "WHERE FUNCTION('MONTH', o.orderDate) = :month " +

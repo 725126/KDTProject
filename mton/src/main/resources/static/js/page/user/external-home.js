@@ -10,7 +10,10 @@ document.addEventListener('DOMContentLoaded', function () {
             right: 'dayGridMonth,timeGridWeek,listWeek'
         },
         locale: 'ko',
-        height: 425,
+        height: 684,
+        allDaySlot: true, // all-day 영역 켜기
+        dayMaxEvents: false, // 자동 더보기 끄고 직접 스크롤로 처리
+        slotEventOverlap: false, // 겹침 방지 (optional)
 
         // ✅ 서버에서 일정 동적 로딩
         events: '/external/api/calendar/events',
